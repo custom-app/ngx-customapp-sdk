@@ -15,7 +15,7 @@ Documentation is maintained with [TypeDoc](https://typedoc.org/) with [typedoc-n
 ### Requirements
 
 SDK must be as easy to setup as possible, but allow comprehensive customisation. This includes:
- - Support for message serialization and usage of custom models (e.g. [protobuff](https://www.npmjs.com/package/typedoc-ngx-theme)).
+ - Support for a custom message serialization and usage of custom models (e.g. [protobuff](https://www.npmjs.com/package/typedoc-ngx-theme)).
  - Everything, that is Angular agnostic, must have a dedicated package, so it could be used without Angular.
  - It must be possible to use only features, that you need. Websockets, authorisation, protobuf, interceptors, account management must not be required.
  - Bundle must be optimized.
