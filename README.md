@@ -178,7 +178,8 @@ Requirements and functionality:
 
 A package for a forms framework
 Requirements and functionality:
-- Suited for [template driven forms](https://angular.io/guide/forms)
+- Suited for [template driven forms](https://angular.io/guide/forms).
+- Compatible with Material inputs, Carbon Components.
 - Implements useful utils for handling validation errors, preventing double clicks and managing disabled state of submit button.
 
 ### ngx-customapp-sdk/pattern-auth-before-authorized-socket
