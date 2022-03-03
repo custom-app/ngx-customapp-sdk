@@ -8,7 +8,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "karma start karma.conf.js"
   },
   "devDependencies": {
     "jasmine-core": "^4.0.1",
