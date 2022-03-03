@@ -1,6 +1,15 @@
 # ngx-customapp-sdk
 SDK allowing you to quickly setup authorization and websocket life cycle in an Angular app. Some utils are also included
 
+# Contents
+
+- [Design](#design)
+ * [Tech stack)(#tech-stack)
+ * [Main ideas](#main-ideas)
+  + [Requirements](#requirements)
+  + [Packages](#packages)
+  + [Authorization and websocket patterns](#authorization-and-websocket-patterns)
+
 # Design
 ## Tech stack
 
@@ -43,8 +52,9 @@ SDK must implement following functions:
 To meet all the requierements following packages necessary:
 - A package for a websocket life cycle management
 - A package for an authorization and JWT and access management
-- A package for a forms framework
 - A package for working with protobuff over http and websocket
+- A package for every pattern
+- A package for a forms framework
 
 ### Authorization and websocket patterns
 
@@ -158,4 +168,4 @@ Requirements and functionality:
 
 #### ngx-customapp-sdk/pattern-auth-before-authorized-socket
 
-Connects together websocket, jwt, proto-http packages to implement [Pattern 4 "Auth before an authorized socket"](Pattern-4-"Auth before an authorized socket")
+Connects together websocket, jwt, proto-http packages to implement [Pattern 4 "Auth before an authorized socket"](#pattern-4-auth-before-an-authorized-socket)
