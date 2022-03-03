@@ -5,10 +5,20 @@ SDK allowing you to quickly setup authorization and websocket life cycle in an A
 
 - [Design](#design)
   - [Tech stack](#tech-stack)
-  - [Main ideas](#main-ideas)
-    - [Requirements](#requirements)
-    - [Packages](#packages)
-    - [Authorization and websocket patterns](#authorization-and-websocket-patterns)
+  - [Requirements](#requirements)
+  - [Packages](#packages)
+  - [Authorization and websocket patterns](#authorization-and-websocket-patterns)
+    * [Pattern 1, "Just auth"](#pattern-1-just-auth)
+    * [Pattern 2 "Auth before a public socket"](#pattern-2-auth-before-a-public-socket)
+    * [Pattern 3 "Auth after a public socket"](#pattern-3-auth-after-a-public-socket)
+    * [Pattern 4 "Auth before an authorized socket"](#pattern-4-auth-before-an-authorized-socket)
+    * [Pattern 5 "Auth after an authorized socket"](#pattern-5-auth-after-an-authorized-socket)
+  - [Package structure](#package-structure)
+  - [ngx-customapp-sdk/rxjs-websocket](#ngx-customapp-sdk/rxjs-websocket)
+  - [ngx-customapp-sdk/jwt](#ngx-customapp-sdk/jwt)
+  - [ngx-customapp-sdk/proto-http](#ngx-customapp-sdk/proto-http)
+  - [ngx-customapp-sdk/pattern-auth-before-authorized-socket](#ngx-customapp-sdk/pattern-auth-before-authorized-socket)
+
 
 # Design
 ## Tech stack
@@ -19,9 +29,7 @@ Monorepo package management through [yarn workspace](https://yarnpkg.com/feature
 
 Documentation is maintained with [TypeDoc](https://typedoc.org/) with [typedoc-ngx-theme](https://www.npmjs.com/package/typedoc-ngx-theme)
 
-## Main ideas
-
-### Requirements
+## Requirements
 
 SDK must be as easy to setup as possible, but allow comprehensive customisation. This includes:
  - Support for a custom message serialization and usage of custom models (e.g. [protobuff](https://www.npmjs.com/package/typedoc-ngx-theme)).
@@ -47,7 +55,7 @@ SDK must implement following functions:
 - Sync for difference in server time. Support setting time delta after auth, after socket auth or even with dedicated request.
 - Some unpredictable functionality (just leave some extra settings and extra methods).
 
-### Packages
+## Packages
 
 To meet all the requierements following packages necessary:
 - A package for a websocket life cycle management
@@ -56,11 +64,11 @@ To meet all the requierements following packages necessary:
 - A package for every pattern
 - A package for a forms framework
 
-### Authorization and websocket patterns
+## Authorization and websocket patterns
 
 To determine exact classes and functions these packages must implement, we first need to consider authorisation and socket management patterns.
 
-#### Pattern 1, "Just auth"
+### Pattern 1, "Just auth"
 Flow:
 - The user logs in.
 - An http request with user credentials is being sent.
@@ -70,7 +78,7 @@ Flow:
 - No subscriptions and sockets.
 - The user can logout, logout from every device, may be change an account back and fourth.
 
-#### Pattern 2 "Auth before a public socket"
+### Pattern 2 "Auth before a public socket"
 Flow:
 - The user logs in.
 - An http request with user credentials is being sent.
@@ -81,7 +89,7 @@ Flow:
 - The user can logout, logout from every device, may be change an account back and fourth.
 - After a logout socket is closed
 
-#### Pattern 3 "Auth after a public socket"
+### Pattern 3 "Auth after a public socket"
 Flow:
 - The public socket is opened, may be multiple, may be in specified order, may be with subscriptions.
 - May be a server time delta is requested or already received and saved, may be after auth.
@@ -92,7 +100,7 @@ Flow:
 - Th user can logout, logout from every device, may be change an account back and fourth.
 - After a logout the socket is not closed. The socket does not depend on an account info.
 
-#### Pattern 4 "Auth before an authorized socket"
+### Pattern 4 "Auth before an authorized socket"
 Flow:
 - The user logs in.
 - An http request with user credentials is being sent.
@@ -108,7 +116,7 @@ Flow:
 - The user can logout, logout from every device, may be change an account back and fourth.
 - After logout all of the sockets are closed.
 
-#### Pattern 5 "Auth after an authorized socket"
+### Pattern 5 "Auth after an authorized socket"
 Flow:
 - The user logs in.
 - The socket is opened.
@@ -122,11 +130,11 @@ Flow:
 - The user can logout, logout from every device, may be change an account back and fourth.
 - After logout all of the sockets are closed.
 
-### Package structure
+## Package structure
 
 There are packages, their requirements and exported functionality listed below.
 
-#### ngx-customapp-sdk/websocket
+### ngx-customapp-sdk/rxjs-websocket
 
 A package for a websocket life cycle management.
 Requirements and functionality:
@@ -143,7 +151,7 @@ Requirements and functionality:
 - Support for custom serializer and deserializer.
 - Functions for request-response pattern.
 
-#### ngx-customapp-sdk/jwt
+### ngx-customapp-sdk/jwt
 
 A package for an authorization and a JWT management
 
@@ -156,7 +164,7 @@ Requirements and functionality:
 - Provides store for sending auth request, saving response and account info, sending logout messages.
 - Provides an access guard and models for managing permissions.
 
-#### ngx-customapp-sdk/proto-http
+### ngx-customapp-sdk/proto-http
 
 A package that handle details of working with proto over http. Helps to manage headers, errors, serialization, deserialization.
 Requirements and functionality:
@@ -166,6 +174,13 @@ Requirements and functionality:
 - Service for handling and reporting errors.
 - Utils for handling different types of body when parsing proto response.
 
-#### ngx-customapp-sdk/pattern-auth-before-authorized-socket
+### ngx-customapp-sdk/forms
 
-Connects together websocket, jwt, proto-http packages to implement [Pattern 4 "Auth before an authorized socket"](#pattern-4-auth-before-an-authorized-socket)
+A package for a forms framework
+Requirements and functionality:
+- Suited for [template driven forms](https://angular.io/guide/forms)
+- Implements useful utils for handling validation errors, preventing double clicks and managing disabled state of submit button.
+
+### ngx-customapp-sdk/pattern-auth-before-authorized-socket
+
+Connects together rxjs-websocket, jwt, proto-http packages to implement [Pattern 4 "Auth before an authorized socket"](#pattern-4-auth-before-an-authorized-socket)
