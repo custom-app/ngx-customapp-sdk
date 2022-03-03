@@ -3,9 +3,9 @@ SDK allowing you to quickly setup authorization and websocket life cycle in an A
 
 # Contents
 
-- [Design](#design)
- * [Tech stack](#tech-stack)
- * [Main ideas](#main-ideas)
+* [Design](#design)
+ - [Tech stack](#tech-stack)
+ - [Main ideas](#main-ideas)
   + [Requirements](#requirements)
   + [Packages](#packages)
   + [Authorization and websocket patterns](#authorization-and-websocket-patterns)
