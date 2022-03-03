@@ -42,8 +42,7 @@ SDK must implement following functions:
 
 To meet all the requierements following packages necessary:
 - A package for a websocket life cycle management
-- A package for an authorization and JWT management
-- A package for an access management
+- A package for an authorization and JWT and access management
 - A package for a forms framework
 - A package for working with protobuff over http and websocket
 
@@ -99,7 +98,7 @@ Flow:
 - The user can logout, logout from every device, may be change an account back and fourth.
 - After logout all of the sockets are closed.
 
-### Pattern 5 "Auth after an authorized socket"
+#### Pattern 5 "Auth after an authorized socket"
 Flow:
 - The user logs in.
 - The socket is opened.
@@ -113,3 +112,50 @@ Flow:
 - The user can logout, logout from every device, may be change an account back and fourth.
 - After logout all of the sockets are closed.
 
+### Package structure
+
+There are packages, their requirements and exported functionality listed below.
+
+#### ngx-customapp-sdk/websocket
+
+A package for a websocket life cycle management.
+Requirements and functionality:
+- Based on RxJs
+- Works with a single type for request messages and a single type for response messages.
+- Support an auto reconnect.
+- A support for a request buffer. A support for not adding requests to the buffer, different buffers for authorized and unauthorized requests, and a support for setting the queue length.
+- Support sending an autorization request(s) just after the opening. Reconnect have to repeat the autorization.
+- Support sending an subscription request(s) just after the authorization.
+- Counts successful and unsuccessful opening tries.
+- Offers to set a predicate for reopeningn socket.
+- Offers a subscriptions for statuses: pending, opened, authorized, subscribed, closing, closed.
+- No error observer is provided cos there is generally no way to handle a websocket error, other than close the socket.
+- Support for custom serializer and deserializer.
+- Functions for request-response pattern.
+
+#### ngx-customapp-sdk/jwt
+
+A package for an authorization and a JWT management
+
+Requirements and functionality:
+- Based on RxJs and NgRx.
+- Stores the JWT in the localStorage.
+- Does not expose a key, which is used to access the JWT in the localStorage. You do not need to access localStorage manualy.
+- Provides an http interceptor, which can pin JWT to every http request and refresh it, if necessary.
+- Provides a service which is responsible for maintaining tokens fresh.
+- Provides store for sending auth request, saving response and account info, sending logout messages.
+- Provides an access guard and models for managing permissions.
+
+#### ngx-customapp-sdk/proto-http
+
+A package that handle details of working with proto over http. Helps to manage headers, errors, serialization, deserialization.
+Requirements and functionality:
+- Based on RxJs.
+- Base service for sending http request.
+- Version interceptor.
+- Service for handling and reporting errors.
+- Utils for handling different types of body when parsing proto response.
+
+#### ngx-customapp-sdk/pattern-auth-before-authorized-socket
+
+Connects together websocket, jwt, proto-http packages to implement [Pattern 4 "Auth before an authorized socket"](Pattern-4-"Auth before an authorized socket")
