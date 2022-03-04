@@ -27,7 +27,9 @@ Suited for Angular.
 
 Monorepo package management through [yarn workspace](https://yarnpkg.com/features/workspaces).
 
-Documentation is maintained with [TypeDoc](https://typedoc.org/) with [typedoc-ngx-theme](https://www.npmjs.com/package/typedoc-ngx-theme)
+Testing with [Karma](https://karma-runner.github.io/latest/index.html) and [Jasmine](https://jasmine.github.io/)
+
+Documentation is maintained with [TypeDoc](https://typedoc.org/) and [typedoc-ngx-theme](https://www.npmjs.com/package/typedoc-ngx-theme)
 
 ## Requirements
 
