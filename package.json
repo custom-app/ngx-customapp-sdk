@@ -6,6 +6,9 @@
     "packages/*",
     "examples/*"
   ],
+  "scripts": {
+    "doc": "typedoc"
+  },
   "license": "MIT",
   "private": true
 }

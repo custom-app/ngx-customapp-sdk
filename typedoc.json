@@ -1,0 +1,6 @@
+{
+  "entryPoints": [
+    "packages/rxjs-websocket/src/index.ts"
+  ],
+  "out": "docs"
+}
