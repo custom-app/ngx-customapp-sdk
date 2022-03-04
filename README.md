@@ -14,10 +14,10 @@ SDK allowing you to quickly setup authorization and websocket life cycle in an A
     * [Pattern 4 "Auth before an authorized socket"](#pattern-4-auth-before-an-authorized-socket)
     * [Pattern 5 "Auth after an authorized socket"](#pattern-5-auth-after-an-authorized-socket)
   - [Package structure](#package-structure)
-  - [ngx-customapp-sdk/rxjs-websocket](#ngx-customapp-sdkrxjs-websocket)
-  - [ngx-customapp-sdk/jwt](#ngx-customapp-sdkjwt)
-  - [ngx-customapp-sdk/proto-http](#ngx-customapp-sdkproto-http)
-  - [ngx-customapp-sdk/pattern-auth-before-authorized-socket](#ngx-customapp-sdkpattern-auth-before-authorized-socket)
+    * [ngx-customapp-sdk/rxjs-websocket](#ngx-customapp-sdkrxjs-websocket)
+    * [ngx-customapp-sdk/jwt](#ngx-customapp-sdkjwt)
+    * [ngx-customapp-sdk/proto-http](#ngx-customapp-sdkproto-http)
+    * [ngx-customapp-sdk/pattern-auth-before-authorized-socket](#ngx-customapp-sdkpattern-auth-before-authorized-socket)
 
 
 # Design
