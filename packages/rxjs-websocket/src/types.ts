@@ -64,10 +64,11 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
 
   /**
    * If passed, an authorization message will be sent whenever the socket opens.
+   * When not passed, socket state transition opened->authorized still happens, but instant.
    */
   authorize?: {
     /**
-     * Creates a request, after which socket will be authorized.
+     * Creates a request, after which the socket will be authorized.
      * Response to this request is emitted into `WebSocketController.authorized$`
      * and `WebSocketController.messages$` observables.
      */
@@ -86,20 +87,23 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
    * To tell server, that you need regular updates, you send a subscribe request.
    * To tell that you don't, you send unsubscribe request.
    * Updates will be handled as ordinary messages - passed to the `WebSocketController.messages$` observable.
+   *
+   * When not passed, socket state transition authorized->subscribed still happens, but instant.
    */
   subscribe?: {
     /**
-     * Creates a request, after which socket will be subscribed.
-     * Response to this request is emitted into `WebSocketController.subscribed$`
-     * and `WebSocketController.messages$` observables.
+     * Creates a request array, after sending every request of which the socket will be subscribed.
+     * Array of responses to these requests is emitted into `WebSocketController.subscribed$` observable
+     * and every response from array is emitted into `WebSocketController.messages$` observables one by one.
      * @param authResponse A response on the message, created by the `authorize.createRequest`.
      * If no `authorizeIsResponseSuccessful` was provided, authResponse will be null.
      */
-    createRequest: (authResponse?: ResponseType) => RequestType,
+    createRequests: (authResponse?: ResponseType) => RequestType[],
     /**
      * Helps to determine if the subscription completed successfully. If not passed,
      * socket will become authorized immediately after sending auth request. If any response must be considered
      * successful, pass `() => true`.
+     * Will be called for every subscribe response.
      * @param response param for the auth response.
      */
     isResponseSuccessful?: (response: ResponseType) => boolean
@@ -113,4 +117,28 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
    * If set to be `ArrayBuffer`, binaryType must be `'arraybuffer'`
    */
   binaryType?: 'blob' | 'arraybuffer';
+
+  /**
+   * A WebSocket constructor to use.
+   */
+  WebSocketCtor?: { new(url: string, protocols?: string | string[]): WebSocket };
+}
+
+/**
+ * Describes how much there were successful and unsuccessful open tries. This data used
+ * by configured functions to determine if the socket should reconnect and reconnect params.
+ */
+export interface ReconnectState {
+  wasPrevOpenSuccessful: boolean,
+  openedCounter: number,
+  erroredCounter: number
+}
+
+export enum WebSocketControllerState {
+  pending,
+  opened,
+  authorized,
+  subscribed,
+  closing,
+  closed,
 }

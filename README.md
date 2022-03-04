@@ -14,6 +14,7 @@ SDK allowing you to quickly setup authorization and websocket life cycle in an A
     * [Pattern 4 "Auth before an authorized socket"](#pattern-4-auth-before-an-authorized-socket)
     * [Pattern 5 "Auth after an authorized socket"](#pattern-5-auth-after-an-authorized-socket)
   - [Package structure](#package-structure)
+    * [ngx-customapp-sdk/utils](#ngx-customapp-sdkutils)
     * [ngx-customapp-sdk/rxjs-websocket](#ngx-customapp-sdkrxjs-websocket)
     * [ngx-customapp-sdk/jwt](#ngx-customapp-sdkjwt)
     * [ngx-customapp-sdk/proto-http](#ngx-customapp-sdkproto-http)
@@ -60,6 +61,7 @@ SDK must implement following functions:
 ## Packages
 
 To meet all the requierements following packages necessary:
+- A package with widely used utils
 - A package for a websocket life cycle management
 - A package for an authorization and JWT and access management
 - A package for working with protobuff over http and websocket
@@ -135,6 +137,10 @@ Flow:
 ## Package structure
 
 There are packages, their requirements and exported functionality listed below.
+
+### ngx-customapp-sdk/utils
+
+A package with widely used utils
 
 ### ngx-customapp-sdk/rxjs-websocket
 

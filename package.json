@@ -10,5 +10,8 @@
     "doc": "typedoc"
   },
   "license": "MIT",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "typedoc": "^0.22.12"
+  }
 }

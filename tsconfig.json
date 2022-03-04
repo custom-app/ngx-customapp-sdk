@@ -2,7 +2,6 @@
   "compilerOptions": {
     /* Copied from Angular setup */
     "baseUrl": "./",
-    "outDir": "./dist",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitOverride": true,

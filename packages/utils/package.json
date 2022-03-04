@@ -1,7 +1,7 @@
 {
-  "name": "rxjs-websocket",
+  "name": "utils",
   "version": "1.0.0",
-  "description": "A package for a websocket life cycle management.",
+  "description": "A package with utils, used through ngx-customapp-sdk",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "repository": "https://github.com/loyal-inform/ngx-customapp-sdk.git",
@@ -18,8 +18,5 @@
     "karma-chrome-launcher": "^3.1.0",
     "karma-jasmine": "^4.0.1",
     "typescript": "^4.6.2"
-  },
-  "peerDependencies": {
-    "rxjs": "~7.5.0"
   }
 }
