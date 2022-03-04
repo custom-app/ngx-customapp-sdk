@@ -94,10 +94,34 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
 
   open(
     options: {
+      /**
+       * If set, the socket will try to reconnect after being closed
+       * In general, you want to set this, cos it is the main feature of the package.
+       */
       autoReconnect?: {
-        interval?: (reconnectState: ReconnectState) => number,
+        /**
+         * To calculate amount of milliseconds between socket being closed and next try to open.
+         * @param reconnectState {@link ReconnectState}
+         */
+        interval: (reconnectState: ReconnectState) => number,
+        /**
+         * To determine if socket have to try to reconnect. If returns false,
+         * socket is closed, until `open()` is called again.
+         * If not passed, always tries to reconnect (same as if `() => true` is passed)
+         * @param reconnectState {@link ReconnectState}
+         */
         shouldReconnect?: (reconnectState: ReconnectState) => boolean,
+        /**
+         * To determine, if auth message have to be sent.
+         * If not passed, auth message is always sent (same as if `() => true` is passed).
+         * @param reconnectState {@link ReconnectState}
+         */
         authorize?: (reconnectState: ReconnectState) => boolean,
+        /**
+         * To determine, if subscribe requests have to be sent.
+         * If not passed, always tries to subscribe (same as if `() => true` is passed)
+         * @param reconnectState {@link ReconnectState}
+         */
         subscribe?: (reconnectState: ReconnectState) => boolean,
       }
     }
