@@ -147,7 +147,7 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
    */
   send(
     msg: RequestType,
-    options: {
+    options?: {
       /** If true, the message will be sent even if the socket is not authorized and not subscribed */
       withoutAuth?: boolean,
       /** If true, the message will be sent even if the socket is not subscribed. */
@@ -180,7 +180,7 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
    */
   request(
     msg: RequestType,
-    options: {
+    options?: {
       /** If true, the message will be sent even if the socket is not authorized and not subscribed */
       withoutAuth?: boolean,
       /** If true, the message will be sent even if the socket is not subscribed. */

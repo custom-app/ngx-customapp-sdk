@@ -128,6 +128,7 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
   /**
    * Help to preserve messages, when reconnection happens. When the message comes, but the socket is not ready
    * to consume it, it goes to the buffer and being sent later, when the socket is ready.
+   * Buffer is enabled by default.
    */
   buffer?: {
     /**
