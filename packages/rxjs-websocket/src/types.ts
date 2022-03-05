@@ -1,18 +1,20 @@
 /**
  * Describes websocket behaviour, serialization, deserialization, authorization, subscriptions etc.
- * The auto reconnect settings are passed to the `WebSocketController.open()` method.
+ * The auto reconnect settings are passed to the {@link WebSocketController.open} method.
  *
  * It is supposed that you usually communicate with a server using request-response pattern.
  * So every message being sent have an id and corresponding response have the exact same id.
- * To delegate the control over id's, you pass `setRequestId` function, which transforms your
- * message, so it has the id set, and you pass `getResponseId` function, which works as it is called.
- * If you do not want to set id on a request message, you can use parameters of the `WebSocketController.send()` method.
+ * To delegate the control over id's, you pass {@link WebSocketControllerConfig.setRequestId} function,
+ * which transforms your message, so it has the id set, and you pass {@link WebSocketControllerConfig.getResponseId}
+ * function, to get response id. If you do not want to set id on a request message,
+ * you can use options param of the {@link WebSocketController.send} method.
  *
  * The id must be number. If you need to use a string or something else, transform this number
  * to the string in the set function, and back to the number in the get function.
  *
- * @typeParam RequestType The type of messages, that will be consumed by the `WebSocketController.send()` method.
- * @typeParam ResponseType The type, of messages, that will be produced by `messages$` observable.
+ * @typeParam RequestType The type of messages, that will be consumed
+ * by {@link WebSocketController.send} and {@link WebSocketController.request} methods.
+ * @typeParam ResponseType The type, of messages, that will be produced by {@link WebSocketController.messages$} observable.
  * @typeParam UnderlyingDataType Must be `ArrayBuffer`, `Blob` or `string`.
  * The result of the serializer function and a parameter of the deserializer.
  * It is supposed that you send only messages of this type through the underlying WebSocket.
@@ -34,7 +36,7 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
   protocol?: string | string[],
 
   /**
-   * Function to be called on every message, passed to the `WebSocketController.send()` method.
+   * Function to be called on every message, passed to the {@link WebSocketController.send} method.
    * If not stated, RequestType must be equal to the UnderlyingDataType.
    * If you want to communicate through JSON, pass JSON.stringify method here.
    * @param request A message to be serialized into UnderlyingDataType
@@ -69,8 +71,8 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
   authorize?: {
     /**
      * Creates a request, after which the socket will be authorized.
-     * Response to this request is emitted into `WebSocketController.authorized$`
-     * and `WebSocketController.messages$` observables.
+     * Response to this request is emitted into {@link WebSocketController.authorized$}
+     * and {@link WebSocketController.messages$} observables.
      */
     createRequest: () => RequestType,
     /**
@@ -86,15 +88,15 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
    * This param is used when your socket starts sending updates of some data only after you ask it for.
    * To tell server, that you need regular updates, you send a subscribe request.
    * To tell that you don't, you send unsubscribe request.
-   * Updates will be handled as ordinary messages - passed to the `WebSocketController.messages$` observable.
+   * Updates will be handled as ordinary messages - passed to the {@link WebSocketController.messages$} observable.
    *
    * When not passed, socket state transition authorized->subscribed still happens, but instant.
    */
   subscribe?: {
     /**
      * Creates a request array, after sending every request of which the socket will be subscribed.
-     * Array of responses to these requests is emitted into `WebSocketController.subscribed$` observable
-     * and every response from array is emitted into `WebSocketController.messages$` observables one by one.
+     * Array of responses to these requests is emitted into the {@link WebSocketController.subscribed$} observable
+     * and every response from array is emitted into {@link WebSocketController.messages$} observables one by one.
      * @param authResponse A response on the message, created by the `authorize.createRequest`.
      * If no `authorizeIsResponseSuccessful` was provided, authResponse will be null.
      */
@@ -122,6 +124,27 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
    * A WebSocket constructor to use.
    */
   WebSocketCtor?: { new(url: string, protocols?: string | string[]): WebSocket };
+
+  /**
+   * Help to preserve messages, when reconnection happens. When the message comes, but the socket is not ready
+   * to consume it, it goes to the buffer and being sent later, when the socket is ready.
+   */
+  buffer?: {
+    /**
+     *  The size of both authorized and unauthorized buffers of messages. Zero means no buffer,
+     *  the message will be dropped immediately, if it could not be sent.
+     *
+     *  Default is 1.
+     */
+    size?: number,
+    /**
+     *  If set to the `dropOld`, the new message will replace the oldest one, when there is no space left.
+     * `dropNew` - the newest one.
+     *
+     * Default is 'dropOld'
+     */
+    overflow: 'dropOld' | 'dropNew'
+  }
 }
 
 /**
@@ -134,6 +157,10 @@ export interface ReconnectState {
   erroredCounter: number
 }
 
+/**
+ * Reflects the state in the WebSocketController life cycle.
+ * Default transitions are: closed -> pending -> opened -> authorized -> subscribed -> closing -> closed.
+ */
 export enum WebSocketControllerState {
   pending,
   opened,

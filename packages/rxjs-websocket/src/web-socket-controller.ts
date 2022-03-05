@@ -4,6 +4,12 @@ import {Observable, Subject} from 'rxjs';
 
 // TODO describe how to use and examples
 export class WebSocketController<RequestType, ResponseType, UnderlyingDataType = string> {
+
+  constructor(
+    private readonly config: WebSocketControllerConfig<RequestType, ResponseType, UnderlyingDataType>
+  ) {
+  }
+
   // passed as arg to functions in options.autoReconnect of the open() method
   private _reconnectState: ReconnectState = {
     openedCounter: 0,
@@ -34,8 +40,7 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
   }
 
   /**
-   * Reflects the state in the WebSocketController life cycle.
-   * Default transitions are: closed -> pending -> opened -> authorized -> subscribed -> closing -> closed.
+   * {@link WebSocketControllerState}
    */
   get state(): WebSocketControllerState {
     return this._state
@@ -58,7 +63,7 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
   /**
    * Fires whenever the transition opened->authorized happens.
    *
-   * Emits an auth response, when config.authorize.isResponseSuccessful is set, void otherwise.
+   * Emits an auth response, when {@link WebSocketControllerConfig.authorize.isResponseSuccessful} is set, void otherwise.
    */
   get authorized$(): Observable<ResponseType | void> {
     return this._authorized$
@@ -67,7 +72,7 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
   /**
    * Fires whenever the transition authorized->subscribed happens.
    *
-   * Emits an auth subscribe responses, when config.subscribe.isResponseSuccessful is set, void otherwise.
+   * Emits an auth subscribe responses, when {@link WebSocketControllerConfig.subscribe.isResponseSuccessful} is set, void otherwise.
    */
   get subscribed$(): Observable<ResponseType[] | void> {
     return this._subscribed$
@@ -85,11 +90,6 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
    */
   get closed$(): Observable<void> {
     return this._closed$
-  }
-
-  constructor(
-    private readonly config: WebSocketControllerConfig<RequestType, ResponseType, UnderlyingDataType>
-  ) {
   }
 
   open(
@@ -130,6 +130,68 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
   }
 
   close(): void {
+    // TODO: implement
+  }
+
+  /**
+   * Sends the message into underlying socket.
+   *
+   * By default, if the socket is not opened or authorized,
+   * the message is saved to the buffer, and being sent later, when the socket comes to an appropriate state.
+   * You also can control parameters of the buffer through {@link WebSocketControllerConfig.buffer}
+   * Note, that there are different buffers for messages, that require the socket to be authorized,
+   * and for those, that do not.
+   *
+   * @param msg The data to be serialized and sent.
+   * @param options Controls the authorization, usage of buffer, etc.
+   */
+  send(
+    msg: RequestType,
+    options: {
+      /** If true, the message will be sent even if the socket is not authorized and not subscribed */
+      withoutAuth?: boolean,
+      /** If true, the message will be sent even if the socket is not subscribed. */
+      withoutSubscription?: boolean,
+      /** If true, the message will be sent without calling function {@link WebSocketControllerConfig.setRequestId}*/
+      withoutId?: boolean,
+      /**
+       * If true, the message will be omitted when the socket is not in an appropriate state to send messages,
+       * e.g. not authorized
+       */
+      noBuffer?: boolean,
+    }
+  ): void {
+    // TODO: implement
+  }
+
+  /**
+   * Sends the message and waits for the corresponding response message. The response is found
+   * by id, so setRequestId(msg) === getResponseId(response). Those functions are configured
+   * in {@link WebSocketControllerConfig}.
+   *
+   * By default, if the socket is not opened or authorized,
+   * the message is saved to the buffer, and being sent later, when the socket comes to an appropriate state.
+   * You also can control parameters of the buffer through {@link WebSocketControllerConfig.buffer}
+   * Note, that there are different buffers for messages, that require the socket to be authorized,
+   * and for those, that do not.
+   *
+   * @param msg The data to be serialized and sent.
+   * @param options Controls the authorization, usage of buffer, etc.
+   */
+  request(
+    msg: RequestType,
+    options: {
+      /** If true, the message will be sent even if the socket is not authorized and not subscribed */
+      withoutAuth?: boolean,
+      /** If true, the message will be sent even if the socket is not subscribed. */
+      withoutSubscription?: boolean,
+      /**
+       * If true, the message will be omitted when the socket is not in an appropriate state to send messages,
+       * e.g. not authorized
+       */
+      noBuffer?: boolean,
+    }
+  ): Observable<ResponseType> {
     // TODO: implement
   }
 }
