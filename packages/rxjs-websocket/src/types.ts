@@ -126,9 +126,9 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
   WebSocketCtor?: { new(url: string, protocols?: string | string[]): WebSocket };
 
   /**
-   * Help to preserve messages, when reconnection happens. When the message comes, but the socket is not ready
-   * to consume it, it goes to the buffer and being sent later, when the socket is ready.
-   * Buffer is enabled by default.
+   * Helps to preserve messages, when reconnection happens. When the message comes, but the socket is not ready
+   * to consume it, the message goes to the buffer and being sent later, when the socket is ready.
+   * The buffer is enabled by default.
    */
   buffer?: {
     /**
@@ -142,7 +142,7 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
      *  If set to the `dropOld`, the new message will replace the oldest one, when there is no space left.
      * `dropNew` - the newest one.
      *
-     * Default is 'dropOld'
+     * Default is 'dropOld'.
      */
     overflow: 'dropOld' | 'dropNew'
   }
