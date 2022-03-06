@@ -1,4 +1,11 @@
-import {ReconnectState, WebSocketControllerConfig, WebSocketControllerState} from './types';
+import {
+  ReconnectState,
+  SendOptions,
+  WebSocketControllerConfig,
+  WebSocketControllerState,
+  WebSocketRequestOptions,
+  WebSocketSendOptions
+} from './types';
 import {Observable, Subject} from 'rxjs';
 
 
@@ -139,27 +146,15 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
    * By default, if the socket is not opened or authorized,
    * the message is saved to the buffer, and being sent later, when the socket comes to an appropriate state.
    * You also can control parameters of the buffer through {@link WebSocketControllerConfig.buffer}
-   * Note, that there are different buffers for messages, that require the socket to be authorized,
+   * Note, that there are different buffers for messages, that require the socket to be authorized, or to be subscribed,
    * and for those, that do not.
    *
    * @param msg The data to be serialized and sent.
-   * @param options Controls the authorization, usage of buffer, etc.
+   * @param options Controls the authorization, usage of buffer, etc. {@link WebSocketSendOptions}.
    */
   send(
     msg: RequestType,
-    options?: {
-      /** If true, the message will be sent even if the socket is not authorized and not subscribed */
-      withoutAuth?: boolean,
-      /** If true, the message will be sent even if the socket is not subscribed. */
-      withoutSubscription?: boolean,
-      /** If true, the message will be sent without calling function {@link WebSocketControllerConfig.setRequestId}*/
-      withoutId?: boolean,
-      /**
-       * If true, the message will be omitted when the socket is not in an appropriate state to send messages,
-       * e.g. not authorized
-       */
-      noBuffer?: boolean,
-    }
+    options?: WebSocketSendOptions,
   ): void {
     // TODO: implement
   }
@@ -176,21 +171,11 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
    * and for those, that do not.
    *
    * @param msg The data to be serialized and sent.
-   * @param options Controls the authorization, usage of buffer, etc.
+   * @param options Controls the authorization, usage of buffer, etc. {@link WebSocketRequestOptions}
    */
   request(
     msg: RequestType,
-    options?: {
-      /** If true, the message will be sent even if the socket is not authorized and not subscribed */
-      withoutAuth?: boolean,
-      /** If true, the message will be sent even if the socket is not subscribed. */
-      withoutSubscription?: boolean,
-      /**
-       * If true, the message will be omitted when the socket is not in an appropriate state to send messages,
-       * e.g. not authorized
-       */
-      noBuffer?: boolean,
-    }
+    options?: WebSocketRequestOptions
   ): Observable<ResponseType> {
     // TODO: implement
   }

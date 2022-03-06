@@ -129,6 +129,8 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
    * Helps to preserve messages, when reconnection happens. When the message comes, but the socket is not ready
    * to consume it, the message goes to the buffer and being sent later, when the socket is ready.
    * The buffer is enabled by default.
+   * Note, there are different buffers for authorized messages, subscribed messages,
+   * and for messages that don't require eiter.
    */
   buffer?: {
     /**
@@ -169,4 +171,22 @@ export enum WebSocketControllerState {
   subscribed,
   closing,
   closed,
+}
+
+export interface WebSocketRequestOptions {
+  /** If true, the message will be sent even if the socket is not authorized and not subscribed */
+  withoutAuth?: boolean,
+  /** If true, the message will be sent even if the socket is not subscribed. */
+  withoutSubscription?: boolean,
+  /**
+   * If true, the message will be omitted when the socket is not in an appropriate state to send messages,
+   * e.g. not authorized
+   */
+  noBuffer?: boolean,
+}
+
+
+export interface WebSocketSendOptions extends WebSocketRequestOptions {
+  /** If true, the message will be sent without calling function {@link WebSocketControllerConfig.setRequestId}*/
+  withoutId?: boolean,
 }
