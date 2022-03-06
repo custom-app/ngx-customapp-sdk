@@ -22,6 +22,8 @@
  * (even that original WebSocket [supports](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/binaryType)).
  * If you send binary data, send ONLY binary data. If you send text frames, send ONLY text frames.
  * */
+import {Subject} from 'rxjs';
+
 export interface WebSocketControllerConfig<RequestType, ResponseType, UnderlyingDataType = string> {
   /**
    * The url of the socket server to connect to,
@@ -189,4 +191,15 @@ export interface WebSocketRequestOptions {
 export interface WebSocketSendOptions extends WebSocketRequestOptions {
   /** If true, the message will be sent without calling function {@link WebSocketControllerConfig.setRequestId}*/
   withoutId?: boolean,
+}
+
+/**
+ *  @internal
+ *  The element of the message buffer. Also handles the requests.
+ * */
+export interface WebSocketMessage<RequestType, ResponseType> {
+  // the message to be serialized and sent
+  msg: RequestType,
+  // Used if the message is a request and there supposed to be a response.
+  responseSubject?: Subject<ResponseType>,
 }
