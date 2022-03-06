@@ -1,6 +1,5 @@
 import {
   ReconnectState,
-  SendOptions,
   WebSocketControllerConfig,
   WebSocketControllerState,
   WebSocketRequestOptions,
