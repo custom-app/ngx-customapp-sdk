@@ -29,7 +29,7 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
    * The url of the socket server to connect to,
    * passed directly to a [WebSocket constructor](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket)
    */
-  url?: string
+  url: string | URL
 
   /**
    * The protocol to use to connect,
@@ -125,7 +125,7 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
   /**
    * A WebSocket constructor to use.
    */
-  WebSocketCtor?: { new(url: string, protocols?: string | string[]): WebSocket };
+  WebSocketCtor?: { new(url: string | URL, protocols?: string | string[]): WebSocket };
 
   /**
    * Helps to preserve messages, when reconnection happens. When the message comes, but the socket is not ready
@@ -139,18 +139,20 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
      *  The size of both authorized and unauthorized buffers of messages. Zero means no buffer,
      *  the message will be dropped immediately, if it could not be sent.
      *
-     *  Default is 1.
+     *  Default is {@link defaultWebSocketMessageBufferSize}.
      */
     size?: number,
     /**
      *  If set to the `dropOld`, the new message will replace the oldest one, when there is no space left.
      * `dropNew` - the newest one.
      *
-     * Default is 'dropOld'.
+     * Default is {@link defaultWebSocketBufferOverflow}.
      */
-    overflow: 'dropOld' | 'dropNew'
+    overflow: BufferOverflowStrategy
   }
 }
+
+export type BufferOverflowStrategy = 'dropOld' | 'dropNew'
 
 /**
  * Describes how much there were successful and unsuccessful open tries. This data used
@@ -173,6 +175,48 @@ export enum WebSocketControllerState {
   subscribed,
   closing,
   closed,
+}
+
+export interface WebSocketOpenOptions {
+  /**
+   * If set, the socket will try to reconnect after being closed
+   * In general, you want to set this, cos it is the main feature of the package.
+   */
+  autoReconnect?: {
+    /**
+     * To calculate amount of milliseconds between socket being closed and next try to open.
+     * You may want to return random delay every time, to prevent overloading
+     * server after the one restarts.
+     * If the function errors, the default is {@link defaultReconnectInterval}
+     * @param reconnectState {@link ReconnectState}
+     */
+    interval: (reconnectState: ReconnectState) => number,
+    /**
+     * To determine if socket have to try to reconnect. If returns false,
+     * socket is closed, until `open()` is called again.
+     * If not passed, always tries to reconnect (same as if `() => true` is passed)
+     * @param reconnectState {@link ReconnectState}
+     */
+    shouldReconnect?: (reconnectState: ReconnectState) => boolean,
+    /**
+     * To determine, if auth message have to be sent.
+     * If not passed, auth message is always sent (same as if `() => true` is passed).
+     * @param reconnectState {@link ReconnectState}
+     */
+    authorize?: (reconnectState: ReconnectState) => boolean,
+    /**
+     * To determine, if subscribe requests have to be sent.
+     * If not passed, always tries to subscribe (same as if `() => true` is passed)
+     * @param reconnectState {@link ReconnectState}
+     */
+    subscribe?: (reconnectState: ReconnectState) => boolean,
+  },
+  /**
+   * If you try to open an already opened socket, the error will be thrown by default.
+   * This is cos it usually means, that there is some error in the code, that uses the WebSocketController.
+   * WebSocketController itself is designed to handle reconnects, authorization and subscriptions.
+   */
+  doNotThrowWhenOpened?: boolean,
 }
 
 export interface WebSocketRequestOptions {

@@ -155,7 +155,8 @@ Requirements and functionality:
 - Counts successful and unsuccessful opening tries.
 - Offers to set a predicate for reopeningn socket.
 - Offers a subscriptions for statuses: pending, opened, authorized, subscribed, closing, closed.
-- No error observer is provided cos there is generally no way to handle a websocket error, other than close the socket.
+- The error observable is provided, but it is useless, cos there is generally no way to handle a websocket error, 
+- other than close the socket, which is made internally.
 - Support for custom serializer and deserializer.
 - Functions for request-response pattern.
 

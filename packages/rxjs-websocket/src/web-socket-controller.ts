@@ -2,18 +2,29 @@ import {
   ReconnectState,
   WebSocketControllerConfig,
   WebSocketControllerState,
+  WebSocketOpenOptions,
   WebSocketRequestOptions,
   WebSocketSendOptions
 } from './types';
 import {Observable, Subject} from 'rxjs';
+import {WebSocketIsAlreadyOpened} from './errors';
+import {WebSocketMessageBuffer} from './web-socket-message-buffer';
 
+/**
+ * Need this to prevent an overload.
+ * The time between socket happening to be closed and the next try to open.
+ */
+export const defaultReconnectInterval = 10000;
 
 // TODO describe how to use and examples
-export class WebSocketController<RequestType, ResponseType, UnderlyingDataType = string> {
+export class WebSocketController<RequestType,
+  ResponseType,
+  UnderlyingDataType extends string | ArrayBufferLike | Blob | ArrayBufferView> {
 
   constructor(
-    private readonly config: WebSocketControllerConfig<RequestType, ResponseType, UnderlyingDataType>
+    private readonly _config: WebSocketControllerConfig<RequestType, ResponseType, UnderlyingDataType>
   ) {
+    this._buffer = new WebSocketMessageBuffer<RequestType, ResponseType>(this._config.buffer)
   }
 
   // passed as arg to functions in options.autoReconnect of the open() method
@@ -30,13 +41,40 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
 
   // To notify about every state
   private _pending$ = new Subject<void>()
-  private _opened$ = new Subject<void>()
+  private _opened$ = new Subject<Event>()
   // Emits an auth response, when config.authorize.isResponseSuccessful is set, void otherwise
   private _authorized$ = new Subject<ResponseType | void>()
   // Emits an auth subscribe responses, when config.subscribe.isResponseSuccessful is set, void otherwise
   private _subscribed$ = new Subject<ResponseType[] | void>()
   private _closing$ = new Subject<void>()
-  private _closed$ = new Subject<void>()
+  private _closed$ = new Subject<CloseEvent>()
+  // to notify about errors
+  private _error$ = new Subject<any>()
+  // store messages, if the socket is not ready to consume them
+  private _buffer: WebSocketMessageBuffer<RequestType, ResponseType>
+
+  /**
+   * @internal
+   * Used to call functions, usually provided by the user, that can throw errors.
+   * @param defaultValue
+   * @param func
+   * @param args
+   * @private
+   */
+  private _safeCall<ArgsType extends any[], ReturnType>(
+    defaultValue: ReturnType,
+    func?: (...args: ArgsType) => ReturnType,
+    ...args: ArgsType
+  ): ReturnType {
+    if (func) {
+      try {
+        return func(...args)
+      } catch (error) {
+        this._error$.next(error)
+      }
+    }
+    return defaultValue
+  }
 
   /**
    *  Observable with all messages, received by the socket. Subscription does not affect opening and closing socket.
@@ -46,6 +84,7 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
   }
 
   /**
+   * The WebSocketController is designed the way you do not need this field, but if you need, you could use it.
    * {@link WebSocketControllerState}
    */
   get state(): WebSocketControllerState {
@@ -62,7 +101,7 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
   /**
    * Fires whenever the transition pending->opened happens.
    */
-  get opened$(): Observable<void> {
+  get opened$(): Observable<Event> {
     return this._opened$
   }
 
@@ -94,49 +133,91 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
   /**
    * Fires whenever the transition closing->closed happens.
    */
-  get closed$(): Observable<void> {
+  get closed$(): Observable<CloseEvent> {
     return this._closed$
   }
 
+  /**
+   * Fires with socket, serialization and any other errors.
+   *
+   * Generally there is no way to handle the errors, other than reopen socket,
+   * which is made internally. If you wish, you can log these errors or report
+   * them to the server via http.
+   */
+  get error$(): Observable<any> {
+    return this._error$
+  }
+
+  /**
+   * Opens websocket and sets up reconnect according to options.
+   * @param options {@link WebSocketOpenOptions}
+   * @throws WebSocketIsAlreadyOpened
+   */
   open(
-    options: {
-      /**
-       * If set, the socket will try to reconnect after being closed
-       * In general, you want to set this, cos it is the main feature of the package.
-       */
-      autoReconnect?: {
-        /**
-         * To calculate amount of milliseconds between socket being closed and next try to open.
-         * @param reconnectState {@link ReconnectState}
-         */
-        interval: (reconnectState: ReconnectState) => number,
-        /**
-         * To determine if socket have to try to reconnect. If returns false,
-         * socket is closed, until `open()` is called again.
-         * If not passed, always tries to reconnect (same as if `() => true` is passed)
-         * @param reconnectState {@link ReconnectState}
-         */
-        shouldReconnect?: (reconnectState: ReconnectState) => boolean,
-        /**
-         * To determine, if auth message have to be sent.
-         * If not passed, auth message is always sent (same as if `() => true` is passed).
-         * @param reconnectState {@link ReconnectState}
-         */
-        authorize?: (reconnectState: ReconnectState) => boolean,
-        /**
-         * To determine, if subscribe requests have to be sent.
-         * If not passed, always tries to subscribe (same as if `() => true` is passed)
-         * @param reconnectState {@link ReconnectState}
-         */
-        subscribe?: (reconnectState: ReconnectState) => boolean,
-      }
-    }
+    options: WebSocketOpenOptions
   ): void {
-    // TODO: implement
+    if (this.state !== WebSocketControllerState.closed) {
+      if (!options.doNotThrowWhenOpened) {
+        throw new WebSocketIsAlreadyOpened()
+      }
+      return
+    }
+    let {WebSocketCtor, protocol, url, binaryType} = this._config
+    if (!WebSocketCtor) {
+      WebSocketCtor = WebSocket
+    }
+    let socket: WebSocket
+    try {
+      socket = protocol
+        ? new WebSocketCtor(url, protocol)
+        : new WebSocketCtor(url)
+      if (binaryType) {
+        socket.binaryType = binaryType
+      }
+      this._socket = socket
+    } catch (e) {
+      this._error$.next(e)
+      return;
+    }
+    // working with socket var, instead of this._socket,
+    // to prevent occasional duplicates (when the socket in this._socket is different from socket we are working with)
+    socket.onerror = (error) => {
+      this._error$.next(error)
+      this._reopen(options)
+    }
+    socket.onopen = (event) => {
+      if (!this._socket) {
+        socket.close();
+        return
+      }
+
+    }
+  }
+
+  private _reopen(options: WebSocketOpenOptions) {
+    this.close()
+    if (options.autoReconnect) {
+      const {shouldReconnect, interval} = options.autoReconnect
+      setTimeout(() => {
+        if (this._safeCall(true, shouldReconnect, this._reconnectState)) {
+          this.open(options)
+        }
+      }, this._safeCall(defaultReconnectInterval, interval, this._reconnectState))
+    }
   }
 
   close(): void {
-    // TODO: implement
+    if (
+      this._socket && (
+        this._socket.readyState === WebSocket.OPEN ||
+        this._socket.readyState === WebSocket.CONNECTING
+      )
+    ) {
+      this._socket?.close()
+    }
+    // Even if readyState is CLOSING, it will be closed anyway, so we can remove underlying socket from state
+    this._socket = undefined;
+    this._state = WebSocketControllerState.closed
   }
 
   /**
@@ -156,6 +237,17 @@ export class WebSocketController<RequestType, ResponseType, UnderlyingDataType =
     options?: WebSocketSendOptions,
   ): void {
     // TODO: implement
+  }
+
+  private _sendDirect(msg: RequestType): void {
+    let {serializer} = this._config
+    if (!serializer) {
+      serializer = (v: RequestType) => v as unknown as UnderlyingDataType
+    }
+    const data = this._safeCall(null, serializer, msg)
+    if (data) {
+      this._socket?.send(data)
+    }
   }
 
   /**
