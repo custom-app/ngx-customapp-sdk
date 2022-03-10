@@ -400,15 +400,17 @@ export class WebSocketController<RequestType,
     ) {
       this._sendDirect(msg)
     } else {
-      if (options?.withoutAuth) {
-        this._buffer.addAny(msg)
-        return
+      if (!options?.noBuffer) {
+        if (options?.withoutAuth) {
+          this._buffer.addAny(msg)
+          return
+        }
+        if (options?.withoutSubscription) {
+          this._buffer.addAuth(msg)
+          return;
+        }
+        this._buffer.addSub(msg)
       }
-      if (options?.withoutSubscription) {
-        this._buffer.addAuth(msg)
-        return;
-      }
-      this._buffer.addSub(msg)
       return;
     }
   }
