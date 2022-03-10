@@ -1,14 +1,8 @@
 import {BufferOverflowStrategy, WebSocketControllerConfig} from './types';
 
 
-/**
- * The default for {@link WebSocketControllerConfig.buffer.size}
- */
 export const defaultWebSocketMessageBufferSize = 1;
 
-/**
- * The default for {@link WebSocketControllerConfig.buffer.overflow}
- */
 export const defaultWebSocketBufferOverflow: BufferOverflowStrategy = 'dropOld'
 
 export enum MessageRequirements {

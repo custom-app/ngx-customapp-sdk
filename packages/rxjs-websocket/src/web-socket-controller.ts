@@ -62,7 +62,6 @@ export class WebSocketController<RequestType,
   private _buffer: WebSocketMessageBuffer<RequestType, ResponseType>
 
   /**
-   * @internal
    * Used to call functions, usually provided by the user, that can throw errors.
    * @param defaultValue
    * @param func
@@ -116,7 +115,8 @@ export class WebSocketController<RequestType,
   /**
    * Fires whenever the transition opened->authorized happens.
    *
-   * Emits an auth response, when {@link WebSocketControllerConfig.authorize.isResponseSuccessful} is set, void otherwise.
+   * Emits an auth response, when the `isResponseSuccessful` field in {@link WebSocketControllerConfig.authorize}
+   * is set, void otherwise.
    */
   get authorized$(): Observable<ResponseType | void> {
     return this._authorized$
@@ -125,7 +125,8 @@ export class WebSocketController<RequestType,
   /**
    * Fires whenever the transition authorized->subscribed happens.
    *
-   * Emits an auth subscribe responses, when {@link WebSocketControllerConfig.subscribe.isResponseSuccessful} is set, void otherwise.
+   * Emits an auth subscribe responses, when the `isResponseSuccessful` field in {@link WebSocketControllerConfig.subscribe}
+   * is set, void otherwise.
    */
   get subscribed$(): Observable<ResponseType[] | void> {
     return this._subscribed$
@@ -147,7 +148,8 @@ export class WebSocketController<RequestType,
 
   /**
    * Fires when either authorization response was not successful
-   * (determined by {@link WebSocketControllerConfig.authorize.isResponseSuccessful}) or authorization request
+   * (determined by the field `isResponseSuccessful` of the {@link WebSocketControllerConfig.authorize})
+   * or authorization request
    * timed out (if so, will error with RxJs `TimeoutError`).
    */
   get notAuthorized$(): Observable<ResponseType> {
@@ -156,8 +158,8 @@ export class WebSocketController<RequestType,
 
   /**
    * Fires when one of the subscription responses was not successful
-   * (determined by {@link WebSocketControllerConfig.subscribe.isResponseSuccessful}) or when one of
-   * the requests timed out (if so, will error with RxJs `TimeoutError`).
+   * (determined by the field `isResponseSuccessful` of the {@link WebSocketControllerConfig.subscribe})
+   * or when one of the requests timed out (if so, will error with RxJs `TimeoutError`).
    */
   get notSubscribed$(): Observable<ResponseType> {
     return this._notSubscribed$

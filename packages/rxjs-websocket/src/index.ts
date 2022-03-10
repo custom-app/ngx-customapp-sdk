@@ -6,5 +6,13 @@ export {
   WebSocketOpenOptions,
   WebSocketSendOptions
 } from './types'
-export {WebSocketController} from './web-socket-controller'
+export {
+  WebSocketController,
+  defaultRequestTimeout,
+  defaultReconnectInterval
+} from './web-socket-controller'
 
+export {
+  defaultWebSocketBufferOverflow,
+  defaultWebSocketMessageBufferSize
+} from './web-socket-message-buffer'

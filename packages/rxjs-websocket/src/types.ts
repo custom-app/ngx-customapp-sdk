@@ -71,7 +71,7 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
    *
    * Default is {@link defaultRequestTimeout}
    */
-  requestTimeout: number
+  requestTimeout?: number
 
   /**
    * If passed, an authorization message will be sent whenever the socket opens.

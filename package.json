@@ -7,7 +7,7 @@
     "examples/*"
   ],
   "scripts": {
-    "doc": "typedoc"
+    "doc": "typedoc --excludePrivate"
   },
   "license": "MIT",
   "private": true,
