@@ -1,5 +1,6 @@
 {
   "name": "ngx-customapp-sdk",
+  "packageManager": "yarn@3.2.0",
   "description": "SDK allowing you to quickly setup authorization and websocket life cycle in an Angular app. Some utils are also included",
   "repository": "https://github.com/loyal-inform/ngx-customapp-sdk.git",
   "workspaces": [
@@ -7,7 +8,8 @@
     "examples/*"
   ],
   "scripts": {
-    "doc": "typedoc --excludePrivate"
+    "doc": "typedoc --excludePrivate",
+    "start": "yarn workspaces foreach -piv run start"
   },
   "license": "MIT",
   "private": true,
