@@ -51,8 +51,8 @@ SDK must implement following functions:
 - JWT and authorization headers management, refreshing jwt before opening sockets and before each request.
 - Sync JWT between different packages. Prohibit concurrent refreshes.
 - Login, logout functions and account management in the context of authorization.
-- A support for changing accounts back and forth (Admin can login as client and login back to admin).
-- A Support for receiving account info both inside a websocket life cycle and outside of it.
+- A support for changing accounts back and forth (Admin can log in as client and login back to admin).
+- A Support for receiving account info both inside a websocket life cycle and outside it.
 - Access management (access guards).
 - A Forms framework.
 - Sync for difference in server time. Support setting time delta after auth, after socket auth or even with dedicated request.
@@ -80,7 +80,7 @@ Flow:
 - May be a server time delta is requested or already received and saved.
 - JWT tokens being saved and included in headers of every request (except explicitly stated).
 - No subscriptions and sockets.
-- The user can logout, logout from every device, may be change an account back and fourth.
+- The user can logout, logout from every device, may be change an account back and forth.
 
 ### Pattern 2 "Auth before a public socket"
 Flow:
@@ -90,7 +90,7 @@ Flow:
 - May be server a time delta is requested or already received and saved, may be after the socket is opened.
 - JWT tokens being saved and included in headers of every request (except explicitly stated).
 - The public socket is opened, may be multiple, may be in specified order, may be with subscriptions.
-- The user can logout, logout from every device, may be change an account back and fourth.
+- The user can logout, logout from every device, may be change an account back and forth.
 - After a logout socket is closed
 
 ### Pattern 3 "Auth after a public socket"
@@ -101,7 +101,7 @@ Flow:
 - An http request with user credentials is being sent.
 - An http response with JWT tokens and maybe the user info is received.
 - JWT tokens being saved and included in headers of every request (except explicitly stated).
-- Th user can logout, logout from every device, may be change an account back and fourth.
+- Th user can logout, logout from every device, may be change an account back and forth.
 - After a logout the socket is not closed. The socket does not depend on an account info.
 
 ### Pattern 4 "Auth before an authorized socket"
@@ -117,8 +117,8 @@ Flow:
 - Subscription requests are sent in the socket.
 - Subscription responses received from the socket.
 - May be more sockets are opened and more auth and subscription messages are sent.
-- The user can logout, logout from every device, may be change an account back and fourth.
-- After logout all of the sockets are closed.
+- The user can log out, logout from every device, may be change an account back and forth.
+- After logout all the sockets are closed.
 
 ### Pattern 5 "Auth after an authorized socket"
 Flow:
@@ -150,11 +150,13 @@ Requirements and functionality:
 - Works with a single type for request messages and a single type for response messages.
 - Support an auto reconnect.
 - A support for a request buffer. A support for not adding requests to the buffer, different buffers for authorized and unauthorized requests, and a support for setting the queue length.
-- Support sending an autorization request(s) just after the opening. Reconnect have to repeat the autorization.
-- Support sending an subscription request(s) just after the authorization.
+- Support sending an authorization request(s) just after the opening. Reconnect have to repeat the autorization.
+- Support sending a subscription request(s) just after the authorization.
 - Counts successful and unsuccessful opening tries.
-- Offers to set a predicate for reopeningn socket.
-- Offers a subscriptions for statuses: pending, opened, authorized, subscribed, closing, closed.
+- Offers to set a predicate for reopening socket.
+- Offers subscriptions for statuses: pending, opened, authorized, subscribed, closing, closed.
+- Offers subscriptions for not successful status transitions: notAuthorized, notSubscribed.
+- But there is no "notAuthorized" or "notSubscribed" status, the socket is closed immediately.
 - The error observable is provided, but it is useless, cos there is generally no way to handle a websocket error, 
 - other than close the socket, which is made internally.
 - Support for custom serializer and deserializer.
