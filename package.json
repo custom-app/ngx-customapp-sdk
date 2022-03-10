@@ -12,6 +12,7 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "typedoc": "^0.22.12"
+    "typedoc": "^0.22.12",
+    "typedoc-plugin-missing-exports": "^0.22.6"
   }
 }

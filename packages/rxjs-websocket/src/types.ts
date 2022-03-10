@@ -163,6 +163,7 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
   }
 }
 
+/** Describes what to do with messages in the buffer, when it overflows. */
 export type BufferOverflowStrategy = 'dropOld' | 'dropNew'
 
 /**
@@ -190,6 +191,9 @@ export enum WebSocketControllerState {
   closed,
 }
 
+/**
+ * Describes the reconnection behaviour.
+ */
 export interface WebSocketOpenOptions {
   /**
    * If set, the socket will try to reconnect after being closed
@@ -232,6 +236,9 @@ export interface WebSocketOpenOptions {
   doNotThrowWhenOpened?: boolean,
 }
 
+/**
+ * Describes how the {@link WebSocketController} should handle the message being sent.
+ */
 export interface WebSocketSendOptions {
   /** If true, the message will be sent even if the socket is not authorized and not subscribed */
   withoutAuth?: boolean,

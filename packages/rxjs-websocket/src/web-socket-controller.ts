@@ -18,6 +18,9 @@ export const defaultReconnectInterval = 10000; // 10 seconds
 export const defaultRequestTimeout = 2 * 60 * 1000; // 2 minutes
 
 // TODO describe how to use and examples
+/**
+ * Class, that wraps the socket and takes control over authorization, subscription and reconnection.
+ */
 export class WebSocketController<RequestType,
   ResponseType,
   UnderlyingDataType extends string | ArrayBufferLike | Blob | ArrayBufferView> {
@@ -56,7 +59,6 @@ export class WebSocketController<RequestType,
   private _notSubscribed$ = new Subject<ResponseType>()
   // to notify about errors
   private _error$ = new Subject<any>()
-  // store messages, if the socket is not ready to consume them
   private _buffer: WebSocketMessageBuffer<RequestType, ResponseType>
 
   /**
@@ -172,6 +174,41 @@ export class WebSocketController<RequestType,
     return this._error$
   }
 
+  // function for handling side effects of the state transition
+  private _pending(): void {
+    this._state = WebSocketControllerState.pending
+    this._pending$.next()
+  }
+
+  private _opened(e: Event): void {
+    this._state = WebSocketControllerState.opened
+    this._opened$.next(e)
+  }
+
+  private _authorized(authResponse?: ResponseType): void {
+    this._state = WebSocketControllerState.authorized
+    this._authorized$.next(authResponse)
+    this._sendBuffered(MessageRequirements.auth)
+    this._subscribe()
+  }
+
+  // not related to the RxJs. Subscribe means to send the subscription request and wait for a response
+  private _subscribed(subscribeResponses?: ResponseType[]): void {
+    this._state = WebSocketControllerState.authorized
+    this._subscribed$.next(subscribeResponses)
+    this._sendBuffered(MessageRequirements.sub)
+  }
+
+  private _closing(): void {
+    this._closing$.next()
+    this._state = WebSocketControllerState.closing
+  }
+
+  private _closed(e: CloseEvent): void {
+    this._state = WebSocketControllerState.closed
+    this._closed$.next(e)
+  }
+
   /**
    * Opens websocket and sets up reconnect according to options.
    * @param options {@link WebSocketOpenOptions}
@@ -186,6 +223,7 @@ export class WebSocketController<RequestType,
       }
       return
     }
+    this._pending()
     let {WebSocketCtor, protocol, url, binaryType} = this._config
     if (!WebSocketCtor) {
       WebSocketCtor = WebSocket
@@ -211,8 +249,7 @@ export class WebSocketController<RequestType,
         socket.ws.close();
         return
       }
-      this._state = WebSocketControllerState.opened
-      this._opened$.next(e)
+      this._opened(e)
       this._sendBuffered(MessageRequirements.any)
       this._authorize()
     }
@@ -224,8 +261,7 @@ export class WebSocketController<RequestType,
       this._reconnectState.erroredCounter++
     }
     socket.ws.onclose = (e: CloseEvent) => {
-      this._state = WebSocketControllerState.closed
-      this._closed$.next(e)
+      this._closed(e)
       if (!socket.closedManually) {
         this._reopen(options)
       }
@@ -260,13 +296,6 @@ export class WebSocketController<RequestType,
     }
   }
 
-  private _authorized(authResponse?: ResponseType): void {
-    this._state = WebSocketControllerState.authorized
-    this._authorized$.next(authResponse)
-    this._sendBuffered(MessageRequirements.auth)
-    this._subscribe()
-  }
-
   private _authorize(): void {
     const {authorize} = this._config
     if (authorize) {
@@ -293,13 +322,6 @@ export class WebSocketController<RequestType,
       // if no auth required, the socket is considered authorized immediately
       this._authorized()
     }
-  }
-
-  // not related to the RxJs. Subscribe means to send the subscription request and wait for a response
-  private _subscribed(subscribeResponses?: ResponseType[]): void {
-    this._state = WebSocketControllerState.authorized
-    this._subscribed$.next(subscribeResponses)
-    this._sendBuffered(MessageRequirements.sub)
   }
 
   // not related to the RxJs. Subscribe means to send the subscription request and wait for a response
@@ -345,8 +367,7 @@ export class WebSocketController<RequestType,
         this._socket.ws.readyState === WebSocket.OPEN ||
         this._socket.ws.readyState === WebSocket.CONNECTING
       ) {
-        this._closing$.next()
-        this._state = WebSocketControllerState.closing
+        this._closing()
         this._socket?.ws.close()
       }
     }
