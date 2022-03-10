@@ -52,6 +52,8 @@ export class WebSocketController<RequestType,
   private _subscribed$ = new Subject<ResponseType[] | void>()
   private _closing$ = new Subject<void>()
   private _closed$ = new Subject<CloseEvent>()
+  // to notify, that state transition was not successful
+
   // to notify about errors
   private _error$ = new Subject<any>()
   // store messages, if the socket is not ready to consume them

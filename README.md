@@ -154,9 +154,9 @@ Requirements and functionality:
 - Support sending a subscription request(s) just after the authorization.
 - Counts successful and unsuccessful opening tries.
 - Offers to set a predicate for reopening socket.
-- Offers subscriptions for statuses: pending, opened, authorized, subscribed, closing, closed.
-- Offers subscriptions for not successful status transitions: notAuthorized, notSubscribed.
-- But there is no "notAuthorized" or "notSubscribed" status, the socket is closed immediately.
+- Offers subscriptions for states: pending, opened, authorized, subscribed, closing, closed.
+- Offers subscriptions for not successful state transitions: notAuthorized, notSubscribed.
+- But there is no "notAuthorized" or "notSubscribed" state, the socket is closed immediately.
 - The error observable is provided, but it is useless, cos there is generally no way to handle a websocket error, 
 - other than close the socket, which is made internally.
 - Support for custom serializer and deserializer.
