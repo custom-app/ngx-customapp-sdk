@@ -160,7 +160,9 @@ export type BufferOverflowStrategy = 'dropOld' | 'dropNew'
  */
 export interface ReconnectState {
   wasPrevOpenSuccessful: boolean,
-  openedCounter: number,
+  /** number of times socket was in state "subscribed" */
+  subscribedCounter: number,
+  /** number of times socket.onerror callback fired */
   erroredCounter: number
 }
 

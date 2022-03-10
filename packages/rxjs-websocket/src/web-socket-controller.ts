@@ -2,13 +2,15 @@ import {
   ReconnectState,
   WebSocketControllerConfig,
   WebSocketControllerState,
+  WebSocketMessage,
   WebSocketOpenOptions,
   WebSocketRequestOptions,
   WebSocketSendOptions
 } from './types';
 import {Observable, Subject} from 'rxjs';
 import {WebSocketIsAlreadyOpened} from './errors';
-import {WebSocketMessageBuffer} from './web-socket-message-buffer';
+import {MessageRequirements, WebSocketMessageBuffer} from './web-socket-message-buffer';
+import {WrappedSocket} from './wrapped-socket';
 
 /**
  * Need this to prevent an overload.
@@ -29,11 +31,11 @@ export class WebSocketController<RequestType,
 
   // passed as arg to functions in options.autoReconnect of the open() method
   private _reconnectState: ReconnectState = {
-    openedCounter: 0,
+    subscribedCounter: 0, // TODO: increment
     erroredCounter: 0,
     wasPrevOpenSuccessful: false,
   }
-  private _socket?: WebSocket;
+  private _socket?: WrappedSocket;
   // For all messages, received from the server
   private _messages$ = new Subject<ResponseType>()
 
@@ -166,14 +168,15 @@ export class WebSocketController<RequestType,
     if (!WebSocketCtor) {
       WebSocketCtor = WebSocket
     }
-    let socket: WebSocket
+    let socket: WrappedSocket
     try {
-      socket = protocol
+      const ws = protocol
         ? new WebSocketCtor(url, protocol)
         : new WebSocketCtor(url)
       if (binaryType) {
-        socket.binaryType = binaryType
+        ws.binaryType = binaryType
       }
+      socket = new WrappedSocket(ws)
       this._socket = socket
     } catch (e) {
       this._error$.next(e)
@@ -181,17 +184,31 @@ export class WebSocketController<RequestType,
     }
     // working with socket var, instead of this._socket,
     // to prevent occasional duplicates (when the socket in this._socket is different from socket we are working with)
-    socket.onerror = (error) => {
-      this._error$.next(error)
-      this._reopen(options)
-    }
-    socket.onopen = (event) => {
+    socket.ws.onopen = (event) => {
       if (!this._socket) {
-        socket.close();
+        socket.ws.close();
         return
       }
-
+      this._sendBuffered(MessageRequirements.any)
     }
+    socket.ws.onerror = (error) => {
+      this._error$.next(error)
+      if (!socket.closedManually) {
+        this._reopen(options)
+      }
+      this._reconnectState.erroredCounter++
+    }
+    socket.ws.onclose = (e: CloseEvent) => {
+      this._closed$.next(e)
+      if (!socket.closedManually) {
+        this._reopen(options)
+      }
+    }
+  }
+
+  private _sendBuffered(requirement: MessageRequirements): void {
+    const messages = this._buffer.remove(requirement)
+    messages.forEach(msg => this._sendDirect(msg))
   }
 
   private _reopen(options: WebSocketOpenOptions) {
@@ -207,13 +224,15 @@ export class WebSocketController<RequestType,
   }
 
   close(): void {
-    if (
-      this._socket && (
-        this._socket.readyState === WebSocket.OPEN ||
-        this._socket.readyState === WebSocket.CONNECTING
-      )
-    ) {
-      this._socket?.close()
+    if (this._socket) {
+      // to prevent occasional reopening
+      this._socket.closedManually = true
+      if (
+        this._socket.ws.readyState === WebSocket.OPEN ||
+        this._socket.ws.readyState === WebSocket.CONNECTING
+      ) {
+        this._socket?.ws.close()
+      }
     }
     // Even if readyState is CLOSING, it will be closed anyway, so we can remove underlying socket from state
     this._socket = undefined;
@@ -239,14 +258,14 @@ export class WebSocketController<RequestType,
     // TODO: implement
   }
 
-  private _sendDirect(msg: RequestType): void {
+  private _sendDirect(msg: WebSocketMessage<RequestType, ResponseType>): void {
     let {serializer} = this._config
     if (!serializer) {
       serializer = (v: RequestType) => v as unknown as UnderlyingDataType
     }
-    const data = this._safeCall(null, serializer, msg)
+    const data = this._safeCall(null, serializer, msg.msg)
     if (data) {
-      this._socket?.send(data)
+      this._socket?.ws.send(data)
     }
   }
 
