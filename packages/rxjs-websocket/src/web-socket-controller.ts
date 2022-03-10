@@ -6,7 +6,7 @@ import {
   WebSocketRequestOptions,
   WebSocketSendOptions
 } from './types';
-import {catchError, EMPTY, filter, Observable, Subject, take, tap, timeout} from 'rxjs';
+import {catchError, EMPTY, filter, forkJoin, map, Observable, Subject, take, tap, timeout} from 'rxjs';
 import {WebSocketIsAlreadyOpened} from './errors';
 import {MessageRequirements, WebSocketMessageBuffer} from './web-socket-message-buffer';
 import {WrappedSocket} from './wrapped-socket';
@@ -212,6 +212,7 @@ export class WebSocketController<RequestType,
         socket.ws.close();
         return
       }
+      this._state = WebSocketControllerState.opened
       this._opened$.next(e)
       this._sendBuffered(MessageRequirements.any)
       this._authorize()
@@ -224,6 +225,7 @@ export class WebSocketController<RequestType,
       this._reconnectState.erroredCounter++
     }
     socket.ws.onclose = (e: CloseEvent) => {
+      this._state = WebSocketControllerState.closed
       this._closed$.next(e)
       if (!socket.closedManually) {
         this._reopen(options)
@@ -259,8 +261,9 @@ export class WebSocketController<RequestType,
     }
   }
 
-  private _authorized(): void {
-    this._authorized$.next()
+  private _authorized(authResponse?: ResponseType): void {
+    this._state = WebSocketControllerState.authorized
+    this._authorized$.next(authResponse)
     this._sendBuffered(MessageRequirements.auth)
     this._subscribe()
   }
@@ -275,9 +278,9 @@ export class WebSocketController<RequestType,
         const successful$ = response$.pipe(
           filter(isResponseSuccessful),
           catchError(() => EMPTY), // error is passed to this._notAuthorized$ subject
-          tap(() => this._authorized())
+          tap(response => this._authorized(response))
         )
-        successful$.subscribe(this._authorized$)
+        successful$.subscribe()
         const failed$ = response$.pipe(
           filter(response => !isResponseSuccessful(response))
         )
@@ -293,10 +296,48 @@ export class WebSocketController<RequestType,
     }
   }
 
-  private _subscribe(): void {
-    const {subscribe} = this._config
+  // not related to the RxJs. Subscribe means to send the subscription request and wait for a response
+  private _subscribed(subscribeResponses?: ResponseType[]): void {
+    this._state = WebSocketControllerState.authorized
+    this._subscribed$.next(subscribeResponses)
+    this._sendBuffered(MessageRequirements.sub)
   }
 
+  // not related to the RxJs. Subscribe means to send the subscription request and wait for a response
+  private _subscribe(): void {
+    const {subscribe} = this._config
+    if (subscribe) {
+      const {createRequests, isResponseSuccessful} = subscribe
+      const msgList = createRequests()
+      if (isResponseSuccessful) {
+        const responses$ = forkJoin(
+          msgList.map(msg => this._requestDirect(msg))
+        )
+        const successful$ = responses$.pipe(
+          filter(responses => responses.every(isResponseSuccessful)),
+          catchError(() => EMPTY), // error is passed to this._notAuthorized$ subject
+          tap(responses => this._subscribed(responses))
+        )
+        successful$.subscribe()
+        const failed$ = responses$.pipe(
+          map(responses =>
+            responses.find(resp => !isResponseSuccessful(resp))
+          ),
+          filter(Boolean)
+        )
+        // will also pipe errors
+        failed$.subscribe(this._notSubscribed$)
+      }
+    } else {
+      // if no subscription is required, the socket is considered subscribed immediately
+      this._subscribed()
+    }
+  }
+
+  /**
+   * Closes the socket, cancels the reconnection.
+   * The `closed$` observable will fire.
+   */
   close(): void {
     if (this._socket) {
       // to prevent occasional reopening
@@ -305,12 +346,13 @@ export class WebSocketController<RequestType,
         this._socket.ws.readyState === WebSocket.OPEN ||
         this._socket.ws.readyState === WebSocket.CONNECTING
       ) {
+        this._closing$.next()
+        this._state = WebSocketControllerState.closing
         this._socket?.ws.close()
       }
     }
     // Even if readyState is CLOSING, it will be closed anyway, so we can remove underlying socket from state
     this._socket = undefined;
-    this._state = WebSocketControllerState.closed
   }
 
   /**
