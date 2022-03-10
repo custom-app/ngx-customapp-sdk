@@ -438,6 +438,9 @@ export class WebSocketController<RequestType,
    * Note, that there are different buffers for messages, that require the socket to be authorized,
    * and for those, that do not.
    *
+   * Unlike Angular HttpClient, the request is being sent immediately after the function was called,
+   * not after subscription to the inner observable.
+   *
    * @param msg The data to be serialized and sent.
    * @param options Controls the authorization, usage of buffer, etc. {@link WebSocketSendOptions}
    */
