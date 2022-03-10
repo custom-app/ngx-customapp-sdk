@@ -6,7 +6,7 @@ import {
   WebSocketRequestOptions,
   WebSocketSendOptions
 } from './types';
-import {filter, Observable, Subject, take, timeout} from 'rxjs';
+import {catchError, EMPTY, filter, Observable, Subject, take, tap, timeout} from 'rxjs';
 import {WebSocketIsAlreadyOpened} from './errors';
 import {MessageRequirements, WebSocketMessageBuffer} from './web-socket-message-buffer';
 import {WrappedSocket} from './wrapped-socket';
@@ -53,7 +53,8 @@ export class WebSocketController<RequestType,
   private _closing$ = new Subject<void>()
   private _closed$ = new Subject<CloseEvent>()
   // to notify, that state transition was not successful
-
+  private _notAuthorized$ = new Subject<ResponseType>()
+  private _notSubscribed$ = new Subject<ResponseType>()
   // to notify about errors
   private _error$ = new Subject<any>()
   // store messages, if the socket is not ready to consume them
@@ -141,6 +142,24 @@ export class WebSocketController<RequestType,
    */
   get closed$(): Observable<CloseEvent> {
     return this._closed$
+  }
+
+  /**
+   * Fires when either authorization response was not successful
+   * (determined by {@link WebSocketControllerConfig.authorize.isResponseSuccessful}) or authorization request
+   * timed out (if so, will error with RxJs `TimeoutError`).
+   */
+  get notAuthorized$(): Observable<ResponseType> {
+    return this._notAuthorized$
+  }
+
+  /**
+   * Fires when one of the subscription responses was not successful
+   * (determined by {@link WebSocketControllerConfig.subscribe.isResponseSuccessful}) or when one of
+   * the requests timed out (if so, will error with RxJs `TimeoutError`).
+   */
+  get notSubscribed$(): Observable<ResponseType> {
+    return this._notSubscribed$
   }
 
   /**
@@ -249,10 +268,21 @@ export class WebSocketController<RequestType,
   private _authorize(): void {
     const {authorize} = this._config
     if (authorize) {
-      const msg = authorize.createRequest()
-      if (authorize.isResponseSuccessful) {
-        this._requestDirect(msg)
-          .subscribe()
+      const {createRequest, isResponseSuccessful} = authorize
+      const msg = createRequest()
+      if (isResponseSuccessful) {
+        const response$ = this._requestDirect(msg)
+        const successful$ = response$.pipe(
+          filter(isResponseSuccessful),
+          catchError(() => EMPTY), // error is passed to this._notAuthorized$ subject
+          tap(() => this._authorized())
+        )
+        successful$.subscribe(this._authorized$)
+        const failed$ = response$.pipe(
+          filter(response => !isResponseSuccessful(response))
+        )
+        // will also pipe errors
+        failed$.subscribe(this._notAuthorized$)
       } else {
         this._sendDirect(msg)
         this._authorized()
