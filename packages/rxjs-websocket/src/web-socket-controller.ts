@@ -3,8 +3,7 @@ import {
   WebSocketControllerConfig,
   WebSocketControllerState,
   WebSocketOpenOptions,
-  WebSocketRequestOptions,
-  WebSocketSendOptions
+  WebSocketSendOptions,
 } from './types';
 import {catchError, EMPTY, filter, forkJoin, map, Observable, Subject, take, tap, timeout} from 'rxjs';
 import {WebSocketIsAlreadyOpened} from './errors';
@@ -356,7 +355,7 @@ export class WebSocketController<RequestType,
   }
 
   /**
-   * Sends the message into underlying socket.
+   * Sends the message into the underlying socket.
    *
    * By default, if the socket is not opened or authorized,
    * the message is saved to the buffer, and being sent later, when the socket comes to an appropriate state.
@@ -371,7 +370,24 @@ export class WebSocketController<RequestType,
     msg: RequestType,
     options?: WebSocketSendOptions,
   ): void {
-    // TODO: implement
+    if (
+      this._state === WebSocketControllerState.subscribed ||
+      (options?.withoutSubscription && this._state === WebSocketControllerState.authorized) ||
+      (options?.withoutAuth && this._state === WebSocketControllerState.opened)
+    ) {
+      this._sendDirect(msg)
+    } else {
+      if (options?.withoutAuth) {
+        this._buffer.addAny(msg)
+        return
+      }
+      if (options?.withoutSubscription) {
+        this._buffer.addAuth(msg)
+        return;
+      }
+      this._buffer.addSub(msg)
+      return;
+    }
   }
 
   private _sendDirect(msg: RequestType): void {
@@ -398,11 +414,11 @@ export class WebSocketController<RequestType,
    * and for those, that do not.
    *
    * @param msg The data to be serialized and sent.
-   * @param options Controls the authorization, usage of buffer, etc. {@link WebSocketRequestOptions}
+   * @param options Controls the authorization, usage of buffer, etc. {@link WebSocketSendOptions}
    */
   request(
     msg: RequestType,
-    options?: WebSocketRequestOptions
+    options?: WebSocketSendOptions
   ): Observable<ResponseType> {
     const {request, requestId} = this._addRequestId(msg)
     this.send(request, options)
