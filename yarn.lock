@@ -6033,6 +6033,7 @@ __metadata:
   dependencies:
     typedoc: ^0.22.12
     typedoc-plugin-missing-exports: ^0.22.6
+    typescript: ^4.6.2
   languageName: unknown
   linkType: soft
 
