@@ -49,9 +49,9 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
    * Function to be called on every message, received by "onmessage" handler of underlying socket.
    * If not stated, ResponseType must be equal to the UnderlyingDataType.
    * If you want to communicate through JSON, pass JSON.parse method here.
-   * @param response
+   * @param responseEvent The whole event, in case you need not only data.
    */
-  deserializer?: (response: ResponseType) => UnderlyingDataType,
+  deserializer?: (responseEvent: MessageEvent<UnderlyingDataType>) => ResponseType,
 
   /**
    * Sets an id which helps find a corresponding response message.
@@ -67,8 +67,18 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
   getResponseId: (response: ResponseType) => number,
 
   /**
+   * If there is no response during `requestTimeout` after sending the request, the rxjs `TimeoutError` is
+   * thrown into observable.
+   *
+   * Default is {@link defaultRequestTimeout}
+   */
+  requestTimeout: number
+
+  /**
    * If passed, an authorization message will be sent whenever the socket opens.
    * When not passed, socket state transition opened->authorized still happens, but instant.
+   *
+   * Authorization request MUST have a response.
    */
   authorize?: {
     /**
@@ -237,15 +247,4 @@ export interface WebSocketRequestOptions {
 export interface WebSocketSendOptions extends WebSocketRequestOptions {
   /** If true, the message will be sent without calling function {@link WebSocketControllerConfig.setRequestId}*/
   withoutId?: boolean,
-}
-
-/**
- *  @internal
- *  The element of the message buffer. Also handles the requests.
- * */
-export interface WebSocketMessage<RequestType, ResponseType> {
-  // the message to be serialized and sent
-  msg: RequestType,
-  // Used if the message is a request and there supposed to be a response.
-  responseSubject?: Subject<ResponseType>,
 }

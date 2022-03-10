@@ -1,4 +1,4 @@
-import {BufferOverflowStrategy, WebSocketControllerConfig, WebSocketMessage} from './types';
+import {BufferOverflowStrategy, WebSocketControllerConfig} from './types';
 
 
 /**
@@ -25,13 +25,13 @@ export class WebSocketMessageBuffer<RequestType, ResponseType> {
   }
 
   // new messages are added through unshift, old removed through pop
-  private _buffers: Record<MessageRequirements, WebSocketMessage<RequestType, ResponseType>[]> = {
+  private _buffers: Record<MessageRequirements, RequestType[]> = {
     [MessageRequirements.any]: [],
     [MessageRequirements.auth]: [],
     [MessageRequirements.sub]: [],
   }
 
-  add(msg: WebSocketMessage<RequestType, ResponseType>, requirement: MessageRequirements): void {
+  add(msg: RequestType, requirement: MessageRequirements): void {
     const size = this._config?.size || defaultWebSocketMessageBufferSize
     const overflow = this._config?.overflow || defaultWebSocketBufferOverflow
     const buffer = this._buffers[requirement]
@@ -45,33 +45,33 @@ export class WebSocketMessageBuffer<RequestType, ResponseType> {
     buffer.unshift(msg)
   }
 
-  addAny(msg: WebSocketMessage<RequestType, ResponseType>): void {
+  addAny(msg: RequestType): void {
     this.add(msg, MessageRequirements.any)
   }
 
-  addAuth(msg: WebSocketMessage<RequestType, ResponseType>): void {
+  addAuth(msg: RequestType): void {
     this.add(msg, MessageRequirements.auth)
   }
 
-  addSub(msg: WebSocketMessage<RequestType, ResponseType>): void {
+  addSub(msg: RequestType): void {
     this.add(msg, MessageRequirements.sub)
   }
 
-  remove(requirement: MessageRequirements): WebSocketMessage<RequestType, ResponseType>[] {
+  remove(requirement: MessageRequirements): RequestType[] {
     const allMessages = this._buffers[requirement]
     this._buffers[requirement] = []
     return allMessages
   }
 
-  removeAny(): WebSocketMessage<RequestType, ResponseType>[] {
+  removeAny(): RequestType[] {
     return this.remove(MessageRequirements.any)
   }
 
-  removeAuth(): WebSocketMessage<RequestType, ResponseType>[] {
+  removeAuth(): RequestType[] {
     return this.remove(MessageRequirements.auth)
   }
 
-  removeSub(): WebSocketMessage<RequestType, ResponseType>[] {
+  removeSub(): RequestType[] {
     return this.remove(MessageRequirements.sub)
   }
 }

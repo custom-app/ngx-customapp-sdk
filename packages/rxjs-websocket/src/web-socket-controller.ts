@@ -2,12 +2,11 @@ import {
   ReconnectState,
   WebSocketControllerConfig,
   WebSocketControllerState,
-  WebSocketMessage,
   WebSocketOpenOptions,
   WebSocketRequestOptions,
   WebSocketSendOptions
 } from './types';
-import {Observable, Subject} from 'rxjs';
+import {filter, Observable, Subject, take, timeout} from 'rxjs';
 import {WebSocketIsAlreadyOpened} from './errors';
 import {MessageRequirements, WebSocketMessageBuffer} from './web-socket-message-buffer';
 import {WrappedSocket} from './wrapped-socket';
@@ -16,7 +15,8 @@ import {WrappedSocket} from './wrapped-socket';
  * Need this to prevent an overload.
  * The time between socket happening to be closed and the next try to open.
  */
-export const defaultReconnectInterval = 10000;
+export const defaultReconnectInterval = 10000; // 10 seconds
+export const defaultRequestTimeout = 2 * 60 * 1000; // 2 minutes
 
 // TODO describe how to use and examples
 export class WebSocketController<RequestType,
@@ -35,6 +35,8 @@ export class WebSocketController<RequestType,
     erroredCounter: 0,
     wasPrevOpenSuccessful: false,
   }
+  // used for setting request id
+  private _reqCounter = 1
   private _socket?: WrappedSocket;
   // For all messages, received from the server
   private _messages$ = new Subject<ResponseType>()
@@ -184,12 +186,14 @@ export class WebSocketController<RequestType,
     }
     // working with socket var, instead of this._socket,
     // to prevent occasional duplicates (when the socket in this._socket is different from socket we are working with)
-    socket.ws.onopen = (event) => {
+    socket.ws.onopen = (e: Event) => {
       if (!this._socket) {
         socket.ws.close();
         return
       }
+      this._opened$.next(e)
       this._sendBuffered(MessageRequirements.any)
+      this._authorize()
     }
     socket.ws.onerror = (error) => {
       this._error$.next(error)
@@ -202,6 +206,17 @@ export class WebSocketController<RequestType,
       this._closed$.next(e)
       if (!socket.closedManually) {
         this._reopen(options)
+      }
+    }
+    socket.ws.onmessage = (e: MessageEvent<UnderlyingDataType>) => {
+      let {deserializer} = this._config
+      if (!deserializer) {
+        deserializer = (v: MessageEvent<UnderlyingDataType>) => v as unknown as ResponseType
+      }
+      try {
+        this._messages$.next(deserializer(e))
+      } catch (e) {
+        this._error$.next(e)
       }
     }
   }
@@ -221,6 +236,33 @@ export class WebSocketController<RequestType,
         }
       }, this._safeCall(defaultReconnectInterval, interval, this._reconnectState))
     }
+  }
+
+  private _authorized(): void {
+    this._authorized$.next()
+    this._sendBuffered(MessageRequirements.auth)
+    this._subscribe()
+  }
+
+  private _authorize(): void {
+    const {authorize} = this._config
+    if (authorize) {
+      const msg = authorize.createRequest()
+      if (authorize.isResponseSuccessful) {
+        this._requestDirect(msg)
+          .subscribe()
+      } else {
+        this._sendDirect(msg)
+        this._authorized()
+      }
+    } else {
+      // if no auth required, the socket is considered authorized immediately
+      this._authorized()
+    }
+  }
+
+  private _subscribe(): void {
+    const {subscribe} = this._config
   }
 
   close(): void {
@@ -258,14 +300,15 @@ export class WebSocketController<RequestType,
     // TODO: implement
   }
 
-  private _sendDirect(msg: WebSocketMessage<RequestType, ResponseType>): void {
+  private _sendDirect(msg: RequestType): void {
     let {serializer} = this._config
     if (!serializer) {
       serializer = (v: RequestType) => v as unknown as UnderlyingDataType
     }
-    const data = this._safeCall(null, serializer, msg.msg)
-    if (data) {
-      this._socket?.ws.send(data)
+    try {
+      this._socket?.ws.send(serializer(msg))
+    } catch (e) {
+      this._error$.next(e)
     }
   }
 
@@ -287,6 +330,35 @@ export class WebSocketController<RequestType,
     msg: RequestType,
     options?: WebSocketRequestOptions
   ): Observable<ResponseType> {
-    // TODO: implement
+    const {request, requestId} = this._addRequestId(msg)
+    this.send(request, options)
+    return this._pipeForResponse(requestId)
+  }
+
+  private _addRequestId(msg: RequestType): { request: RequestType, requestId: number } {
+    const {setRequestId} = this._config
+    const requestId = this._reqCounter++
+    const request = setRequestId(msg, requestId)
+    return {
+      request,
+      requestId
+    }
+  }
+
+  // makes a request without any buffer and any checks
+  private _requestDirect(msg: RequestType): Observable<ResponseType> {
+    const {request, requestId} = this._addRequestId(msg)
+    this._sendDirect(request)
+    return this._pipeForResponse(requestId)
+  }
+
+  private _pipeForResponse(requestId: number): Observable<ResponseType> {
+    let {getResponseId, requestTimeout} = this._config
+    requestTimeout = requestTimeout === undefined ? defaultRequestTimeout : requestTimeout;
+    return this.messages$.pipe(
+      filter(response => getResponseId(response) === requestId),
+      take(1),
+      timeout({first: requestTimeout}),
+    )
   }
 }
