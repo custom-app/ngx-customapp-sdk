@@ -5,7 +5,7 @@
   "repository": "https://github.com/loyal-inform/ngx-customapp-sdk.git",
   "workspaces": [
     "packages/*",
-    "examples/*"
+    "angular-packages/"
   ],
   "scripts": {
     "doc": "typedoc --excludePrivate",
