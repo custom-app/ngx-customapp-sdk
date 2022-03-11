@@ -1,5 +1,5 @@
 {
-  "name": "auth-before-authorized-socket",
+  "name": "ngx-customapp-exapmple-auth-before-authorized-socket",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",

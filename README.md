@@ -14,11 +14,12 @@ SDK allowing you to quickly setup authorization and websocket life cycle in an A
     * [Pattern 4 "Auth before an authorized socket"](#pattern-4-auth-before-an-authorized-socket)
     * [Pattern 5 "Auth after an authorized socket"](#pattern-5-auth-after-an-authorized-socket)
   - [Package structure](#package-structure)
-    * [ngx-customapp-sdk/utils](#ngx-customapp-sdkutils)
-    * [ngx-customapp-sdk/rxjs-websocket](#ngx-customapp-sdkrxjs-websocket)
-    * [ngx-customapp-sdk/jwt](#ngx-customapp-sdkjwt)
-    * [ngx-customapp-sdk/proto-http](#ngx-customapp-sdkproto-http)
-    * [ngx-customapp-sdk/pattern-auth-before-authorized-socket](#ngx-customapp-sdkpattern-auth-before-authorized-socket)
+    * [customapp-utils](#customapp-utils)
+    * [customapp-rxjs-websocket](#customapp-rxjs-websocket)
+    * [ngx-customapp-jwt](#ngx-customapp-jwt)
+    * [ngx-customapp-proto-http](#ngx-customapp-proto-http)
+    * [ngx-customapp-forms](#ngx-customapp-forms)
+    * [ngx-customapp-pattern-auth-before-authorized-socket](#ngx-customapp-pattern-auth-before-authorized-socket)
 
 
 # Design
@@ -138,11 +139,11 @@ Flow:
 
 There are packages, their requirements and exported functionality listed below.
 
-### ngx-customapp-sdk/utils
+### customapp-utils
 
 A package with widely used utils
 
-### ngx-customapp-sdk/rxjs-websocket
+### customapp-rxjs-websocket
 
 A package for a websocket life cycle management.
 Requirements and functionality:
@@ -162,7 +163,7 @@ Requirements and functionality:
 - Support for custom serializer and deserializer.
 - Functions for request-response pattern.
 
-### ngx-customapp-sdk/jwt
+### ngx-customapp-jwt
 
 A package for an authorization and a JWT management
 
@@ -175,7 +176,7 @@ Requirements and functionality:
 - Provides store for sending auth request, saving response and account info, sending logout messages.
 - Provides an access guard and models for managing permissions.
 
-### ngx-customapp-sdk/proto-http
+### ngx-customapp-proto-http
 
 A package that handle details of working with proto over http. Helps to manage headers, errors, serialization, deserialization.
 Requirements and functionality:
@@ -185,7 +186,7 @@ Requirements and functionality:
 - Service for handling and reporting errors.
 - Utils for handling different types of body when parsing proto response.
 
-### ngx-customapp-sdk/forms
+### ngx-customapp-forms
 
 A package for a forms framework
 Requirements and functionality:
@@ -193,6 +194,6 @@ Requirements and functionality:
 - Compatible with Material inputs, Carbon Components.
 - Implements useful utils for handling validation errors, preventing double clicks and managing disabled state of submit button.
 
-### ngx-customapp-sdk/pattern-auth-before-authorized-socket
+### ngx-customapp-pattern-auth-before-authorized-socket
 
 Connects together rxjs-websocket, jwt, proto-http packages to implement [Pattern 4 "Auth before an authorized socket"](#pattern-4-auth-before-an-authorized-socket)

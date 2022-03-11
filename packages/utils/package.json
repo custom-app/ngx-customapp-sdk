@@ -1,5 +1,5 @@
 {
-  "name": "utils",
+  "name": "customapp-utils",
   "version": "1.0.0",
   "description": "A package with utils, used through ngx-customapp-sdk",
   "main": "dist/index.js",
