@@ -1,14 +1,12 @@
-import {
-  ReconnectState,
-  WebSocketControllerConfig,
-  WebSocketControllerState,
-  WebSocketOpenOptions,
-  WebSocketSendOptions,
-} from './types';
 import {catchError, EMPTY, filter, forkJoin, map, Observable, Subject, take, tap, timeout} from 'rxjs';
 import {WebSocketIsAlreadyOpened} from './errors';
 import {MessageRequirements, WebSocketMessageBuffer} from './web-socket-message-buffer';
 import {WrappedSocket} from './wrapped-socket';
+import {WebSocketControllerConfig} from './models/websocket-controller-config';
+import {ReconnectState} from './models/reconnect-state';
+import {WebSocketControllerState} from './models/websocket-controller-state';
+import {WebSocketOpenOptions} from './models/websocket-open-options';
+import {WebSocketSendOptions} from './models/websocket-send-options';
 
 /**
  * Need this to prevent an overload.

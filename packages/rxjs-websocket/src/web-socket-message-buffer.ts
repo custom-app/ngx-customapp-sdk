@@ -1,4 +1,5 @@
-import {BufferOverflowStrategy, WebSocketControllerConfig} from './types';
+import {BufferOverflowStrategy} from './models/buffer-overflow-strategy';
+import {WebSocketControllerConfig} from './models/websocket-controller-config';
 
 
 export const defaultWebSocketMessageBufferSize = 1;

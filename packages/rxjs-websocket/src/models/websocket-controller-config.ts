@@ -22,6 +22,7 @@
  * (even that original WebSocket [supports](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/binaryType)).
  * If you send binary data, send ONLY binary data. If you send text frames, send ONLY text frames.
  * */
+import {BufferOverflowStrategy} from './buffer-overflow-strategy';
 
 export interface WebSocketControllerConfig<RequestType, ResponseType, UnderlyingDataType = string> {
   /**
@@ -161,92 +162,4 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
      */
     overflow: BufferOverflowStrategy
   }
-}
-
-/** Describes what to do with messages in the buffer, when it overflows. */
-export type BufferOverflowStrategy = 'dropOld' | 'dropNew'
-
-/**
- * Describes how much there were successful and unsuccessful open tries. This data used
- * by configured functions to determine if the socket should reconnect and reconnect params.
- */
-export interface ReconnectState {
-  wasPrevOpenSuccessful: boolean,
-  /** number of times socket was in state "subscribed" */
-  subscribedCounter: number,
-  /** number of times socket.onerror callback fired */
-  erroredCounter: number
-}
-
-/**
- * Reflects the state in the WebSocketController life cycle.
- * Default transitions are: closed -> pending -> opened -> authorized -> subscribed -> closing -> closed.
- */
-export enum WebSocketControllerState {
-  pending,
-  opened,
-  authorized,
-  subscribed,
-  closing,
-  closed,
-}
-
-/**
- * Describes the reconnection behaviour.
- */
-export interface WebSocketOpenOptions {
-  /**
-   * If set, the socket will try to reconnect after being closed
-   * In general, you want to set this, cos it is the main feature of the package.
-   */
-  autoReconnect?: {
-    /**
-     * To calculate amount of milliseconds between socket being closed and next try to open.
-     * You may want to return random delay every time, to prevent overloading
-     * server after the one restarts.
-     * If the function errors, the default is {@link defaultReconnectInterval}
-     * @param reconnectState {@link ReconnectState}
-     */
-    interval: (reconnectState: ReconnectState) => number,
-    /**
-     * To determine if socket have to try to reconnect. If returns false,
-     * socket is closed, until `open()` is called again.
-     * If not passed, always tries to reconnect (same as if `() => true` is passed)
-     * @param reconnectState {@link ReconnectState}
-     */
-    shouldReconnect?: (reconnectState: ReconnectState) => boolean,
-    /**
-     * To determine, if auth message have to be sent.
-     * If not passed, auth message is always sent (same as if `() => true` is passed).
-     * @param reconnectState {@link ReconnectState}
-     */
-    authorize?: (reconnectState: ReconnectState) => boolean,
-    /**
-     * To determine, if subscribe requests have to be sent.
-     * If not passed, always tries to subscribe (same as if `() => true` is passed)
-     * @param reconnectState {@link ReconnectState}
-     */
-    subscribe?: (reconnectState: ReconnectState) => boolean,
-  },
-  /**
-   * If you try to open an already opened socket, the error will be thrown by default.
-   * This is cos it usually means, that there is some error in the code, that uses the WebSocketController.
-   * WebSocketController itself is designed to handle reconnects, authorization and subscriptions.
-   */
-  doNotThrowWhenOpened?: boolean,
-}
-
-/**
- * Describes how the {@link WebSocketController} should handle the message being sent.
- */
-export interface WebSocketSendOptions {
-  /** If true, the message will be sent even if the socket is not authorized and not subscribed */
-  withoutAuth?: boolean,
-  /** If true, the message will be sent even if the socket is not subscribed. */
-  withoutSubscription?: boolean,
-  /**
-   * If true, the message will be omitted when the socket is not in an appropriate state to send messages,
-   * e.g. not authorized
-   */
-  noBuffer?: boolean,
 }
