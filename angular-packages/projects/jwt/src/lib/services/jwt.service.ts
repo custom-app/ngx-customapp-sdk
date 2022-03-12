@@ -93,7 +93,7 @@ export class JwtService<JwtInfoType extends JwtInfo,
   /**
    * Refreshes the tokens if needed and calls the callback, when the tokens refreshed successfully,
    * or calls the {@link AuthConfig.noFreshJwt}, when the tokens were not refreshed.
-   * @param callback
+   * @param callback The function to be called after JWT were refreshed.
    */
   withFreshJwt(callback: (jwt: JwtGroupType) => void): void {
     const jwt = this._jwt
