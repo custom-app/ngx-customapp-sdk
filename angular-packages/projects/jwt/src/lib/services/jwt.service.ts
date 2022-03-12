@@ -2,11 +2,11 @@ import {Injectable} from '@angular/core';
 import {JwtApi} from '../models/jwt-api';
 import {JwtInfo} from '../models/jwt-info';
 import {JwtGroup} from '../models/jwt-group';
-import {Observable, Subscription, tap} from 'rxjs';
+import {Observable, Subject, Subscription, tap} from 'rxjs';
 import {AuthConfig} from '../models/auth-config';
 import {isJwtExpired} from '../utils';
 import {NoFreshJwtListener} from '../models/no-fresh-jwt-listener';
-import {defaultJwtStorageKey} from '../config/jwt-storage-key';
+import {defaultJwtStorageKey} from '../constants/jwt-storage-key';
 
 @Injectable()
 export class JwtService<JwtInfoType extends JwtInfo,
@@ -91,14 +91,22 @@ export class JwtService<JwtInfoType extends JwtInfo,
   }
 
   /**
-   * Refreshes the tokens if needed and calls the callback, when the tokens refreshed successfully,
-   * or calls the {@link AuthConfig.noFreshJwt}, when the tokens were not refreshed.
+   * Refreshes the tokens if needed and calls the callback, when the tokens refreshed successfully.
+   * If the tokens are not refreshable, the callback is called with expired JWT and
+   * the {@link AuthConfig.noFreshJwt} is also called
+   *
+   * If you want the callback to be called only with fresh tokens, pass `true` as the second parameter.
+   *
    * @param callback The function to be called after JWT were refreshed.
+   * @param callWithFreshOnly If true, the callback will not be called when JWT are not refreshable.
    */
-  withFreshJwt(callback: (jwt: JwtGroupType) => void): void {
+  withFreshJwt(callback: (jwt?: JwtGroupType) => void, callWithFreshOnly?: boolean): void {
     const jwt = this._jwt
     if (!jwt || isJwtExpired(jwt.refreshToken)) {
       this.noFreshJwtListener.noFreshJwt()
+      if (!callWithFreshOnly) {
+        callback(jwt)
+      }
       return
     }
     if (isJwtExpired(jwt.accessToken)) {
@@ -119,6 +127,14 @@ export class JwtService<JwtInfoType extends JwtInfo,
     } else {
       callback(jwt)
     }
+  }
+
+  freshJwt(): Observable<JwtGroupType | undefined> {
+    const subject = new Subject<JwtGroupType | undefined>()
+    this.withFreshJwt(jwt => {
+      subject.next(jwt)
+    })
+    return subject
   }
 
   /**

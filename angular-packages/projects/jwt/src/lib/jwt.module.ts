@@ -3,7 +3,7 @@ import {JwtComponent} from './jwt.component';
 import {JwtService} from './services/jwt.service';
 import {JwtInfo} from './models/jwt-info';
 import {JwtGroup} from './models/jwt-group';
-import {AUTH_CONFIG} from './config/di-token';
+import {AUTH_CONFIG} from './constants/di-token';
 import {AuthConfig} from './models/auth-config';
 import {JwtApi} from './models/jwt-api';
 import {NoFreshJwtListener} from './models/no-fresh-jwt-listener';
