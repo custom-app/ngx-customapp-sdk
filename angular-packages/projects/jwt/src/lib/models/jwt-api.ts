@@ -1,13 +1,11 @@
 import {Observable} from 'rxjs';
-import {JwtGroup} from './jwt-group';
 import {JwtInfo} from './jwt-info';
+import {JwtGroup} from './jwt-group';
 
 /**
  * Provides methods to interact with backend
  */
-export abstract class JwtApi<JwtInfoType extends JwtInfo,
-  JwtGroupType extends JwtGroup<JwtInfoType>,
-  Credentials,
+export abstract class JwtApi<Credentials,
   UserId,
   AuthResponse> {
   /**
@@ -24,11 +22,11 @@ export abstract class JwtApi<JwtInfoType extends JwtInfo,
    * @param accessToken the access token of the current user (not target).
    * @returns The `AuthResponse` as if the target user logged in using his credentials.
    */
-  abstract loginAs: (userId: UserId, accessToken: JwtInfoType) => Observable<AuthResponse>
+  abstract loginAs: (userId: UserId, accessToken: JwtInfo) => Observable<AuthResponse>
   /**
    * Uses valid long-living refresh token to get new access and refresh tokens from backend.
    */
-  abstract refresh: (refreshToken: JwtInfoType) => Observable<JwtGroupType>
+  abstract refresh: (refreshToken: JwtInfo) => Observable<JwtGroup<JwtInfo>>
   /**
    * Invalidates tokens.
    * @param fromAllDevices Optional functionality

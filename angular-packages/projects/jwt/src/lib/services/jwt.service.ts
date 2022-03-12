@@ -1,27 +1,25 @@
 import {Injectable} from '@angular/core';
 import {JwtApi} from '../models/jwt-api';
-import {JwtInfo} from '../models/jwt-info';
-import {JwtGroup} from '../models/jwt-group';
 import {Observable, Subject, Subscription, tap} from 'rxjs';
 import {AuthConfig} from '../models/auth-config';
 import {isJwtExpired} from '../utils';
 import {NoFreshJwtListener} from '../models/no-fresh-jwt-listener';
 import {defaultJwtStorageKey} from '../constants/jwt-storage-key';
+import {JwtGroup} from '../models/jwt-group';
+import {JwtInfo} from '../models/jwt-info';
 
 @Injectable()
-export class JwtService<JwtInfoType extends JwtInfo,
-  JwtGroupType extends JwtGroup<JwtInfoType>,
-  Credentials,
+export class JwtService<Credentials,
   UserId,
   AuthResponse> {
 
-  private _jwt?: JwtGroupType
+  private _jwt?: JwtGroup<JwtInfo>
   private _refresh?: Subscription
-  private _waitingForRefresh: ((jwt: JwtGroupType) => void)[] = []
+  private _waitingForRefresh: ((jwt: JwtGroup<JwtInfo>) => void)[] = []
 
   constructor(
-    private jwtApi: JwtApi<JwtInfoType, JwtGroupType, Credentials, UserId, AuthResponse>,
-    private config: AuthConfig<JwtInfoType, JwtGroupType, Credentials, UserId, AuthResponse>,
+    private jwtApi: JwtApi<Credentials, UserId, AuthResponse>,
+    private config: AuthConfig<Credentials, UserId, AuthResponse>,
     private noFreshJwtListener: NoFreshJwtListener,
   ) {
     this._loadJwt()
@@ -31,7 +29,7 @@ export class JwtService<JwtInfoType extends JwtInfo,
     return this.config.jwtStorageKey || defaultJwtStorageKey
   }
 
-  private _setJwt(jwt: JwtGroupType): void {
+  private _setJwt(jwt: JwtGroup<JwtInfo>): void {
     this._jwt = jwt
     localStorage.setItem(this._storageKey, JSON.stringify(jwt))
   }
@@ -67,7 +65,7 @@ export class JwtService<JwtInfoType extends JwtInfo,
   /**
    * Readonly access to the JWT. Probably you should use {@link withFreshJwt}.
    */
-  get jwt(): JwtGroupType | undefined {
+  get jwt(): JwtGroup<JwtInfo> | undefined {
     return this._jwt
   }
 
@@ -84,7 +82,7 @@ export class JwtService<JwtInfoType extends JwtInfo,
   /**
    * Makes a call to the {@link JwtApi.loginAs}, but handles the jwt in response.
    */
-  loginAs(userId: UserId, accessToken: JwtInfoType): Observable<AuthResponse> {
+  loginAs(userId: UserId, accessToken: JwtInfo): Observable<AuthResponse> {
     return this._pipeAuthResponse(
       this.jwtApi.loginAs(userId, accessToken)
     )
@@ -100,7 +98,7 @@ export class JwtService<JwtInfoType extends JwtInfo,
    * @param callback The function to be called after JWT were refreshed.
    * @param callWithFreshOnly If true, the callback will not be called when JWT are not refreshable.
    */
-  withFreshJwt(callback: (jwt?: JwtGroupType) => void, callWithFreshOnly?: boolean): void {
+  withFreshJwt(callback: (jwt?: JwtGroup<JwtInfo>) => void, callWithFreshOnly?: boolean): void {
     const jwt = this._jwt
     if (!jwt || isJwtExpired(jwt.refreshToken)) {
       this.noFreshJwtListener.noFreshJwt()
@@ -129,8 +127,8 @@ export class JwtService<JwtInfoType extends JwtInfo,
     }
   }
 
-  freshJwt(): Observable<JwtGroupType | undefined> {
-    const subject = new Subject<JwtGroupType | undefined>()
+  freshJwt(): Observable<JwtGroup<JwtInfo> | undefined> {
+    const subject = new Subject<JwtGroup<JwtInfo> | undefined>()
     this.withFreshJwt(jwt => {
       subject.next(jwt)
     })

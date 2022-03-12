@@ -14,10 +14,10 @@ export class JwtAdapter<JwtInfoType extends JwtInfo,
   Credentials,
   UserId,
   AuthResponse> {
-  private _configDiToken = new InjectionToken<AuthConfig<JwtInfoType, JwtGroupType, Credentials, UserId, AuthResponse>>('authConfig')
+  private _configDiToken = new InjectionToken<AuthConfig<Credentials, UserId, AuthResponse>>('authConfig')
 
   constructor(
-    private config: AuthConfig<JwtInfoType, JwtGroupType, Credentials, UserId, AuthResponse>
+    private config: AuthConfig<Credentials, UserId, AuthResponse>
   ) {
   }
 
@@ -52,6 +52,10 @@ export class JwtAdapter<JwtInfoType extends JwtInfo,
       useClass: AuthInterceptor,
       multi: true,
     }
+  }
+
+  actions() {
+
   }
 
   selectors() {
