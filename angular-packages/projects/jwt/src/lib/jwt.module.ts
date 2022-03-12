@@ -1,5 +1,4 @@
 import {ModuleWithProviders, NgModule} from '@angular/core';
-import {JwtComponent} from './jwt.component';
 import {JwtService} from './services/jwt.service';
 import {JwtInfo} from './models/jwt-info';
 import {JwtGroup} from './models/jwt-group';
@@ -10,13 +9,9 @@ import {NoFreshJwtListener} from './models/no-fresh-jwt-listener';
 
 
 @NgModule({
-  declarations: [
-    JwtComponent
-  ],
+  declarations: [],
   imports: [],
-  exports: [
-    JwtComponent
-  ]
+  exports: []
 })
 export class JwtModule {
   static forRoot<JwtInfoType extends JwtInfo,
