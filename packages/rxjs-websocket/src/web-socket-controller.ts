@@ -183,6 +183,8 @@ export class WebSocketController<RequestType,
   private _opened(e: Event): void {
     this._state = WebSocketControllerState.opened
     this._opened$.next(e)
+    this._sendBuffered(MessageRequirements.any)
+    this._authorize()
   }
 
   private _authorized(authResponse?: ResponseType): void {
@@ -250,8 +252,6 @@ export class WebSocketController<RequestType,
         return
       }
       this._opened(e)
-      this._sendBuffered(MessageRequirements.any)
-      this._authorize()
     }
     socket.ws.onerror = (error) => {
       this._error$.next(error)
@@ -348,6 +348,8 @@ export class WebSocketController<RequestType,
         )
         // will also pipe errors
         failed$.subscribe(this._notSubscribed$)
+      } else {
+        this._subscribed()
       }
     } else {
       // if no subscription is required, the socket is considered subscribed immediately
