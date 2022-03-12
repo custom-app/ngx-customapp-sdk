@@ -108,6 +108,7 @@ export class JwtService<JwtInfoType extends JwtInfo,
           .jwtApi
           .refresh(jwt.refreshToken)
           .subscribe(freshJwt => {
+            this._setJwt(freshJwt)
             this
               ._waitingForRefresh
               .forEach(fn => fn(freshJwt))
