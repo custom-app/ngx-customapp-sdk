@@ -8,6 +8,9 @@ import {NoFreshJwtListener} from './models/no-fresh-jwt-listener';
 import {JwtService} from './services/jwt.service';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {AuthInterceptor} from './http-interceptor/auth.interceptor';
+import {createAction, props} from '@ngrx/store'
+import {packageName} from './constants/package-name';
+
 
 export class JwtAdapter<JwtInfoType extends JwtInfo,
   JwtGroupType extends JwtGroup<JwtInfoType>,
@@ -55,7 +58,33 @@ export class JwtAdapter<JwtInfoType extends JwtInfo,
   }
 
   actions() {
+    return {
+      login: createAction(
+        `[${packageName}] login`,
+        props<{ credentials: Credentials }>()
+      ),
+      loginSucceed: createAction(
+        `[${packageName}] login succeed`,
+        props<{ response: AuthResponse }>(),
+      ),
+      loginErrored: createAction(
+        `[${packageName}] login errored`,
+        props<{ error: string }>(),
+      ),
 
+      loginAs: createAction(
+        `[${packageName}] login as`,
+        props<{ userId: UserId }>()
+      ),
+      loginAsSucceed: createAction(
+        `[${packageName}] login as succeed`,
+        props<{ response: AuthResponse }>()
+      ),
+      loginAsErrored: createAction(
+        `[${packageName}] login as errored`,
+        props<{ error: string }>(),
+      )
+    }
   }
 
   selectors() {

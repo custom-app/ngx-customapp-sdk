@@ -2,6 +2,7 @@ import {JwtGroup} from './jwt-group';
 import {JwtInfo} from './jwt-info';
 import {JwtApi} from './jwt-api';
 import {NoFreshJwtListener} from './no-fresh-jwt-listener';
+import {ActionCreator} from '@ngrx/store'
 
 export interface AuthConfig<Credentials,
   UserId,
@@ -33,4 +34,5 @@ export interface AuthConfig<Credentials,
    * Default is {@link defaultJwtStorageKey}
    */
   jwtStorageKey?: string,
+  actionToWaitUntilAuth: ActionCreator<any>;
 }

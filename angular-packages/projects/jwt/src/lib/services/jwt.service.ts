@@ -1,12 +1,13 @@
 import {Injectable} from '@angular/core';
 import {JwtApi} from '../models/jwt-api';
-import {Observable, Subject, Subscription, tap} from 'rxjs';
+import {EMPTY, mergeMap, Observable, Subject, Subscription, tap, throwError} from 'rxjs';
 import {AuthConfig} from '../models/auth-config';
 import {isJwtExpired} from '../utils';
 import {NoFreshJwtListener} from '../models/no-fresh-jwt-listener';
 import {defaultJwtStorageKey} from '../constants/jwt-storage-key';
 import {JwtGroup} from '../models/jwt-group';
 import {JwtInfo} from '../models/jwt-info';
+import {LoginAsCalledWhenUnauthorized, LoginAsMethodUnimplemented} from '../errors';
 
 @Injectable()
 export class JwtService<Credentials,
@@ -14,6 +15,8 @@ export class JwtService<Credentials,
   AuthResponse> {
 
   private _jwt?: JwtGroup<JwtInfo>
+  // the stack to store master JWT when using loginAs
+  private _jwtStash: JwtGroup<JwtInfo>[] = []
   private _refresh?: Subscription
   private _waitingForRefresh: ((jwt: JwtGroup<JwtInfo>) => void)[] = []
 
@@ -52,14 +55,18 @@ export class JwtService<Credentials,
     }
   }
 
-  private _pipeAuthResponse(request: Observable<AuthResponse>): Observable<AuthResponse> {
-    return request
-      .pipe(
-        tap(authResponse => {
-          const jwt = this.config.authResponseToJwt(authResponse)
-          this._setJwt(jwt)
-        })
-      )
+  private _stashJwt(): void {
+    if (this._jwt) {
+      this._jwtStash.push(this._jwt)
+      this._deleteJwt()
+    }
+  }
+
+  private _unstashJwt(): void {
+    const jwt = this._jwtStash.pop()
+    if (jwt) {
+      this._setJwt(jwt)
+    }
   }
 
   /**
@@ -73,19 +80,41 @@ export class JwtService<Credentials,
    * Makes a call to the {@link JwtApi.login}, but handles the jwt in response.
    */
   login(credentials: Credentials): Observable<AuthResponse> {
-    return this._pipeAuthResponse(
-      this.jwtApi.login(credentials)
-    )
-
+    return this.jwtApi.login(credentials)
+      .pipe(
+        tap(authResponse => {
+          const jwt = this.config.authResponseToJwt(authResponse)
+          this._setJwt(jwt)
+        })
+      )
   }
 
   /**
    * Makes a call to the {@link JwtApi.loginAs}, but handles the jwt in response.
    */
-  loginAs(userId: UserId, accessToken: JwtInfo): Observable<AuthResponse> {
-    return this._pipeAuthResponse(
-      this.jwtApi.loginAs(userId, accessToken)
-    )
+  loginAs(userId: UserId): Observable<AuthResponse> {
+    return this
+      .freshJwt()
+      .pipe(
+        mergeMap(jwt => {
+          if (!jwt) {
+            return throwError(() => new LoginAsCalledWhenUnauthorized())
+          }
+          if (!this.jwtApi.loginAs) {
+            return throwError(() => new LoginAsMethodUnimplemented())
+          }
+          return this
+            .jwtApi
+            .loginAs(jwt.accessToken, userId)
+            .pipe(
+              tap(authResponse => {
+                const jwt = this.config.authResponseToJwt(authResponse)
+                this._stashJwt()
+                this._setJwt(jwt)
+              })
+            )
+        })
+      )
   }
 
   /**
@@ -136,15 +165,31 @@ export class JwtService<Credentials,
   }
 
   /**
+   * Logs out the current user. If there was loginAs call previously (perhaps multiple calls),
+   * will restore the JWT of the user, that called loginAs.
    * Makes a call to the {@link JwtApi.logout}, but handles the jwt in response.
+   * If the refresh token is expired or there is no tokens, will return immediately.
    */
   logout(fromAllDevices?: boolean): Observable<void> {
     return this
-      .jwtApi
-      .logout(fromAllDevices)
+      // will refresh expired access token, cos logout need to invalidate refresh token too.
+      .freshJwt()
       .pipe(
-        tap(() => {
-          this._deleteJwt()
+        mergeMap(jwt => {
+          if (jwt && !isJwtExpired(jwt.refreshToken)) {
+            return this
+              .jwtApi
+              .logout(jwt.accessToken, fromAllDevices)
+              .pipe(
+                tap(() => {
+                  this._deleteJwt()
+                  // will set the JWT of the previous user (if there have been) into this.jwt
+                  this._unstashJwt()
+                })
+              )
+          } else {
+            return EMPTY
+          }
         })
       )
   }
