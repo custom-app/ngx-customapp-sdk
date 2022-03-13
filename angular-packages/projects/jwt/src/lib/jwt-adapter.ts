@@ -83,6 +83,17 @@ export class JwtAdapter<JwtInfoType extends JwtInfo,
       loginAsErrored: createAction(
         `[${packageName}] login as errored`,
         props<{ error: string }>(),
+      ),
+
+      logout: createAction(
+        `[${packageName}] logout`,
+        props<{ fromAllDevices?: boolean }>()
+      ),
+      logoutSucceed: createAction(
+        `[${packageName}] logout succeed`,
+      ),
+      logoutErrored: createAction(
+        `[${packageName}] logout errored`,
       )
     }
   }
