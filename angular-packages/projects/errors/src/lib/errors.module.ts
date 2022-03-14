@@ -1,16 +1,10 @@
-import { NgModule } from '@angular/core';
-import { ErrorsComponent } from './errors.component';
-
+import {NgModule} from '@angular/core';
 
 
 @NgModule({
-  declarations: [
-    ErrorsComponent
-  ],
-  imports: [
-  ],
-  exports: [
-    ErrorsComponent
-  ]
+  declarations: [],
+  imports: [],
+  exports: []
 })
-export class ErrorsModule { }
+export class ErrorsModule {
+}
