@@ -4,7 +4,7 @@ import {JwtApi} from './jwt-api';
 import {NoFreshJwtListener} from './no-fresh-jwt-listener';
 import {ActionCreator} from '@ngrx/store'
 
-export interface AuthConfig<Credentials,
+export interface JwtConfig<Credentials,
   UserId,
   AuthResponse,
   UserInfo> {

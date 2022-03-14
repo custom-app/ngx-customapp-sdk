@@ -4,7 +4,7 @@ import {Store} from '@ngrx/store'
 import {JwtActions} from './jwt.actions';
 import {catchError, map, mergeMap, of, throwError} from 'rxjs';
 import {JwtService} from '../services/jwt.service'
-import {AuthConfig} from '../models/auth-config';
+import {JwtConfig} from '../models/jwt-config';
 import {JwtSelectors} from './jwt.selectors';
 import {AppRootStateBase} from './reducers';
 import {LoginAsMethodUnimplemented} from '../errors';
@@ -16,7 +16,7 @@ export class JwtEffects<Credentials, UserId, AuthResponse, UserInfo> {
   constructor(
     private actions$: Actions,
     private jwtService: JwtService<Credentials, UserId, AuthResponse, UserInfo>,
-    private config: AuthConfig<Credentials, UserId, AuthResponse, UserInfo>,
+    private config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>,
     private store: Store<AppRootStateBase<UserInfo>>,
     private a: JwtActions<Credentials, UserId, AuthResponse, UserInfo>,
     private s: JwtSelectors<UserInfo>,

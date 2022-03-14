@@ -6,7 +6,7 @@ export * from './lib/jwt.module';
 export * from './lib/http-interceptor/auth.interceptor'
 export * from './lib/errors'
 
-export * from './lib/models/auth-config'
+export * from './lib/models/jwt-config'
 export * from './lib/models/jwt-api'
 export * from './lib/models/jwt-group'
 export * from './lib/models/jwt-info'

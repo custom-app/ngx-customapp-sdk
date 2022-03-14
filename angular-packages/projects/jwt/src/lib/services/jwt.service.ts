@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {JwtApi} from '../models/jwt-api';
 import {EMPTY, mergeMap, Observable, Subject, Subscription, tap, throwError} from 'rxjs';
-import {AuthConfig} from '../models/auth-config';
+import {JwtConfig} from '../models/jwt-config';
 import {isJwtExpired} from '../utils';
 import {NoFreshJwtListener} from '../models/no-fresh-jwt-listener';
 import {defaultJwtStorageKey} from '../constants/jwt-storage-key';
@@ -23,7 +23,7 @@ export class JwtService<Credentials,
 
   constructor(
     private jwtApi: JwtApi<Credentials, UserId, AuthResponse>,
-    private config: AuthConfig<Credentials, UserId, AuthResponse, UserInfo>,
+    private config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>,
     private noFreshJwtListener: NoFreshJwtListener,
   ) {
     this._loadJwt()
@@ -121,7 +121,7 @@ export class JwtService<Credentials,
   /**
    * Refreshes the tokens if needed and calls the callback, when the tokens refreshed successfully.
    * If the tokens are not refreshable, the callback is called with expired JWT and
-   * the {@link AuthConfig.noFreshJwt} is also called
+   * the {@link JwtConfig.noFreshJwt} is also called
    *
    * If you want the callback to be called only with fresh tokens, pass `true` as the second parameter.
    *

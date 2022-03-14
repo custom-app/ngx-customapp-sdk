@@ -1,6 +1,6 @@
 import {JwtInfo} from './models/jwt-info';
 import {JwtGroup} from './models/jwt-group';
-import {AuthConfig} from './models/auth-config';
+import {JwtConfig} from './models/jwt-config';
 import {InjectionToken, ModuleWithProviders, Provider} from '@angular/core';
 import {JwtModule} from './jwt.module';
 import {JwtApi} from './models/jwt-api';
@@ -27,12 +27,12 @@ export class JwtAdapter<JwtInfoType extends JwtInfo,
   UserId,
   AuthResponse,
   UserInfo> {
-  private _configDiToken = new InjectionToken<AuthConfig<Credentials, UserId, AuthResponse, UserInfo>>('authConfig')
+  private _configDiToken = new InjectionToken<JwtConfig<Credentials, UserId, AuthResponse, UserInfo>>('authConfig')
   private readonly _actions: JwtActions<Credentials, UserId, AuthResponse, UserInfo>
   private readonly _selectors: JwtSelectors<UserInfo>
 
   constructor(
-    private config: AuthConfig<Credentials, UserId, AuthResponse, UserInfo>
+    private config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>
   ) {
     this._actions = jwtActions<Credentials, UserId, AuthResponse, UserInfo>()
     this._selectors = jwtSelectors<UserInfo>()
@@ -77,7 +77,7 @@ export class JwtAdapter<JwtInfoType extends JwtInfo,
       useFactory: (
         actions$: Actions,
         jwtService: JwtService<Credentials, UserId, AuthResponse, UserInfo>,
-        config: AuthConfig<Credentials, UserId, AuthResponse, UserInfo>,
+        config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>,
         store: Store<AppRootStateBase<UserInfo>>
       ) =>
         new JwtEffects(actions$, jwtService, config, store, this.actions(), this.selectors()),

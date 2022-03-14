@@ -1,6 +1,6 @@
 import {HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {AuthConfig} from '../models/auth-config';
+import {JwtConfig} from '../models/jwt-config';
 import {JwtInfo} from '../models/jwt-info';
 import {JwtGroup} from '../models/jwt-group';
 import {mergeMap, Observable} from 'rxjs';
@@ -10,19 +10,15 @@ import {JwtService} from '../services/jwt.service';
 
 /**
  * An HttpInterceptor, that adds a header containing fresh JWT access token to every http request.
- * The header is configured by the {@link AuthConfig.authHeader}.
+ * The header is configured by the {@link JwtConfig.authHeader}.
  * If no fresh JWT is available (refresh token expired), will make the request with expired JWT.
  */
 
 @Injectable()
-export class AuthInterceptor<JwtInfoType extends JwtInfo,
-  JwtGroupType extends JwtGroup<JwtInfoType>,
-  Credentials,
-  UserId,
-  AuthResponse> implements HttpInterceptor {
+export class AuthInterceptor<Credentials, UserId, AuthResponse, UserInfo> implements HttpInterceptor {
   constructor(
-    private config: AuthConfig<JwtInfoType, JwtGroupType, Credentials, UserId, AuthResponse>,
-    private jwtService: JwtService<JwtInfoType, JwtGroupType, Credentials, UserId, AuthResponse>
+    private config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>,
+    private jwtService: JwtService<Credentials, UserId, AuthResponse, UserInfo>
   ) {
   }
 
@@ -52,7 +48,7 @@ export class AuthInterceptor<JwtInfoType extends JwtInfo,
       )
   }
 
-  addAccessToken(req: HttpRequest<any>, jwt: JwtGroupType): HttpRequest<any> {
+  addAccessToken(req: HttpRequest<any>, jwt: JwtGroup<JwtInfo>): HttpRequest<any> {
     let headers: HttpHeaders = req.headers;
     headers = headers.set(
       this.config.authHeader.name,

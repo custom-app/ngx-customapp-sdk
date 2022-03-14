@@ -9,11 +9,11 @@ import * as fromUserStash from './user-stash.reducer';
 export const jwtFeatureKey = packageName
 
 export interface JwtRootState<UserInfo> {
-  [fromUser.userFeatureKey]: fromUser.JwtUserState<UserInfo>
+  [fromUser.userFeatureKey]: fromUser.State<UserInfo>
   [fromLoginInProcess.loginInProcessFeatureKey]: fromLoginInProcess.State;
   [fromLogoutInProcess.logoutInProcessFeatureKey]: fromLogoutInProcess.State;
   [fromLoginAsInProcess.loginAsInProcessFeatureKey]: fromLoginAsInProcess.State;
-  [fromUserStash.userStashFeatureKey]: fromUserStash.State;
+  [fromUserStash.userStashFeatureKey]: fromUserStash.State<UserInfo>;
 }
 
 /**
