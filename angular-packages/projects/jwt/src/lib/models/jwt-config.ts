@@ -15,7 +15,7 @@ export interface JwtConfig<Credentials,
   authResponseToJwt: (authResponse: AuthResponse) => JwtGroup<JwtInfo>,
   authResponseToUserInfo: (authResponse: AuthResponse) => UserInfo,
   /**
-   * Used by the AuthInterceptor http interceptor to set the auth header with jwt pinned for every request.
+   * Used by the JwtInterceptor http interceptor to set the auth header with jwt pinned for every request.
    */
   authHeader: {
     name: string,

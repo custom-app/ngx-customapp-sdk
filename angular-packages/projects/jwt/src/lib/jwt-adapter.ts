@@ -7,7 +7,7 @@ import {JwtApi} from './models/jwt-api';
 import {NoFreshJwtListener} from './models/no-fresh-jwt-listener';
 import {JwtService} from './services/jwt.service';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
-import {AuthInterceptor} from './http-interceptor/auth.interceptor';
+import {JwtInterceptor} from './http-interceptor/jwt.interceptor';
 import {ActionReducerMap, createReducer, on, Store} from '@ngrx/store'
 import {AppRootStateBase, JwtRootState} from './store/reducers';
 import {jwtActions, JwtActions} from './store/jwt.actions';
@@ -62,7 +62,7 @@ export class JwtAdapter<JwtInfoType extends JwtInfo,
   interceptorProvider(): Provider {
     return {
       provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
+      useClass: JwtInterceptor,
       multi: true,
     }
   }

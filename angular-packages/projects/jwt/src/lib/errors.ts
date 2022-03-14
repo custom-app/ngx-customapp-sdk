@@ -1,7 +1,7 @@
-export class AuthInterceptorDropsReportProgress extends Error {
+export class JwtInterceptorDropsReportProgress extends Error {
   constructor() {
-    super('The AuthInterceptor provided by the ngx-cutomapp-jwt is disabling report progress feature of the request, ' +
-      'you need to use disableAuthInterception http context token');
+    super('The JwtInterceptor provided by the ngx-cutomapp-jwt is disabling report progress feature of the request, ' +
+      'you need to use disableJwtInterception http context token');
   }
 }
 
