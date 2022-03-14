@@ -1,6 +1,7 @@
 {
   "entryPoints": [
-    "packages/rxjs-websocket/src/index.ts"
+    "packages/rxjs-websocket/src/index.ts",
+    "angular-packages/projects/jwt/src/public-api.ts"
   ],
   "out": "docs"
 }

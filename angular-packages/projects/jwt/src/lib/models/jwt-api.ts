@@ -15,7 +15,7 @@ export abstract class JwtApi<Credentials,
    * Should make an auth request to the server.
    * @param credentials Login and password or something else, depending on the target application
    * @returns Usually returns information about the user and JWT tokens.
-   * JWT is retrieved from auth response with {@link AuthConfig.authResponseToJwt}.
+   * JWT is retrieved from auth response with {@link JwtConfig.authResponseToJwt}.
    */
   abstract login: (credentials: Credentials) => Observable<AuthResponse>
   /**
