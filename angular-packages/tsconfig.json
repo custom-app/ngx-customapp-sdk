@@ -9,6 +9,10 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "paths": {
+      "errors": [
+        "dist/errors/errors",
+        "dist/errors"
+      ],
       "jwt": [
         "dist/jwt/jwt",
         "dist/jwt"
