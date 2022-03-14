@@ -1,5 +1,5 @@
 import {HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
 import {JwtConfig} from '../models/jwt-config';
 import {JwtInfo} from '../models/jwt-info';
 import {JwtGroup} from '../models/jwt-group';
@@ -7,6 +7,7 @@ import {mergeMap, Observable} from 'rxjs';
 import {disableAuthInterception} from '../constants/disable-auth-interception';
 import {AuthInterceptorDropsReportProgress} from '../errors';
 import {JwtService} from '../services/jwt.service';
+import {JWT_CONFIG} from '../constants/di-token';
 
 /**
  * An HttpInterceptor, that adds a header containing fresh JWT access token to every http request.
@@ -17,7 +18,7 @@ import {JwtService} from '../services/jwt.service';
 @Injectable()
 export class AuthInterceptor<Credentials, UserId, AuthResponse, UserInfo> implements HttpInterceptor {
   constructor(
-    private config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>,
+    @Inject(JWT_CONFIG) private config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>,
     private jwtService: JwtService<Credentials, UserId, AuthResponse, UserInfo>
   ) {
   }

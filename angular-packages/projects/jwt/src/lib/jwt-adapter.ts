@@ -1,7 +1,7 @@
 import {JwtInfo} from './models/jwt-info';
 import {JwtGroup} from './models/jwt-group';
 import {JwtConfig} from './models/jwt-config';
-import {InjectionToken, ModuleWithProviders, Provider} from '@angular/core';
+import {ModuleWithProviders, Provider} from '@angular/core';
 import {JwtModule} from './jwt.module';
 import {JwtApi} from './models/jwt-api';
 import {NoFreshJwtListener} from './models/no-fresh-jwt-listener';
@@ -19,6 +19,7 @@ import * as fromLoginInProcess from './store/reducers/login-in-process.reducer'
 import * as fromLogoutInProcess from './store/reducers/logout-in-process.reducer'
 import * as fromLoginAsInProcess from './store/reducers/login-as-in-process.reducer'
 import * as fromUserStash from './store/reducers/user-stash.reducer'
+import {JWT_CONFIG} from './constants/di-token';
 
 
 export class JwtAdapter<JwtInfoType extends JwtInfo,
@@ -27,7 +28,6 @@ export class JwtAdapter<JwtInfoType extends JwtInfo,
   UserId,
   AuthResponse,
   UserInfo> {
-  private _configDiToken = new InjectionToken<JwtConfig<Credentials, UserId, AuthResponse, UserInfo>>('authConfig')
   private readonly _actions: JwtActions<Credentials, UserId, AuthResponse, UserInfo>
   private readonly _selectors: JwtSelectors<UserInfo>
 
@@ -38,16 +38,12 @@ export class JwtAdapter<JwtInfoType extends JwtInfo,
     this._selectors = jwtSelectors<UserInfo>()
   }
 
-  get configDiToken() {
-    return this._configDiToken
-  }
-
   forRoot(): ModuleWithProviders<JwtModule> {
     return {
       ngModule: JwtModule,
       providers: [
         {
-          provide: this.configDiToken,
+          provide: JWT_CONFIG,
           useValue: this.config,
         },
         {
@@ -81,7 +77,7 @@ export class JwtAdapter<JwtInfoType extends JwtInfo,
         store: Store<AppRootStateBase<UserInfo>>
       ) =>
         new JwtEffects(actions$, jwtService, config, store, this.actions(), this.selectors()),
-      deps: [Actions, JwtService, this.configDiToken, Store],
+      deps: [Actions, JwtService, JWT_CONFIG, Store],
     }
   }
 

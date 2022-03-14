@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
 import {JwtApi} from '../models/jwt-api';
 import {EMPTY, mergeMap, Observable, Subject, Subscription, tap, throwError} from 'rxjs';
 import {JwtConfig} from '../models/jwt-config';
@@ -8,6 +8,7 @@ import {defaultJwtStorageKey} from '../constants/jwt-storage-key';
 import {JwtGroup} from '../models/jwt-group';
 import {JwtInfo} from '../models/jwt-info';
 import {LoginAsCalledWhenUnauthorized, LoginAsMethodUnimplemented} from '../errors';
+import {JWT_CONFIG} from '../constants/di-token';
 
 @Injectable()
 export class JwtService<Credentials,
@@ -23,7 +24,7 @@ export class JwtService<Credentials,
 
   constructor(
     private jwtApi: JwtApi<Credentials, UserId, AuthResponse>,
-    private config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>,
+    @Inject(JWT_CONFIG) private config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>,
     private noFreshJwtListener: NoFreshJwtListener,
   ) {
     this._loadJwt()
