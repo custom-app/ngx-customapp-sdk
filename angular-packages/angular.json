@@ -35,5 +35,8 @@
       }
     }
   },
-  "defaultProject": "jwt"
+  "defaultProject": "jwt",
+  "cli": {
+    "defaultCollection": "@ngrx/schematics"
+  }
 }

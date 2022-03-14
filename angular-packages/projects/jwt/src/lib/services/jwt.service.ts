@@ -12,7 +12,8 @@ import {LoginAsCalledWhenUnauthorized, LoginAsMethodUnimplemented} from '../erro
 @Injectable()
 export class JwtService<Credentials,
   UserId,
-  AuthResponse> {
+  AuthResponse,
+  UserInfo> {
 
   private _jwt?: JwtGroup<JwtInfo>
   // the stack to store master JWT when using loginAs
@@ -22,7 +23,7 @@ export class JwtService<Credentials,
 
   constructor(
     private jwtApi: JwtApi<Credentials, UserId, AuthResponse>,
-    private config: AuthConfig<Credentials, UserId, AuthResponse>,
+    private config: AuthConfig<Credentials, UserId, AuthResponse, UserInfo>,
     private noFreshJwtListener: NoFreshJwtListener,
   ) {
     this._loadJwt()

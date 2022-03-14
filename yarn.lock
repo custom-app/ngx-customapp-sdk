@@ -1781,6 +1781,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ngrx/effects@npm:^13.0.2":
+  version: 13.0.2
+  resolution: "@ngrx/effects@npm:13.0.2"
+  dependencies:
+    tslib: ^2.0.0
+  peerDependencies:
+    "@angular/core": ^13.0.0
+    "@ngrx/store": 13.0.2
+    rxjs: ^6.5.3 || ^7.4.0
+  checksum: 6f15d4169845e704d2521c83dd07880e90385e7194b278eb579349747700487b542fa6375731d609a0c452c854d8e0ca437751d90564b4c2cdd2a5f29115b2ce
+  languageName: node
+  linkType: hard
+
+"@ngrx/schematics@npm:^13.0.2":
+  version: 13.0.2
+  resolution: "@ngrx/schematics@npm:13.0.2"
+  checksum: 749ece874f777d90e84e15aef7a1d9b483afe917136c95d7a143b35210d1c9bec00ecc415e7697c96de955387ab80d3caa279fa6c124cd4afdbdfe11123caaf1
+  languageName: node
+  linkType: hard
+
 "@ngrx/store@npm:^13.0.2":
   version: 13.0.2
   resolution: "@ngrx/store@npm:13.0.2"
@@ -2559,6 +2579,8 @@ __metadata:
     "@angular/platform-browser": ~13.2.0
     "@angular/platform-browser-dynamic": ~13.2.0
     "@angular/router": ~13.2.0
+    "@ngrx/effects": ^13.0.2
+    "@ngrx/schematics": ^13.0.2
     "@ngrx/store": ^13.0.2
     "@types/jasmine": ~3.10.0
     "@types/node": ^12.11.1
@@ -6508,10 +6530,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ngx-customapp-jwt@workspace:angular-packages/projects/jwt"
   dependencies:
+    "@ngrx/schematics": ^13.0.2
     tslib: ^2.3.0
   peerDependencies:
     "@angular/common": ^13.2.0
     "@angular/core": ^13.2.0
+    "@ngrx/effects": "*"
     "@ngrx/store": "*"
   languageName: unknown
   linkType: soft
