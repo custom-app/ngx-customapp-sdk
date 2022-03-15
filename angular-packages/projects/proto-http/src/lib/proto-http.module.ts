@@ -1,16 +1,10 @@
-import { NgModule } from '@angular/core';
-import { ProtoHttpComponent } from './proto-http.component';
-
+import {NgModule} from '@angular/core';
 
 
 @NgModule({
-  declarations: [
-    ProtoHttpComponent
-  ],
-  imports: [
-  ],
-  exports: [
-    ProtoHttpComponent
-  ]
+  declarations: [],
+  imports: [],
+  exports: []
 })
-export class ProtoHttpModule { }
+export class ProtoHttpModule {
+}

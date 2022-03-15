@@ -6,7 +6,9 @@ import {throwError} from 'rxjs';
 import {addErrorContext, errorToUserText, normalizeError} from '../utils/errors';
 import {LocaleId, NormalizedError} from '../models/errors-text';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ErrorsService {
 
   private readonly doNotSend: Set<NormalizedError>
