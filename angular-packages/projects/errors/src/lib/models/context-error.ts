@@ -1,5 +1,5 @@
-export type ContextError<ReportExtensions> = {
+export type ContextError = {
   time: number;
   url: string;
   error: string;
-} & ReportExtensions
+}
