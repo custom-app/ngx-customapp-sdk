@@ -16,6 +16,10 @@
       "jwt": [
         "dist/jwt/jwt",
         "dist/jwt"
+      ],
+      "proto-http": [
+        "dist/proto-http/proto-http",
+        "dist/proto-http"
       ]
     },
     "noImplicitReturns": true,

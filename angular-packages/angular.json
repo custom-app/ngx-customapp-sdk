@@ -64,6 +64,37 @@
           }
         }
       }
+    },
+    "proto-http": {
+      "projectType": "library",
+      "root": "projects/proto-http",
+      "sourceRoot": "projects/proto-http/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/proto-http/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/proto-http/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/proto-http/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/proto-http/src/test.ts",
+            "tsConfig": "projects/proto-http/tsconfig.spec.json",
+            "karmaConfig": "projects/proto-http/karma.conf.js"
+          }
+        }
+      }
     }
   },
   "defaultProject": "jwt",

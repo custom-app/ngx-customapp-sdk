@@ -6526,7 +6526,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ngx-customapp-errors@workspace:angular-packages/projects/errors":
+"ngx-customapp-errors@*, ngx-customapp-errors@workspace:angular-packages/projects/errors":
   version: 0.0.0-use.local
   resolution: "ngx-customapp-errors@workspace:angular-packages/projects/errors"
   dependencies:
@@ -6548,6 +6548,18 @@ __metadata:
     "@angular/core": ^13.2.0
     "@ngrx/effects": "*"
     "@ngrx/store": "*"
+  languageName: unknown
+  linkType: soft
+
+"ngx-customapp-proto-http@workspace:angular-packages/projects/proto-http":
+  version: 0.0.0-use.local
+  resolution: "ngx-customapp-proto-http@workspace:angular-packages/projects/proto-http"
+  dependencies:
+    ngx-customapp-errors: "*"
+    tslib: ^2.3.0
+  peerDependencies:
+    "@angular/common": ^13.2.0
+    "@angular/core": ^13.2.0
   languageName: unknown
   linkType: soft
 
