@@ -6526,6 +6526,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ngx-customapp-errors@workspace:angular-packages/projects/errors":
+  version: 0.0.0-use.local
+  resolution: "ngx-customapp-errors@workspace:angular-packages/projects/errors"
+  dependencies:
+    tslib: ^2.3.0
+  peerDependencies:
+    "@angular/common": ^13.2.0
+    "@angular/core": ^13.2.0
+  languageName: unknown
+  linkType: soft
+
 "ngx-customapp-jwt@workspace:angular-packages/projects/jwt":
   version: 0.0.0-use.local
   resolution: "ngx-customapp-jwt@workspace:angular-packages/projects/jwt"
