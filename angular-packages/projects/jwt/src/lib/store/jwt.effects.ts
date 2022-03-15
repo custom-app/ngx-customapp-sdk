@@ -8,7 +8,7 @@ import {JwtConfig} from '../models/jwt-config';
 import {JwtSelectors} from './jwt.selectors';
 import {AppRootStateBase} from './reducers';
 import {LoginAsMethodUnimplemented} from '../errors';
-import {JWT_CONFIG} from '../constants/di-token';
+import {JWT_ACTIONS, JWT_CONFIG, JWT_SELECTORS} from '../constants/di-token';
 
 
 @Injectable()
@@ -19,8 +19,8 @@ export class JwtEffects<Credentials, UserId, AuthResponse, UserInfo> {
     private jwtService: JwtService<Credentials, UserId, AuthResponse, UserInfo>,
     @Inject(JWT_CONFIG) private config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>,
     private store: Store<AppRootStateBase<UserInfo>>,
-    private a: JwtActions<Credentials, UserId, AuthResponse, UserInfo>,
-    private s: JwtSelectors<UserInfo>,
+    @Inject(JWT_ACTIONS) private a: JwtActions<Credentials, UserId, AuthResponse, UserInfo>,
+    @Inject(JWT_SELECTORS) private s: JwtSelectors<UserInfo>,
   ) {
   }
 

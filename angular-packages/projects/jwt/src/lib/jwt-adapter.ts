@@ -8,18 +8,16 @@ import {NoFreshJwtListener} from './models/no-fresh-jwt-listener';
 import {JwtService} from './services/jwt.service';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {JwtInterceptor} from './http-interceptor/jwt.interceptor';
-import {ActionReducerMap, createReducer, on, Store} from '@ngrx/store'
-import {AppRootStateBase, JwtRootState} from './store/reducers';
+import {ActionReducerMap, createReducer, on} from '@ngrx/store'
+import {JwtRootState} from './store/reducers';
 import {jwtActions, JwtActions} from './store/jwt.actions';
 import {jwtSelectors, JwtSelectors} from './store/jwt.selectors';
-import {JwtEffects} from './store/jwt.effects';
-import {Actions} from '@ngrx/effects'
 import * as fromUser from './store/reducers/user.reducer'
 import * as fromLoginInProcess from './store/reducers/login-in-process.reducer'
 import * as fromLogoutInProcess from './store/reducers/logout-in-process.reducer'
 import * as fromLoginAsInProcess from './store/reducers/login-as-in-process.reducer'
 import * as fromUserStash from './store/reducers/user-stash.reducer'
-import {JWT_CONFIG} from './constants/di-token';
+import {JWT_ACTIONS, JWT_CONFIG, JWT_SELECTORS} from './constants/di-token';
 
 
 export class JwtAdapter<JwtInfoType extends JwtInfo,
@@ -54,6 +52,14 @@ export class JwtAdapter<JwtInfoType extends JwtInfo,
           provide: NoFreshJwtListener,
           useExisting: this.config.noFreshJwt,
         },
+        {
+          provide: JWT_ACTIONS,
+          useValue: this.actions(),
+        },
+        {
+          provide: JWT_SELECTORS,
+          useValue: this.selectors()
+        },
         JwtService,
       ]
     }
@@ -64,20 +70,6 @@ export class JwtAdapter<JwtInfoType extends JwtInfo,
       provide: HTTP_INTERCEPTORS,
       useClass: JwtInterceptor,
       multi: true,
-    }
-  }
-
-  effectsProvider(): Provider {
-    return {
-      provide: JwtEffects,
-      useFactory: (
-        actions$: Actions,
-        jwtService: JwtService<Credentials, UserId, AuthResponse, UserInfo>,
-        config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>,
-        store: Store<AppRootStateBase<UserInfo>>
-      ) =>
-        new JwtEffects(actions$, jwtService, config, store, this.actions(), this.selectors()),
-      deps: [Actions, JwtService, JWT_CONFIG, Store],
     }
   }
 

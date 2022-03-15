@@ -4,7 +4,7 @@ import {JwtConfig} from '../models/jwt-config';
 import {JwtInfo} from '../models/jwt-info';
 import {JwtGroup} from '../models/jwt-group';
 import {mergeMap, Observable} from 'rxjs';
-import {disableJwtInterception} from '../constants/disable-auth-interception';
+import {disableJwtInterception} from '../constants/disable-jwt-interception';
 import {JwtInterceptorDropsReportProgress} from '../errors';
 import {JwtService} from '../services/jwt.service';
 import {JWT_CONFIG} from '../constants/di-token';
