@@ -7,4 +7,5 @@ import {NgModule} from '@angular/core';
   exports: []
 })
 export class PatternAuthBeforeAuthorizedSocketModule {
+  static forRoot(): void {}
 }

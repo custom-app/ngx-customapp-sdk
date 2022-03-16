@@ -12,5 +12,8 @@
   },
   "devDependencies": {
     "@ngrx/schematics": "^13.0.2"
+  },
+  "scripts": {
+    "watch": "ng build --watch --configuration development"
   }
 }
