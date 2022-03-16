@@ -1,4 +1,4 @@
-import {catchError, EMPTY, filter, forkJoin, map, Observable, Subject, take, tap, timeout} from 'rxjs';
+import {catchError, EMPTY, filter, first, forkJoin, map, Observable, Subject, take, tap, timeout} from 'rxjs';
 import {WebSocketIsAlreadyOpened} from './errors';
 import {MessageRequirements, WebSocketMessageBuffer} from './web-socket-message-buffer';
 import {WrappedSocket} from './wrapped-socket';
@@ -300,28 +300,31 @@ export class WebSocketController<RequestType,
     const {authorize} = this._config
     if (authorize) {
       const {createRequest, isResponseSuccessful} = authorize
-      const msg = createRequest()
-      if (msg) {
-        if (isResponseSuccessful) {
-          const response$ = this._requestDirect(msg)
-          const successful$ = response$.pipe(
-            filter(isResponseSuccessful),
-            catchError(() => EMPTY), // error is passed to this._notAuthorized$ subject
-            tap(response => this._authorized(response))
-          )
-          successful$.subscribe()
-          const failed$ = response$.pipe(
-            filter(response => !isResponseSuccessful(response))
-          )
-          // will also pipe errors
-          failed$.subscribe(this._notAuthorized$)
+      createRequest().pipe(
+        first()
+      ).subscribe(msg => {
+        if (msg) {
+          if (isResponseSuccessful) {
+            const response$ = this._requestDirect(msg)
+            const successful$ = response$.pipe(
+              filter(isResponseSuccessful),
+              catchError(() => EMPTY), // error is passed to this._notAuthorized$ subject
+              tap(response => this._authorized(response))
+            )
+            successful$.subscribe()
+            const failed$ = response$.pipe(
+              filter(response => !isResponseSuccessful(response))
+            )
+            // will also pipe errors
+            failed$.subscribe(this._notAuthorized$)
+          } else {
+            this._sendDirect(msg)
+            this._authorized()
+          }
         } else {
-          this._sendDirect(msg)
-          this._authorized()
+          this.close()
         }
-      } else {
-        this.close()
-      }
+      })
     } else {
       // if no auth required, the socket is considered authorized immediately
       this._authorized()
@@ -333,32 +336,35 @@ export class WebSocketController<RequestType,
     const {subscribe} = this._config
     if (subscribe) {
       const {createRequests, isResponseSuccessful} = subscribe
-      const msgList = createRequests()
-      if (msgList) {
-        if (isResponseSuccessful) {
-          const responses$ = forkJoin(
-            msgList.map(msg => this._requestDirect(msg))
-          )
-          const successful$ = responses$.pipe(
-            filter(responses => responses.every(isResponseSuccessful)),
-            catchError(() => EMPTY), // error is passed to this._notAuthorized$ subject
-            tap(responses => this._subscribed(responses))
-          )
-          successful$.subscribe()
-          const failed$ = responses$.pipe(
-            map(responses =>
-              responses.find(resp => !isResponseSuccessful(resp))
-            ),
-            filter(Boolean)
-          )
-          // will also pipe errors
-          failed$.subscribe(this._notSubscribed$)
+      createRequests().pipe(
+        first()
+      ).subscribe(msgList => {
+        if (msgList) {
+          if (isResponseSuccessful) {
+            const responses$ = forkJoin(
+              msgList.map(msg => this._requestDirect(msg))
+            )
+            const successful$ = responses$.pipe(
+              filter(responses => responses.every(isResponseSuccessful)),
+              catchError(() => EMPTY), // error is passed to this._notAuthorized$ subject
+              tap(responses => this._subscribed(responses))
+            )
+            successful$.subscribe()
+            const failed$ = responses$.pipe(
+              map(responses =>
+                responses.find(resp => !isResponseSuccessful(resp))
+              ),
+              filter(Boolean)
+            )
+            // will also pipe errors
+            failed$.subscribe(this._notSubscribed$)
+          } else {
+            this._subscribed()
+          }
         } else {
-          this._subscribed()
+          this.close()
         }
-      } else {
-        this.close()
-      }
+      })
     } else {
       // if no subscription is required, the socket is considered subscribed immediately
       this._subscribed()

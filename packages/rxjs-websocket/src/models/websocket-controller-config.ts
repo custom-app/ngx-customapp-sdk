@@ -23,6 +23,7 @@
  * If you send binary data, send ONLY binary data. If you send text frames, send ONLY text frames.
  * */
 import {BufferOverflowStrategy} from './buffer-overflow-strategy';
+import {Observable} from 'rxjs';
 
 export interface WebSocketControllerConfig<RequestType, ResponseType, UnderlyingDataType extends string | ArrayBufferLike | Blob | ArrayBufferView = string> {
   /**
@@ -88,7 +89,7 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
      *
      * If no value is returned, the socket is closed and not reopened.
      */
-    createRequest: () => RequestType | undefined,
+    createRequest: () => Observable<RequestType | undefined>,
     /**
      * Helps to determine if the authorization completed successfully. If not passed,
      * socket will become authorized immediately after sending auth request. If any response must be considered
@@ -116,7 +117,7 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
      *
      * if no value is returned, the socket is closed and not reopened.
      */
-    createRequests: (authResponse?: ResponseType) => RequestType[] | undefined,
+    createRequests: (authResponse?: ResponseType) => Observable<RequestType[] | undefined>,
     /**
      * Helps to determine if the subscription completed successfully. If not passed,
      * socket will become authorized immediately after sending auth request. If any response must be considered
