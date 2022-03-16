@@ -1,16 +1,10 @@
-import { NgModule } from '@angular/core';
-import { PatternAuthBeforeAuthorizedSocketComponent } from './pattern-auth-before-authorized-socket.component';
-
+import {NgModule} from '@angular/core';
 
 
 @NgModule({
-  declarations: [
-    PatternAuthBeforeAuthorizedSocketComponent
-  ],
-  imports: [
-  ],
-  exports: [
-    PatternAuthBeforeAuthorizedSocketComponent
-  ]
+  declarations: [],
+  imports: [],
+  exports: []
 })
-export class PatternAuthBeforeAuthorizedSocketModule { }
+export class PatternAuthBeforeAuthorizedSocketModule {
+}
