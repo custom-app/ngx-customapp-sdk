@@ -1,6 +1,6 @@
 import {catchError, map, switchMap} from 'rxjs/operators';
-import {HttpErrorResponse, HttpHeaders, HttpResponse} from '@angular/common/http';
-import {from, Observable, of, pipe, throwError} from 'rxjs';
+import {HttpErrorResponse, HttpHeaders, HttpProgressEvent, HttpResponse} from '@angular/common/http';
+import {from, mergeMap, Observable, of, pipe, throwError} from 'rxjs';
 import {protobufHeader} from '../constants/proto-header';
 
 export function handleBlobBody<ResponseType, ErrorResponseType>(
@@ -52,6 +52,7 @@ function responseHandler<T, ResponseType, ErrorResponseType>(
     if (body) {
       return bodyHandler(body, deserializer, getErrorFromResponse);
     } else {
+      // we don't use null messages
       return throwError(() =>
         new Error(
           `null response body, expected array buffer`
@@ -59,6 +60,7 @@ function responseHandler<T, ResponseType, ErrorResponseType>(
       );
     }
   } else {
+    // successful response should always have protobuf header.
     return throwError(() =>
       Error(
         `expected to receiver ${protobufHeader.value} but got ${type}`
@@ -77,15 +79,25 @@ export function createResponseHandlerPipe<T, ResponseType, ErrorResponseType>(
   getErrorFromResponse: (response: ResponseType) => ErrorResponseType | undefined,
 ) {
   return pipe(
-    switchMap((response: HttpResponse<T>): Observable<ResponseType> => {
-      return responseHandler(bodyHandler, response.headers, response.body, deserializer, getErrorFromResponse);
+    mergeMap((response: HttpResponse<T> | HttpProgressEvent): Observable<ResponseType | HttpProgressEvent> => {
+      if (response instanceof HttpResponse) {
+        return responseHandler(bodyHandler, response.headers, response.body, deserializer, getErrorFromResponse);
+      } else {
+        return of(response);
+      }
     }),
     catchError(err => {
-      if (err instanceof HttpErrorResponse) {
+      if (
+        err instanceof HttpErrorResponse &&
+        // http errors have no protobuf header, cos they are thrown by the network, not the backend.
+        err.headers.get(protobufHeader.name) === protobufHeader.value
+      ) {
+        // handle error response from backend
         return responseHandler(bodyHandler, err.headers, err.error, deserializer, getErrorFromResponse);
       }
+      // no handling for app level or network level errors
       return throwError(err);
     }),
-  )
+  );
 }
 
