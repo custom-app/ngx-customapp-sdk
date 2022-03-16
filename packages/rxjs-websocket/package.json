@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "prepare": "yarn build",
-    "start": "tsc --watch",
+    "watch": "tsc --watch",
     "test": "karma start karma.conf.js"
   },
   "devDependencies": {

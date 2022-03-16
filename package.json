@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "doc": "typedoc --excludePrivate",
-    "start": "yarn workspaces foreach -piv run start"
+    "watch": "yarn workspaces foreach -piv run watch"
   },
   "license": "MIT",
   "private": true,
