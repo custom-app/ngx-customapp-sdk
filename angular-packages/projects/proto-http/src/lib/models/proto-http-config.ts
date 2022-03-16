@@ -11,8 +11,19 @@ export interface ProtoHttpConfig<RequestType, ResponseType, ErrorResponseType> {
 
   /**
    * Function to be called on every response.
-   * @param responseEvent The whole event, in case you need not only data.
+   * @param response serialized protobuf response.
    */
-  deserializer: (responseEvent: ArrayBuffer) => ResponseType,
-  getErrorFromResponse: (response: ResponseType) => ErrorResponseType | undefined
+  deserializer: (response: ArrayBuffer) => ResponseType,
+  /**
+   * It's expected, that error is a field of a general response, so this function gets it.
+   * @param response deserialized proto message.
+   */
+  getErrorFromResponse: (response: ResponseType) => ErrorResponseType | undefined,
+  /**
+   * If provided, will be used by
+   */
+  versionHeader?: {
+    name: string,
+    value: string,
+  }
 }

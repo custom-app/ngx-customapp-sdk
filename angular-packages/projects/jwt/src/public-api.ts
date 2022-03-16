@@ -3,7 +3,7 @@
  */
 
 export * from './lib/jwt.module';
-export * from './lib/http-interceptor/jwt.interceptor'
+export * from './lib/http-interceptors/jwt.interceptor'
 export * from './lib/errors'
 export * from './lib/jwt-adapter'
 

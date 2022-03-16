@@ -7,7 +7,7 @@ import {JwtApi} from './models/jwt-api';
 import {NoFreshJwtListener} from './models/no-fresh-jwt-listener';
 import {JwtService} from './services/jwt.service';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
-import {JwtInterceptor} from './http-interceptor/jwt.interceptor';
+import {JwtInterceptor} from './http-interceptors/jwt.interceptor';
 import {ActionReducerMap, createReducer, on} from '@ngrx/store'
 import {JwtRootState} from './store/reducers';
 import {jwtActions, JwtActions} from './store/jwt.actions';
