@@ -17,6 +17,10 @@
         "dist/jwt/jwt",
         "dist/jwt"
       ],
+      "pattern-auth-before-authorized-socket": [
+        "dist/pattern-auth-before-authorized-socket/pattern-auth-before-authorized-socket",
+        "dist/pattern-auth-before-authorized-socket"
+      ],
       "proto-http": [
         "dist/proto-http/proto-http",
         "dist/proto-http"

@@ -6551,6 +6551,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"ngx-customapp-pattern-auth-before-authorized-socket@workspace:angular-packages/projects/pattern-auth-before-authorized-socket":
+  version: 0.0.0-use.local
+  resolution: "ngx-customapp-pattern-auth-before-authorized-socket@workspace:angular-packages/projects/pattern-auth-before-authorized-socket"
+  dependencies:
+    tslib: ^2.3.0
+  peerDependencies:
+    "@angular/common": ^13.2.0
+    "@angular/core": ^13.2.0
+  languageName: unknown
+  linkType: soft
+
 "ngx-customapp-proto-http@workspace:angular-packages/projects/proto-http":
   version: 0.0.0-use.local
   resolution: "ngx-customapp-proto-http@workspace:angular-packages/projects/proto-http"

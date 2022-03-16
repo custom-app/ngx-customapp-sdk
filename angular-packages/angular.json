@@ -95,6 +95,37 @@
           }
         }
       }
+    },
+    "pattern-auth-before-authorized-socket": {
+      "projectType": "library",
+      "root": "projects/pattern-auth-before-authorized-socket",
+      "sourceRoot": "projects/pattern-auth-before-authorized-socket/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/pattern-auth-before-authorized-socket/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/pattern-auth-before-authorized-socket/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/pattern-auth-before-authorized-socket/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/pattern-auth-before-authorized-socket/src/test.ts",
+            "tsConfig": "projects/pattern-auth-before-authorized-socket/tsconfig.spec.json",
+            "karmaConfig": "projects/pattern-auth-before-authorized-socket/karma.conf.js"
+          }
+        }
+      }
     }
   },
   "defaultProject": "jwt",
