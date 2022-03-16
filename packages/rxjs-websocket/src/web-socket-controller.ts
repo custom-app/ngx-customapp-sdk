@@ -301,22 +301,26 @@ export class WebSocketController<RequestType,
     if (authorize) {
       const {createRequest, isResponseSuccessful} = authorize
       const msg = createRequest()
-      if (isResponseSuccessful) {
-        const response$ = this._requestDirect(msg)
-        const successful$ = response$.pipe(
-          filter(isResponseSuccessful),
-          catchError(() => EMPTY), // error is passed to this._notAuthorized$ subject
-          tap(response => this._authorized(response))
-        )
-        successful$.subscribe()
-        const failed$ = response$.pipe(
-          filter(response => !isResponseSuccessful(response))
-        )
-        // will also pipe errors
-        failed$.subscribe(this._notAuthorized$)
+      if (msg) {
+        if (isResponseSuccessful) {
+          const response$ = this._requestDirect(msg)
+          const successful$ = response$.pipe(
+            filter(isResponseSuccessful),
+            catchError(() => EMPTY), // error is passed to this._notAuthorized$ subject
+            tap(response => this._authorized(response))
+          )
+          successful$.subscribe()
+          const failed$ = response$.pipe(
+            filter(response => !isResponseSuccessful(response))
+          )
+          // will also pipe errors
+          failed$.subscribe(this._notAuthorized$)
+        } else {
+          this._sendDirect(msg)
+          this._authorized()
+        }
       } else {
-        this._sendDirect(msg)
-        this._authorized()
+        this.close()
       }
     } else {
       // if no auth required, the socket is considered authorized immediately
@@ -330,26 +334,30 @@ export class WebSocketController<RequestType,
     if (subscribe) {
       const {createRequests, isResponseSuccessful} = subscribe
       const msgList = createRequests()
-      if (isResponseSuccessful) {
-        const responses$ = forkJoin(
-          msgList.map(msg => this._requestDirect(msg))
-        )
-        const successful$ = responses$.pipe(
-          filter(responses => responses.every(isResponseSuccessful)),
-          catchError(() => EMPTY), // error is passed to this._notAuthorized$ subject
-          tap(responses => this._subscribed(responses))
-        )
-        successful$.subscribe()
-        const failed$ = responses$.pipe(
-          map(responses =>
-            responses.find(resp => !isResponseSuccessful(resp))
-          ),
-          filter(Boolean)
-        )
-        // will also pipe errors
-        failed$.subscribe(this._notSubscribed$)
+      if (msgList) {
+        if (isResponseSuccessful) {
+          const responses$ = forkJoin(
+            msgList.map(msg => this._requestDirect(msg))
+          )
+          const successful$ = responses$.pipe(
+            filter(responses => responses.every(isResponseSuccessful)),
+            catchError(() => EMPTY), // error is passed to this._notAuthorized$ subject
+            tap(responses => this._subscribed(responses))
+          )
+          successful$.subscribe()
+          const failed$ = responses$.pipe(
+            map(responses =>
+              responses.find(resp => !isResponseSuccessful(resp))
+            ),
+            filter(Boolean)
+          )
+          // will also pipe errors
+          failed$.subscribe(this._notSubscribed$)
+        } else {
+          this._subscribed()
+        }
       } else {
-        this._subscribed()
+        this.close()
       }
     } else {
       // if no subscription is required, the socket is considered subscribed immediately

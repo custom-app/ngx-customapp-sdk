@@ -85,8 +85,10 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
      * Creates a request, after which the socket will be authorized.
      * Response to this request is emitted into {@link WebSocketController.authorized$}
      * and {@link WebSocketController.messages$} observables.
+     *
+     * If no value is returned, the socket is closed and not reopened.
      */
-    createRequest: () => RequestType,
+    createRequest: () => RequestType | undefined,
     /**
      * Helps to determine if the authorization completed successfully. If not passed,
      * socket will become authorized immediately after sending auth request. If any response must be considered
@@ -111,8 +113,10 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
      * and every response from array is emitted into {@link WebSocketController.messages$} observables one by one.
      * @param authResponse A response on the message, created by the `authorize.createRequest`.
      * If no `authorizeIsResponseSuccessful` was provided, authResponse will be null.
+     *
+     * if no value is returned, the socket is closed and not reopened.
      */
-    createRequests: (authResponse?: ResponseType) => RequestType[],
+    createRequests: (authResponse?: ResponseType) => RequestType[] | undefined,
     /**
      * Helps to determine if the subscription completed successfully. If not passed,
      * socket will become authorized immediately after sending auth request. If any response must be considered
