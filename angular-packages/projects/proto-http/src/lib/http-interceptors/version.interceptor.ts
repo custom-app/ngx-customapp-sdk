@@ -18,7 +18,12 @@ export class VersionInterceptor implements HttpInterceptor {
       return next.handle(request);
     }
     const versionHeader = this.config.versionHeader
+    // version header not configured
     if (!versionHeader) {
+      return next.handle(request)
+    }
+    // do not override existing version header
+    if (request.headers.get(versionHeader.name)) {
       return next.handle(request)
     }
     let headers = request.headers;
