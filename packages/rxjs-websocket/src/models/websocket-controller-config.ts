@@ -24,7 +24,7 @@
  * */
 import {BufferOverflowStrategy} from './buffer-overflow-strategy';
 
-export interface WebSocketControllerConfig<RequestType, ResponseType, UnderlyingDataType = string> {
+export interface WebSocketControllerConfig<RequestType, ResponseType, UnderlyingDataType extends string | ArrayBufferLike | Blob | ArrayBufferView = string> {
   /**
    * The url of the socket server to connect to,
    * passed directly to a [WebSocket constructor](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket)
