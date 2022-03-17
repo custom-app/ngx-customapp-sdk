@@ -46,10 +46,10 @@ export class WebSocketController<RequestType,
   // To notify about every state
   private _pending$ = new Subject<void>()
   private _opened$ = new Subject<Event>()
-  // Emits an auth response, when config.authorize.isResponseSuccessful is set, void otherwise
-  private _authorized$ = new Subject<ResponseType | void>()
-  // Emits an auth subscribe responses, when config.subscribe.isResponseSuccessful is set, void otherwise
-  private _subscribed$ = new Subject<ResponseType[] | void>()
+  // Emits an auth response, when config.authorize.isResponseSuccessful is set, undefined otherwise
+  private _authorized$ = new Subject<ResponseType | undefined>()
+  // Emits an auth subscribe responses, when config.subscribe.isResponseSuccessful is set, undefined otherwise
+  private _subscribed$ = new Subject<ResponseType[] | undefined>()
   private _closing$ = new Subject<void>()
   private _closed$ = new Subject<CloseEvent>()
   // to notify, that state transition was not successful
@@ -113,9 +113,9 @@ export class WebSocketController<RequestType,
    * Fires whenever the transition opened->authorized happens.
    *
    * Emits an auth response, when the `isResponseSuccessful` field in {@link WebSocketControllerConfig.authorize}
-   * is set, void otherwise.
+   * is set, undefined otherwise.
    */
-  get authorized$(): Observable<ResponseType | void> {
+  get authorized$(): Observable<ResponseType | undefined> {
     return this._authorized$
   }
 
@@ -123,9 +123,9 @@ export class WebSocketController<RequestType,
    * Fires whenever the transition authorized->subscribed happens.
    *
    * Emits an auth subscribe responses, when the `isResponseSuccessful` field in {@link WebSocketControllerConfig.subscribe}
-   * is set, void otherwise.
+   * is set, undefined otherwise.
    */
-  get subscribed$(): Observable<ResponseType[] | void> {
+  get subscribed$(): Observable<ResponseType[] | undefined> {
     return this._subscribed$
   }
 
