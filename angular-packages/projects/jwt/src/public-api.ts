@@ -15,3 +15,7 @@ export * from './lib/models/no-fresh-jwt-listener'
 
 export * from './lib/constants/disable-jwt-interception'
 export * from './lib/constants/jwt-storage-key'
+
+export * from './lib/store/reducers'
+
+export * from './lib/services/jwt.service'

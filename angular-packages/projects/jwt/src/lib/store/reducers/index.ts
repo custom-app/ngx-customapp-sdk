@@ -19,6 +19,6 @@ export interface JwtRootState<UserInfo> {
 /**
  * Used to create selectors, not expected to be used anywhere else
  */
-export interface AppRootStateBase<UserInfo> {
+export interface JwtAppRootStateBase<UserInfo> {
   [jwtFeatureKey]: JwtRootState<UserInfo>,
 }

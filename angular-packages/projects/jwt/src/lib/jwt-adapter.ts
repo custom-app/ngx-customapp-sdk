@@ -1,5 +1,3 @@
-import {JwtInfo} from './models/jwt-info';
-import {JwtGroup} from './models/jwt-group';
 import {JwtConfig} from './models/jwt-config';
 import {ModuleWithProviders, Provider} from '@angular/core';
 import {JwtModule} from './jwt.module';
@@ -20,9 +18,7 @@ import * as fromUserStash from './store/reducers/user-stash.reducer'
 import {JWT_ACTIONS, JWT_CONFIG, JWT_SELECTORS} from './constants/di-token';
 
 
-export class JwtAdapter<JwtInfoType extends JwtInfo,
-  JwtGroupType extends JwtGroup<JwtInfoType>,
-  Credentials,
+export class JwtAdapter<Credentials,
   UserId,
   AuthResponse,
   UserInfo> {
