@@ -11,7 +11,7 @@ export interface WebSocketOpenOptions {
   autoReconnect?: {
     /**
      * To calculate amount of milliseconds between socket being closed and next try to open.
-     * You may want to return random delay every time, to prevent overloading
+     * You may want to return a random delay every time, to prevent overloading
      * server after the one restarts.
      * If the function errors, the default is {@link defaultReconnectInterval}
      * @param reconnectState {@link ReconnectState}
