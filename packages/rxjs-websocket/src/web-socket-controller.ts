@@ -31,7 +31,7 @@ export class WebSocketController<RequestType,
 
   // passed as arg to functions in options.autoReconnect of the open() method
   private _reconnectState: ReconnectState = {
-    subscribedCounter: 0, // TODO: increment
+    subscribedCounter: 0,
     erroredCounter: 0,
     wasPrevOpenSuccessful: false,
   }
@@ -57,13 +57,12 @@ export class WebSocketController<RequestType,
   private _notSubscribed$ = new Subject<ResponseType>()
   // to notify about errors
   private _error$ = new Subject<any>()
+  // to notify, that authorization, subscription or something else gone wrong
+  private _closedForever$ = new Subject<void>()
   private _buffer: WebSocketMessageBuffer<RequestType, ResponseType>
 
   /**
    * Used to call functions, usually provided by the user, that can throw errors.
-   * @param defaultValue
-   * @param func
-   * @param args
    * @private
    */
   private _safeCall<ArgsType extends any[], ReturnType>(
@@ -174,6 +173,16 @@ export class WebSocketController<RequestType,
     return this._error$
   }
 
+  /**
+   * Fires when the authorization, subscription or something else gone wrong. Does not
+   * replace notAuthorized$, notSubscribed$, error$ observables, they will emit anyway.
+   *
+   * You can use it to navigate user back to login page.
+   */
+  get closedForever$(): Observable<void> {
+    return this._closedForever$
+  }
+
   // function for handling side effects of the state transition
   private _pending(): void {
     this._state = WebSocketControllerState.pending
@@ -198,6 +207,8 @@ export class WebSocketController<RequestType,
   private _subscribed(subscribeResponses?: ResponseType[]): void {
     this._state = WebSocketControllerState.authorized
     this._subscribed$.next(subscribeResponses)
+    this._reconnectState.subscribedCounter++
+    this._reconnectState.wasPrevOpenSuccessful = true
     this._sendBuffered(MessageRequirements.sub)
   }
 
@@ -264,6 +275,8 @@ export class WebSocketController<RequestType,
       this._closed(e)
       if (!socket.closedManually) {
         this._reopen(options)
+      } else {
+        this._closedForever$.next()
       }
     }
     socket.ws.onmessage = (e: MessageEvent<UnderlyingDataType>) => {
@@ -313,7 +326,8 @@ export class WebSocketController<RequestType,
             )
             successful$.subscribe()
             const failed$ = response$.pipe(
-              filter(response => !isResponseSuccessful(response))
+              filter(response => !isResponseSuccessful(response)),
+              tap(() => this.close()),
             )
             // will also pipe errors
             failed$.subscribe(this._notAuthorized$)
@@ -354,7 +368,8 @@ export class WebSocketController<RequestType,
               map(responses =>
                 responses.find(resp => !isResponseSuccessful(resp))
               ),
-              filter(Boolean)
+              filter(Boolean),
+              tap(() => this.close()),
             )
             // will also pipe errors
             failed$.subscribe(this._notSubscribed$)
