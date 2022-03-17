@@ -16,10 +16,10 @@ import {JWT_CONFIG} from '../constants/di-token';
  */
 
 @Injectable()
-export class JwtInterceptor<Credentials, UserId, AuthResponse, UserInfo> implements HttpInterceptor {
+export class JwtInterceptor<Credentials, AuthResponse, UserInfo, UserId = number> implements HttpInterceptor {
   constructor(
-    @Inject(JWT_CONFIG) private config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>,
-    private jwtService: JwtService<Credentials, UserId, AuthResponse, UserInfo>
+    @Inject(JWT_CONFIG) private config: JwtConfig<Credentials, AuthResponse, UserInfo, UserId>,
+    private jwtService: JwtService<Credentials, AuthResponse, UserInfo, UserId>
   ) {
   }
 

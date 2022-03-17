@@ -5,9 +5,9 @@ import {NoFreshJwtListener} from './no-fresh-jwt-listener';
 import {ActionCreator} from '@ngrx/store'
 
 export interface JwtConfig<Credentials,
-  UserId,
   AuthResponse,
-  UserInfo> {
+  UserInfo,
+  UserId = number> {
   /**
    * Function to retrieve the jwt from auth response.
    * @param authResponse

@@ -19,16 +19,16 @@ import {JWT_ACTIONS, JWT_CONFIG, JWT_SELECTORS} from './constants/di-token';
 
 
 export class JwtAdapter<Credentials,
-  UserId,
   AuthResponse,
-  UserInfo> {
-  private readonly _actions: JwtActions<Credentials, UserId, AuthResponse, UserInfo>
+  UserInfo,
+  UserId = number> {
+  private readonly _actions: JwtActions<Credentials, AuthResponse, UserInfo, UserId>
   private readonly _selectors: JwtSelectors<UserInfo>
 
   constructor(
-    private config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>
+    private config: JwtConfig<Credentials, AuthResponse, UserInfo, UserId>
   ) {
-    this._actions = jwtActions<Credentials, UserId, AuthResponse, UserInfo>()
+    this._actions = jwtActions<Credentials, AuthResponse, UserInfo, UserId>()
     this._selectors = jwtSelectors<UserInfo>()
   }
 
@@ -69,7 +69,7 @@ export class JwtAdapter<Credentials,
     }
   }
 
-  actions(): JwtActions<Credentials, UserId, AuthResponse, UserInfo> {
+  actions(): JwtActions<Credentials, AuthResponse, UserInfo, UserId> {
     return this._actions
   }
 

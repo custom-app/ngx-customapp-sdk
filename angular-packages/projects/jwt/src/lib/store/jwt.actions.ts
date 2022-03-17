@@ -22,7 +22,7 @@ const types = {
 
 type Error = { error: string }
 
-export interface JwtActions<Credentials, UserId, AuthResponse, UserInfo> {
+export interface JwtActions<Credentials, AuthResponse, UserInfo, UserId = number> {
   login: ActionCreatorShort<typeof types.login, { credentials: Credentials }>,
   loginSucceed: ActionCreatorShort<typeof types.loginSucceed, { response: AuthResponse }>,
   loginErrored: ActionCreatorShort<typeof types.loginErrored, Error>,
@@ -40,7 +40,7 @@ export interface JwtActions<Credentials, UserId, AuthResponse, UserInfo> {
   setUser: ActionCreatorShort<typeof types.setUser, { user: UserInfo | undefined }>
 }
 
-export function jwtActions<Credentials, UserId, AuthResponse, UserInfo>(): JwtActions<Credentials, UserId, AuthResponse, UserInfo> {
+export function jwtActions<Credentials, AuthResponse, UserInfo, UserId = number>(): JwtActions<Credentials, AuthResponse, UserInfo, UserId> {
   return {
     login: createAction(
       types.login,

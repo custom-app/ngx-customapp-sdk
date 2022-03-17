@@ -9,8 +9,8 @@ import {JwtGroup} from './jwt-group';
  * by reading the ngx-customapp-errors docs.
  */
 export abstract class JwtApi<Credentials,
-  UserId,
-  AuthResponse> {
+  AuthResponse,
+  UserId = number> {
   /**
    * Should make an auth request to the server.
    * @param credentials Login and password or something else, depending on the target application

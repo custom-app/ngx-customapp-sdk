@@ -12,14 +12,14 @@ import {JWT_ACTIONS, JWT_CONFIG, JWT_SELECTORS} from '../constants/di-token';
 
 
 @Injectable()
-export class JwtEffects<Credentials, UserId, AuthResponse, UserInfo> {
+export class JwtEffects<Credentials, AuthResponse, UserInfo, UserId = number> {
 
   constructor(
     private actions$: Actions,
-    private jwtService: JwtService<Credentials, UserId, AuthResponse, UserInfo>,
-    @Inject(JWT_CONFIG) private config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>,
+    private jwtService: JwtService<Credentials, AuthResponse, UserInfo, UserId>,
+    @Inject(JWT_CONFIG) private config: JwtConfig<Credentials, AuthResponse, UserInfo, UserId>,
     private store: Store<JwtAppRootStateBase<UserInfo>>,
-    @Inject(JWT_ACTIONS) private a: JwtActions<Credentials, UserId, AuthResponse, UserInfo>,
+    @Inject(JWT_ACTIONS) private a: JwtActions<Credentials, AuthResponse, UserInfo, UserId>,
     @Inject(JWT_SELECTORS) private s: JwtSelectors<UserInfo>,
   ) {
   }

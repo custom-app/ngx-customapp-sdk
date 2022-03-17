@@ -12,9 +12,9 @@ import {JWT_CONFIG} from '../constants/di-token';
 
 @Injectable()
 export class JwtService<Credentials,
-  UserId,
   AuthResponse,
-  UserInfo> {
+  UserInfo,
+  UserId = number> {
 
   private _jwt?: JwtGroup<JwtInfo>
   // the stack to store master JWT when using loginAs
@@ -23,8 +23,8 @@ export class JwtService<Credentials,
   private _waitingForRefresh: ((jwt: JwtGroup<JwtInfo>) => void)[] = []
 
   constructor(
-    private jwtApi: JwtApi<Credentials, UserId, AuthResponse>,
-    @Inject(JWT_CONFIG) private config: JwtConfig<Credentials, UserId, AuthResponse, UserInfo>,
+    private jwtApi: JwtApi<Credentials, AuthResponse, UserId>,
+    @Inject(JWT_CONFIG) private config: JwtConfig<Credentials, AuthResponse, UserInfo, UserId>,
     private noFreshJwtListener: NoFreshJwtListener,
   ) {
     this._loadJwt()
