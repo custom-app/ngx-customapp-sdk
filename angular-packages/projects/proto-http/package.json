@@ -10,6 +10,7 @@
     "tslib": "^2.3.0"
   },
   "scripts": {
-    "watch": "ng build --watch --configuration development"
+    "watch": "ng build --watch --configuration development",
+    "build": "ng build"
   }
 }

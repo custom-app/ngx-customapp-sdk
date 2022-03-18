@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "jwt": {
+    "ngx-customapp-jwt": {
       "projectType": "library",
       "root": "projects/jwt",
       "sourceRoot": "projects/jwt/src",
@@ -34,7 +34,7 @@
         }
       }
     },
-    "errors": {
+    "ngx-customapp-errors": {
       "projectType": "library",
       "root": "projects/errors",
       "sourceRoot": "projects/errors/src",
@@ -65,7 +65,7 @@
         }
       }
     },
-    "proto-http": {
+    "ngx-customapp-proto-http": {
       "projectType": "library",
       "root": "projects/proto-http",
       "sourceRoot": "projects/proto-http/src",
@@ -96,7 +96,7 @@
         }
       }
     },
-    "pattern-auth-before-authorized-socket": {
+    "ngx-customapp-pattern-auth-before-authorized-socket": {
       "projectType": "library",
       "root": "projects/pattern-auth-before-authorized-socket",
       "sourceRoot": "projects/pattern-auth-before-authorized-socket/src",
@@ -128,7 +128,7 @@
       }
     }
   },
-  "defaultProject": "jwt",
+  "defaultProject": "ngx-customapp-jwt",
   "cli": {
     "defaultCollection": "@ngrx/schematics"
   }

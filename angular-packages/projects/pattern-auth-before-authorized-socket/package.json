@@ -6,9 +6,11 @@
     "@angular/core": "^13.2.0"
   },
   "dependencies": {
+    "ngx-customapp-jwt": "*",
     "tslib": "^2.3.0"
   },
   "scripts": {
-    "watch": "ng build --watch --configuration development"
+    "watch": "ng build --watch --configuration development",
+    "build": "ng build"
   }
 }

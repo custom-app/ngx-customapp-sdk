@@ -6603,7 +6603,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"ngx-customapp-jwt@workspace:angular-packages/projects/jwt":
+"ngx-customapp-jwt@*, ngx-customapp-jwt@workspace:angular-packages/projects/jwt":
   version: 0.0.0-use.local
   resolution: "ngx-customapp-jwt@workspace:angular-packages/projects/jwt"
   dependencies:
@@ -6621,6 +6621,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ngx-customapp-pattern-auth-before-authorized-socket@workspace:angular-packages/projects/pattern-auth-before-authorized-socket"
   dependencies:
+    ngx-customapp-jwt: "*"
     tslib: ^2.3.0
   peerDependencies:
     "@angular/common": ^13.2.0
