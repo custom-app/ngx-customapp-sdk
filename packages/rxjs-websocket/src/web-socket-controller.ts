@@ -1,4 +1,17 @@
-import {catchError, EMPTY, filter, first, forkJoin, map, Observable, Subject, take, tap, timeout} from 'rxjs';
+import {
+  catchError,
+  filter,
+  first,
+  forkJoin,
+  mergeMap,
+  Observable,
+  of,
+  Subject,
+  take,
+  tap,
+  throwError,
+  timeout
+} from 'rxjs';
 import {WebSocketIsAlreadyOpened} from './errors';
 import {MessageRequirements, WebSocketMessageBuffer} from './web-socket-message-buffer';
 import {WrappedSocket} from './wrapped-socket';
@@ -52,9 +65,6 @@ export class WebSocketController<RequestType,
   private _subscribed$ = new Subject<ResponseType[] | undefined>()
   private _closing$ = new Subject<void>()
   private _closed$ = new Subject<CloseEvent>()
-  // to notify, that state transition was not successful
-  private _notAuthorized$ = new Subject<ResponseType>()
-  private _notSubscribed$ = new Subject<ResponseType>()
   // to notify about errors
   private _error$ = new Subject<any>()
   // to notify, that authorization, subscription or something else gone wrong
@@ -114,6 +124,11 @@ export class WebSocketController<RequestType,
    *
    * Emits an auth response, when the `isResponseSuccessful` field in {@link WebSocketControllerConfig.authorize}
    * is set, undefined otherwise.
+   *
+   * Errors when either authorization response was not successful
+   * (determined by the field `isResponseSuccessful` of the {@link WebSocketControllerConfig.authorize})
+   * or authorization request
+   * timed out (if so, will error with RxJs `TimeoutError`).
    */
   get authorized$(): Observable<ResponseType | undefined> {
     return this._authorized$
@@ -124,6 +139,10 @@ export class WebSocketController<RequestType,
    *
    * Emits an auth subscribe responses, when the `isResponseSuccessful` field in {@link WebSocketControllerConfig.subscribe}
    * is set, undefined otherwise.
+   *
+   * Fires when one of the subscription responses was not successful
+   * (determined by the field `isResponseSuccessful` of the {@link WebSocketControllerConfig.subscribe})
+   * or when one of the requests timed out (if so, will error with RxJs `TimeoutError`).
    */
   get subscribed$(): Observable<ResponseType[] | undefined> {
     return this._subscribed$
@@ -141,25 +160,6 @@ export class WebSocketController<RequestType,
    */
   get closed$(): Observable<CloseEvent> {
     return this._closed$
-  }
-
-  /**
-   * Fires when either authorization response was not successful
-   * (determined by the field `isResponseSuccessful` of the {@link WebSocketControllerConfig.authorize})
-   * or authorization request
-   * timed out (if so, will error with RxJs `TimeoutError`).
-   */
-  get notAuthorized$(): Observable<ResponseType> {
-    return this._notAuthorized$
-  }
-
-  /**
-   * Fires when one of the subscription responses was not successful
-   * (determined by the field `isResponseSuccessful` of the {@link WebSocketControllerConfig.subscribe})
-   * or when one of the requests timed out (if so, will error with RxJs `TimeoutError`).
-   */
-  get notSubscribed$(): Observable<ResponseType> {
-    return this._notSubscribed$
   }
 
   /**
@@ -320,17 +320,20 @@ export class WebSocketController<RequestType,
           if (isResponseSuccessful) {
             const response$ = this._requestDirect(msg)
             const successful$ = response$.pipe(
-              filter(isResponseSuccessful),
-              catchError(() => EMPTY), // error is passed to this._notAuthorized$ subject
-              tap(response => this._authorized(response))
+              mergeMap(response => {
+                if (isResponseSuccessful(response)) {
+                  return of(response)
+                } else {
+                  return throwError(() => response)
+                }
+              }),
+              tap(response => this._authorized(response)),
+              catchError(err => {
+                this.close()
+                return throwError(err)
+              })
             )
             successful$.subscribe()
-            const failed$ = response$.pipe(
-              filter(response => !isResponseSuccessful(response)),
-              tap(() => this.close()),
-            )
-            // will also pipe errors
-            failed$.subscribe(this._notAuthorized$)
           } else {
             this._sendDirect(msg)
             this._authorized()
@@ -360,19 +363,20 @@ export class WebSocketController<RequestType,
             )
             const successful$ = responses$.pipe(
               filter(responses => responses.every(isResponseSuccessful)),
-              catchError(() => EMPTY), // error is passed to this._notAuthorized$ subject
-              tap(responses => this._subscribed(responses))
+              mergeMap(responses => {
+                const unsuccessful = responses.find(resp => !isResponseSuccessful(resp))
+                if (unsuccessful) {
+                  return throwError(unsuccessful)
+                }
+                return of(responses)
+              }),
+              tap(responses => this._subscribed(responses)),
+              catchError(err => {
+                this.close()
+                return throwError(err)
+              })
             )
             successful$.subscribe()
-            const failed$ = responses$.pipe(
-              map(responses =>
-                responses.find(resp => !isResponseSuccessful(resp))
-              ),
-              filter(Boolean),
-              tap(() => this.close()),
-            )
-            // will also pipe errors
-            failed$.subscribe(this._notSubscribed$)
           } else {
             this._subscribed()
           }
