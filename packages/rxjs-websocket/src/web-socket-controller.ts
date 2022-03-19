@@ -1,4 +1,5 @@
 import {
+  AsyncSubject,
   catchError,
   filter,
   first,
@@ -65,6 +66,7 @@ export class WebSocketController<RequestType,
   private _subscribed$ = new Subject<ResponseType[] | undefined>()
   private _closing$ = new Subject<void>()
   private _closed$ = new Subject<CloseEvent>()
+  private _closedManually$: Subject<void>[] = []
   // to notify about errors
   private _error$ = new Subject<any>()
   // to notify, that authorization, subscription or something else gone wrong
@@ -220,6 +222,11 @@ export class WebSocketController<RequestType,
   private _closed(e: CloseEvent): void {
     this._state = WebSocketControllerState.closed
     this._closed$.next(e)
+    this._closedManually$.forEach(closed$ => {
+      closed$.next()
+      closed$.complete()
+    })
+    this._closedManually$ = []
   }
 
   /**
@@ -392,9 +399,8 @@ export class WebSocketController<RequestType,
 
   /**
    * Closes the socket, cancels the reconnection.
-   * The `closed$` observable will fire.
    */
-  close(): void {
+  close(): Observable<void> {
     if (this._socket) {
       // to prevent occasional reopening
       this._socket.closedManually = true
@@ -404,10 +410,14 @@ export class WebSocketController<RequestType,
       ) {
         this._closing()
         this._socket?.ws.close()
+        const closed$ = new AsyncSubject<void>()
+        this._closedManually$.push(closed$)
+        return closed$
       }
     }
-    // Even if readyState is CLOSING, it will be closed anyway, so we can remove underlying socket from state
     this._socket = undefined;
+    return of(void 0);
+    // Even if readyState is CLOSING, it will be closed anyway, so we can remove underlying socket from state
   }
 
   /**
