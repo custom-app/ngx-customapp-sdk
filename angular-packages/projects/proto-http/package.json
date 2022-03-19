@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "peerDependencies": {
     "@angular/common": "^13.2.0",
-    "@angular/core": "^13.2.0"
+    "@angular/core": "^13.2.0",
+    "ngx-customapp-errors": "*"
   },
   "dependencies": {
-    "ngx-customapp-errors": "*",
     "tslib": "^2.3.0"
   },
   "scripts": {
-    "watch": "ng build --watch --configuration development",
-    "build": "ng build"
+    "watch": "yarn build --watch --configuration development",
+    "build": "ng build ngx-customapp-proto-http"
   }
 }

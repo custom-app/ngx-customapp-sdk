@@ -1,6 +1,6 @@
 import {Inject, Injectable} from '@angular/core';
 import {JwtApi} from '../models/jwt-api';
-import {EMPTY, mergeMap, Observable, Subject, Subscription, tap, throwError} from 'rxjs';
+import {bindCallback, EMPTY, mergeMap, Observable, Subscription, tap, throwError} from 'rxjs';
 import {JwtConfig} from '../models/jwt-config';
 import {isJwtExpired} from '../utils';
 import {NoFreshJwtListener} from '../models/no-fresh-jwt-listener';
@@ -151,6 +151,11 @@ export class JwtService<Credentials,
               .forEach(fn => fn(freshJwt))
             this._waitingForRefresh = []
             this._refresh = undefined
+          }, () => {
+            this.noFreshJwtListener.noFreshJwt()
+            if (!callWithFreshOnly) {
+              callback()
+            }
           })
       }
     } else {
@@ -158,13 +163,11 @@ export class JwtService<Credentials,
     }
   }
 
-  freshJwt(): Observable<JwtGroup<JwtInfo> | undefined> {
-    const subject = new Subject<JwtGroup<JwtInfo> | undefined>()
-    this.withFreshJwt(jwt => {
-      subject.next(jwt)
-    })
-    return subject
-  }
+  /**
+   * Refreshes the tokens if needed and emits them as a value. If no fresh tokens available, will emit `undefined`.
+   */
+  freshJwt: () => Observable<JwtGroup<JwtInfo> | undefined> =
+    bindCallback((callback: (jwt: JwtGroup<JwtInfo> | undefined) => void) => this.withFreshJwt(callback))
 
   /**
    * Logs out the current user. If there was loginAs call previously (perhaps multiple calls),

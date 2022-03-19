@@ -9,7 +9,7 @@ import * as fromUserStash from './reducers/user-stash.reducer'
 
 export interface JwtSelectors<UserInfo> {
   selectJwtRootState: Selector<fromJwtRoot.JwtAppRootStateBase<UserInfo>, fromJwtRoot.JwtRootState<UserInfo>>,
-  selectJwtUser: Selector<fromJwtRoot.JwtAppRootStateBase<UserInfo>, fromUser.State<UserInfo>>,
+  selectJwtUser: Selector<fromJwtRoot.JwtAppRootStateBase<UserInfo>, UserInfo | undefined>,
   selectJwtLoginInProcess: Selector<fromJwtRoot.JwtAppRootStateBase<UserInfo>, fromLoginInProcess.State>,
   selectJwtLoginAsInProcess: Selector<fromJwtRoot.JwtAppRootStateBase<UserInfo>, fromLoginAsInProcess.State>
   selectJwtLogoutInProcess: Selector<fromJwtRoot.JwtAppRootStateBase<UserInfo>, fromLogoutInProcess.State>,
