@@ -4,14 +4,10 @@
   "peerDependencies": {
     "@angular/common": "^13.2.0",
     "@angular/core": "^13.2.0",
-    "ngx-customapp-jwt": "*",
-    "ngx-customapp-errors": "*"
+    "ngx-customapp-errors": "*",
+    "ngx-customapp-jwt": "*"
   },
   "dependencies": {
     "tslib": "^2.3.0"
-  },
-  "scripts": {
-    "watch": "yarn build --watch --configuratio=development",
-    "build": "ng build ngx-customapp-pattern-auth-before-authorized-socket"
   }
 }

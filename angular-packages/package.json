@@ -2,9 +2,21 @@
   "name": "angular-packages",
   "version": "1.0.0",
   "scripts": {
-    "ng": "ng"
+    "ng": "ng",
+    "watch:jwt": "yarn build:jwt --watch --configuration=development",
+    "build:jwt": "ng build ngx-customapp-jwt",
+    "watch:errors": "yarn build:errors --watch --configuration development",
+    "build:errors": "ng build ngx-customapp-errors",
+    "watch:proto-http": "yarn build:proto-http --watch --configuration development",
+    "build:proto-http": "ng build ngx-customapp-proto-http",
+    "watch:pattern-auth-before-authorized-socket": "yarn build --watch --configuratio=development",
+    "build:pattern-auth-before-authorized-socket": "ng build ngx-customapp-pattern-auth-before-authorized-socket",
+    "build": "yarn build:jwt && yarn build:errors && yarn build:proto-http && yarn build:pattern-auth-before-authorized-socket"
   },
   "private": true,
+  "workspaces": [
+    "dist/*"
+  ],
   "dependencies": {
     "@angular/animations": "~13.2.0",
     "@angular/common": "~13.2.0",
@@ -36,7 +48,7 @@
     "ng-packagr": "^13.0.0",
     "typescript": "~4.5.2"
   },
-  "workspaces": [
-    "projects/*"
-  ]
+  "resolutions": {
+    "frontend": "portal:/Users/santalov/WebstormProjects/loop/frontend"
+  }
 }

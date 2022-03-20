@@ -12,9 +12,5 @@
   },
   "devDependencies": {
     "@ngrx/schematics": "^13.0.2"
-  },
-  "scripts": {
-    "watch": "yarn build --watch --configuration=development",
-    "build": "ng build ngx-customapp-jwt"
   }
 }

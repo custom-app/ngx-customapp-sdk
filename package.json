@@ -4,13 +4,11 @@
   "description": "SDK allowing you to quickly setup authorization and websocket life cycle in an Angular app. Some utils are also included",
   "repository": "https://github.com/loyal-inform/ngx-customapp-sdk.git",
   "workspaces": [
-    "packages/*",
-    "angular-packages",
-    "angular-packages/projects/*"
+    "packages/*"
   ],
   "scripts": {
     "doc": "typedoc --excludePrivate",
-    "watch": "yarn workspaces foreach -piv run watch"
+    "watch": "yarn workspaces foreach --include packages/* angular-packages/* -piv run watch"
   },
   "license": "MIT",
   "private": true,
@@ -18,5 +16,8 @@
     "typedoc": "^0.22.12",
     "typedoc-plugin-missing-exports": "^0.22.6",
     "typescript": "^4.6.2"
+  },
+  "resolutions": {
+    "frontend": "portal:/Users/santalov/WebstormProjects/loop/frontend"
   }
 }

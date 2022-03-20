@@ -8,9 +8,5 @@
   },
   "dependencies": {
     "tslib": "^2.3.0"
-  },
-  "scripts": {
-    "watch": "yarn build --watch --configuration development",
-    "build": "ng build ngx-customapp-proto-http"
   }
 }
