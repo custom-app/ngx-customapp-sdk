@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "doc": "typedoc --excludePrivate",
-    "watch": "yarn workspaces foreach --include packages/* angular-packages/* -piv run watch"
+    "watch": "yarn workspaces foreach -piv run watch"
   },
   "license": "MIT",
   "private": true,

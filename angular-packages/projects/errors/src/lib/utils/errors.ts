@@ -44,11 +44,20 @@ export function addErrorContext(error: any): ContextError {
  * @internal
  * Gets human-readable error
  */
-export function getErrorText(error: string, locale: LocaleId, errorsText: ErrorsText): string {
+export function getErrorText(
+  error: string,
+  locale: LocaleId,
+  errorsText: ErrorsText,
+  errorResponseToAppendix?: (error: any) => string
+): string {
   if (error) {
     const errText = errorsText[locale][error.trim().toLowerCase()];
     if (errText) {
-      return errText;
+      if (errorResponseToAppendix) {
+        return errText + errorResponseToAppendix(error);
+      } else {
+        return errText
+      }
     } else {
       // if there is no human-readable error text
       return error + '';
@@ -65,10 +74,10 @@ export function getErrorText(error: string, locale: LocaleId, errorsText: Errors
 export function errorToUserText(
   error: any,
   config: ErrorsConfig,
-  locale: LocaleId
+  locale: LocaleId,
 ): string {
   if (config.isErrorResponse(error)) {
-    return config.errorResponseToNormalizedError(error);
+    return getErrorText(config.errorResponseToNormalizedError(error), locale, config.errorsText, config.errorResponseToAppendix);
   } else if (error.message === 'Timeout has occurred') {
     // timeout of the observable (usually the request into socket)
     return getErrorText(error.message, locale, config.errorsText);

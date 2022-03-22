@@ -3,7 +3,6 @@ import {ModuleWithProviders, Provider} from '@angular/core';
 import {JwtModule} from './jwt.module';
 import {JwtApi} from './models/jwt-api';
 import {NoFreshJwtListener} from './models/no-fresh-jwt-listener';
-import {JwtService} from './services/jwt.service';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {JwtInterceptor} from './http-interceptors/jwt.interceptor';
 import {ActionReducerMap, createReducer, on} from '@ngrx/store'
@@ -56,7 +55,7 @@ export class JwtAdapter<Credentials,
           provide: JWT_SELECTORS,
           useValue: this.selectors()
         },
-        JwtService,
+        // JwtService, JwtGuard are providedIn:'root'
       ]
     }
   }

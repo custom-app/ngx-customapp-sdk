@@ -3,6 +3,6 @@
  * have to use this interface.
  */
 export interface JwtGroup<JwtInfoType> {
-  accessToken: JwtInfoType,
-  refreshToken: JwtInfoType,
+  accessToken?: JwtInfoType,
+  refreshToken?: JwtInfoType,
 }

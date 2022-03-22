@@ -9,7 +9,7 @@ import {ProtoHttpConfig} from '../models/proto-http-config';
 export class VersionInterceptor implements HttpInterceptor {
 
   constructor(
-    @Inject(PROTO_HTTP_CONFIG) private config: ProtoHttpConfig<any, any, any>
+    @Inject(PROTO_HTTP_CONFIG) private config: ProtoHttpConfig<any, any>
   ) {
   }
 

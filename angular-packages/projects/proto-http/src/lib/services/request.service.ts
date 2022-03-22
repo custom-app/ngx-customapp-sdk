@@ -1,10 +1,10 @@
 import {Inject, Injectable} from '@angular/core';
 import {HttpClient, HttpContext, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {catchError, from, Observable, of, OperatorFunction, throwError} from 'rxjs';
-import {ErrorsService} from 'ngx-customapp-errors/src/lib/services/errors.service';
+import {ErrorsService} from 'ngx-customapp-errors';
 import {ProtoHttpConfig} from '../models/proto-http-config';
 import {PROTO_HTTP_CONFIG} from '../constants/di-token';
-import {disableJwtInterception} from 'ngx-customapp-jwt/src/lib/constants/disable-jwt-interception';
+import {disableJwtInterception} from 'ngx-customapp-jwt';
 import {protobufHeader} from '../constants/proto-header';
 import {createResponseHandlerPipe, handleArrayBufferBody, handleBlobBody} from '../utils/response-handlers';
 import {switchMap} from 'rxjs/operators';
@@ -12,26 +12,26 @@ import {switchMap} from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
-export class RequestService<RequestType, ResponseType, ErrorResponseType> {
+export class RequestService<RequestType, ResponseType> {
 
   private readonly handleProtoBlobResponse: OperatorFunction<HttpResponse<Blob>, ResponseType>
   private readonly handleProtoArrayBufferResponse: OperatorFunction<HttpResponse<ArrayBuffer>, ResponseType>
 
   constructor(
-    @Inject(PROTO_HTTP_CONFIG) private config: ProtoHttpConfig<RequestType, ResponseType, ErrorResponseType>,
+    @Inject(PROTO_HTTP_CONFIG) private config: ProtoHttpConfig<RequestType, ResponseType>,
     private http: HttpClient,
     private errorsService: ErrorsService,
   ) {
-    this.handleProtoBlobResponse = createResponseHandlerPipe(handleBlobBody, config.deserializer, config.getErrorFromResponse);
-    this.handleProtoArrayBufferResponse = createResponseHandlerPipe(handleArrayBufferBody, config.deserializer, config.getErrorFromResponse)
+    this.handleProtoBlobResponse = createResponseHandlerPipe(handleBlobBody, config.deserializer, config.isErrorResponse);
+    this.handleProtoArrayBufferResponse = createResponseHandlerPipe(handleArrayBufferBody, config.deserializer, config.isErrorResponse)
   }
 
-  private _requestBlob(endpoint: string, req: RequestType, disableAuth?: boolean): Observable<HttpResponse<Blob>> {
+  private _requestBlob(endpoint: string, req?: RequestType, headers?: HttpHeaders, disableAuth?: boolean): Observable<HttpResponse<Blob>> {
     return this.http.post(
       endpoint,
-      this.config.serializer(req),
+      req ? this.config.serializer(req) : null,
       {
-        headers: new HttpHeaders().set(protobufHeader.name, protobufHeader.value),
+        headers: (headers || new HttpHeaders()).set(protobufHeader.name, protobufHeader.value),
         observe: 'response',
         responseType: 'blob',
         context: new HttpContext().set(disableJwtInterception, !!disableAuth)
@@ -39,12 +39,12 @@ export class RequestService<RequestType, ResponseType, ErrorResponseType> {
     )
   }
 
-  private _requestArrayBuffer(endpoint: string, req: RequestType, disableAuth?: boolean): Observable<HttpResponse<ArrayBuffer>> {
+  private _requestArrayBuffer(endpoint: string, req?: RequestType, headers?: HttpHeaders, disableAuth?: boolean): Observable<HttpResponse<ArrayBuffer>> {
     return this.http.post(
       endpoint,
-      this.config.serializer(req),
+      req ? this.config.serializer(req) : null,
       {
-        headers: new HttpHeaders().set(protobufHeader.name, protobufHeader.value),
+        headers: (headers || new HttpHeaders()).set(protobufHeader.name, protobufHeader.value),
         observe: 'response',
         responseType: 'arraybuffer',
         context: new HttpContext().set(disableJwtInterception, !!disableAuth)
@@ -52,8 +52,8 @@ export class RequestService<RequestType, ResponseType, ErrorResponseType> {
     )
   }
 
-  request(endpoint: string, req: RequestType, disableAuth?: boolean): Observable<ResponseType> {
-    return this._requestArrayBuffer(endpoint, req, disableAuth)
+  request(endpoint: string, req?: RequestType, headers?: HttpHeaders, disableAuth?: boolean): Observable<ResponseType> {
+    return this._requestArrayBuffer(endpoint, req, headers, disableAuth)
       .pipe(
         this.handleProtoArrayBufferResponse,
         catchError(this.errorsService.reportError),
@@ -61,7 +61,7 @@ export class RequestService<RequestType, ResponseType, ErrorResponseType> {
       )
   }
 
-  requestFile(endpoint: string, req: RequestType): Observable<File> {
+  requestFile(endpoint: string, headers?: HttpHeaders, req?: RequestType): Observable<File> {
     return this._requestBlob(endpoint, req).pipe(
       switchMap(response => {
         const disposition = response.headers.get('Content-Disposition')
@@ -77,9 +77,7 @@ export class RequestService<RequestType, ResponseType, ErrorResponseType> {
           // transform blob into ResponseType and retrieve error from here.
           return from(response.body.arrayBuffer()).pipe(
             switchMap(buffer => throwError(() =>
-                this.config.getErrorFromResponse(
-                  this.config.deserializer(buffer)
-                )
+                this.config.deserializer(buffer)
               )
             )
           )

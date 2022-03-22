@@ -2,7 +2,6 @@
   "name": "angular-packages",
   "version": "1.0.0",
   "scripts": {
-    "ng": "ng",
     "watch:jwt": "yarn build:jwt --watch --configuration=development",
     "build:jwt": "ng build ngx-customapp-jwt",
     "watch:errors": "yarn build:errors --watch --configuration development",

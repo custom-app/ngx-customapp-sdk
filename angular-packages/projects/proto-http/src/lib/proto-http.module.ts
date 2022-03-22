@@ -9,8 +9,8 @@ import {ProtoHttpConfig} from './models/proto-http-config';
   exports: []
 })
 export class ProtoHttpModule {
-  static forRoot<RequestType, ResponseType, ErrorResponseType>(
-    config: ProtoHttpConfig<RequestType, ResponseType, ErrorResponseType>
+  static forRoot<RequestType, ResponseType>(
+    config: ProtoHttpConfig<RequestType, ResponseType>
   ): ModuleWithProviders<ProtoHttpModule> {
     return {
       ngModule: ProtoHttpModule,

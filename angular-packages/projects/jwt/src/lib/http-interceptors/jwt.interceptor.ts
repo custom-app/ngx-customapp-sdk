@@ -2,7 +2,6 @@ import {HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest} from 
 import {Inject, Injectable} from '@angular/core';
 import {JwtConfig} from '../models/jwt-config';
 import {JwtInfo} from '../models/jwt-info';
-import {JwtGroup} from '../models/jwt-group';
 import {mergeMap, Observable} from 'rxjs';
 import {disableJwtInterception} from '../constants/disable-jwt-interception';
 import {JwtInterceptorDropsReportProgress} from '../errors';
@@ -38,9 +37,9 @@ export class JwtInterceptor<Credentials, AuthResponse, UserInfo, UserId = number
       .freshJwt()
       .pipe(
         mergeMap(jwt => {
-          if (jwt) {
+          if (jwt?.accessToken) {
             return next.handle(
-              this.addAccessToken(req, jwt)
+              this.addAccessToken(req, jwt.accessToken)
             )
           } else {
             return next.handle(req)
@@ -49,11 +48,11 @@ export class JwtInterceptor<Credentials, AuthResponse, UserInfo, UserId = number
       )
   }
 
-  addAccessToken(req: HttpRequest<any>, jwt: JwtGroup<JwtInfo>): HttpRequest<any> {
+  addAccessToken(req: HttpRequest<any>, accessJwt: JwtInfo): HttpRequest<any> {
     let headers: HttpHeaders = req.headers;
     headers = headers.set(
       this.config.authHeader.name,
-      this.config.authHeader.createValue(jwt.accessToken)
+      this.config.authHeader.createValue(accessJwt)
     );
     return req.clone({
       headers

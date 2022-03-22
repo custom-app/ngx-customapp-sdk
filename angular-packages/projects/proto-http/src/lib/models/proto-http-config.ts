@@ -2,7 +2,7 @@
  * RequestType is supposed to be YourProtoRequestMessage.AsObject.
  * ResponseType is supposed to be YourProtoResponseMessage.AsObject.
  */
-export interface ProtoHttpConfig<RequestType, ResponseType, ErrorResponseType> {
+export interface ProtoHttpConfig<RequestType, ResponseType> {
   /**
    * Function to be called on every request.
    * @param request A message to be serialized into UnderlyingDataType
@@ -15,10 +15,11 @@ export interface ProtoHttpConfig<RequestType, ResponseType, ErrorResponseType> {
    */
   deserializer: (response: ArrayBuffer) => ResponseType,
   /**
-   * It's expected, that error is a field of a general response, so this function gets it.
+   * It's expected, that error might be sent as a regular response, so you could this function to detect.
+   * If a regular response is determined as an error, {@link RequestService.request} will error with that response.
    * @param response deserialized proto message.
    */
-  getErrorFromResponse: (response: ResponseType) => ErrorResponseType | undefined,
+  isErrorResponse?: (response: ResponseType) => boolean,
   /**
    * If provided, will be used by
    */

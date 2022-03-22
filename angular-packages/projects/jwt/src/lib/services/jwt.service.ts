@@ -10,7 +10,9 @@ import {JwtInfo} from '../models/jwt-info';
 import {LoginAsCalledWhenUnauthorized, LoginAsMethodUnimplemented} from '../errors';
 import {JWT_CONFIG} from '../constants/di-token';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class JwtService<Credentials,
   AuthResponse,
   UserInfo,
@@ -99,7 +101,7 @@ export class JwtService<Credentials,
       .freshJwt()
       .pipe(
         mergeMap(jwt => {
-          if (!jwt) {
+          if (!jwt?.accessToken) {
             return throwError(() => new LoginAsCalledWhenUnauthorized())
           }
           if (!this.jwtApi.loginAs) {
@@ -121,7 +123,7 @@ export class JwtService<Credentials,
 
   /**
    * Refreshes the tokens if needed and calls the callback, when the tokens refreshed successfully.
-   * If the tokens are not refreshable, the callback is called with expired JWT and
+   * If the tokens are not refreshable, the callback is called without any arguments and
    * the {@link JwtConfig.noFreshJwt} is also called
    *
    * If you want the callback to be called only with fresh tokens, pass `true` as the second parameter.
@@ -131,35 +133,38 @@ export class JwtService<Credentials,
    */
   withFreshJwt(callback: (jwt?: JwtGroup<JwtInfo>) => void, callWithFreshOnly?: boolean): void {
     const jwt = this._jwt
-    if (!jwt || isJwtExpired(jwt.refreshToken)) {
+    if (!jwt?.refreshToken || isJwtExpired(jwt.refreshToken)) {
       this.noFreshJwtListener.noFreshJwt()
       if (!callWithFreshOnly) {
-        callback(jwt)
+        callback()
       }
       return
     }
-    if (isJwtExpired(jwt.accessToken)) {
+    if (!jwt.accessToken || isJwtExpired(jwt.accessToken)) {
       this._waitingForRefresh.push(callback)
       if (!this._refresh) {
         this._refresh = this
           .jwtApi
           .refresh(jwt.refreshToken)
-          .subscribe(freshJwt => {
-            this._setJwt(freshJwt)
-            this
-              ._waitingForRefresh
-              .forEach(fn => fn(freshJwt))
-            this._waitingForRefresh = []
-            this._refresh = undefined
-          }, () => {
-            this.noFreshJwtListener.noFreshJwt()
-            if (!callWithFreshOnly) {
-              callback()
+          .subscribe({
+            next: freshJwt => {
+              this._setJwt(freshJwt)
+              this
+                ._waitingForRefresh
+                .forEach(fn => fn(freshJwt))
+              this._waitingForRefresh = []
+              this._refresh = undefined
+            },
+            error: () => {
+              this.noFreshJwtListener.noFreshJwt()
+              if (!callWithFreshOnly) {
+                callback()
+              }
             }
           })
       }
     } else {
-      callback(jwt)
+      callback()
     }
   }
 
@@ -181,7 +186,7 @@ export class JwtService<Credentials,
       .freshJwt()
       .pipe(
         mergeMap(jwt => {
-          if (jwt && !isJwtExpired(jwt.refreshToken)) {
+          if (jwt?.accessToken) {
             return this
               .jwtApi
               .logout(jwt.accessToken, fromAllDevices)

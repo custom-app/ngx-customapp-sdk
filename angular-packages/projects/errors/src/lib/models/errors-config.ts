@@ -1,5 +1,4 @@
 import {ErrorsText, NormalizedError} from './errors-text';
-import {ErrorsReporter} from './errors-reporter';
 import {UnhandledErrorHandler} from './unhandled-error-handler';
 
 /**
@@ -76,7 +75,7 @@ export interface ErrorsConfig {
    */
   doNotSend?: NormalizedError[]
   /**
-   * To detect, if the error is a response from the backend. The type of the error response
+   * To detect, if the error is a response from the backend or a network or app error. The type of the error response
    * depends on the backend.
    * @param error The error to be tested.
    */
@@ -84,13 +83,18 @@ export interface ErrorsConfig {
   /**
    * Converts the error response from the backend into normalized error text, used as a key
    * to get human-readable error from {@link ErrorsConfig.errorsText}.
-   * @param errorResponse the error response from the backend.
+   * @param errorResponse the error response from the backend, detected by isErrorResponse function.
    */
   errorResponseToNormalizedError: (errorResponse: any) => NormalizedError
   /**
-   * Provides a function to send the error report to the backend.
+   * Can be used to extract non-translated information about error.
+   * @param errorResponse the error response from the backend, detected by isErrorResponse function.
    */
-  reporter: ErrorsReporter,
+  errorResponseToAppendix?: (errorResponse: any) => string
+  /**
+   * Provides a function to send the error report to the backend. Must implement ErrorsReporter abstract class
+   */
+  reporter: any,
   /**
    * The only method of this service is called, when an error is thrown
    * anywhere in an Angular app, and not caught by the app.
