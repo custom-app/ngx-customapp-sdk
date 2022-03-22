@@ -64,6 +64,7 @@ export class WebSocketsOwnerService<RequestType,
   init(): Observable<void> {
     const initialized$ = new Subject<void>()
     const commonConfig = this.chain.commonConfig
+    const commonOpenOptions = this.chain.commonOpenOptions
     let currentChainLink: WebSocketChainLink<RequestType, ResponseType, UserInfo> = this.chain.chain
     const jwtAndUserInfo$ = this
       .jwtService
@@ -78,6 +79,7 @@ export class WebSocketsOwnerService<RequestType,
           .map(individualConfig => {
             const {socket, responses$} = createSocket(commonConfig, individualConfig, jwtAndUserInfo$)
             this.sockets[individualConfig.socketId] = socket
+            socket.open(commonOpenOptions)
             return responses$
           })
       ).pipe(
