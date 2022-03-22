@@ -37,3 +37,9 @@ export abstract class JwtApi<Credentials,
    */
   abstract logout: (accessToken: JwtInfo, fromAllDevices?: boolean) => Observable<void>
 }
+
+export interface JwtApiConstructor<Credentials,
+  AuthResponse,
+  UserId = number> {
+  new(...args: any[]): JwtApi<Credentials, AuthResponse, UserId>
+}

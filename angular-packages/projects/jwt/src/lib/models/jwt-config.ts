@@ -1,6 +1,6 @@
 import {JwtGroup} from './jwt-group';
 import {JwtInfo} from './jwt-info';
-import {JwtApi} from './jwt-api';
+import {JwtApi, JwtApiConstructor} from './jwt-api';
 import {NoFreshJwtListener} from './no-fresh-jwt-listener';
 import {ActionCreator} from '@ngrx/store'
 
@@ -22,9 +22,9 @@ export interface JwtConfig<Credentials,
     createValue: (jwt: JwtInfo) => string,
   },
   /**
-   * Provides methods to interact with backend
+   * Provides methods to interact with backend. Must implement {@link JwtApi}.
    */
-  jwtApi: JwtApi<Credentials, AuthResponse, UserId>,
+  jwtApi: JwtApiConstructor<Credentials, AuthResponse, UserId>,
   /**
    * Used to start actions, when refresh jwt failed. Usually you want to
    * redirect user to the login page.
