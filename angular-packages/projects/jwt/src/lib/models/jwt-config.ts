@@ -1,7 +1,7 @@
 import {JwtGroup} from './jwt-group';
 import {JwtInfo} from './jwt-info';
 import {JwtApi, JwtApiConstructor} from './jwt-api';
-import {NoFreshJwtListener} from './no-fresh-jwt-listener';
+import {NoFreshJwtListenerConstructor} from './no-fresh-jwt-listener';
 import {ActionCreator} from '@ngrx/store'
 
 export interface JwtConfig<Credentials,
@@ -29,7 +29,7 @@ export interface JwtConfig<Credentials,
    * Used to start actions, when refresh jwt failed. Usually you want to
    * redirect user to the login page.
    */
-  noFreshJwt: NoFreshJwtListener
+  noFreshJwt: NoFreshJwtListenerConstructor
   /**
    * the key to be used in the localStorage.
    *

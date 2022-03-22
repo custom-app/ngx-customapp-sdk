@@ -5,3 +5,7 @@
 export abstract class NoFreshJwtListener {
   abstract noFreshJwt: () => void
 }
+
+export interface NoFreshJwtListenerConstructor {
+  new (...args: any[]): NoFreshJwtListener
+}

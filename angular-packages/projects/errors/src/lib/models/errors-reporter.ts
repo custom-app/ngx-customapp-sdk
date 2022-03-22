@@ -8,3 +8,7 @@ import {ContextError} from './context-error';
 export abstract class ErrorsReporter {
   abstract report(error: ContextError): Observable<void>
 }
+
+export interface ErrorsReporterConstructor {
+  new(...args: any[]): ErrorsReporter
+}

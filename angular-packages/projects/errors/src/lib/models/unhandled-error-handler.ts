@@ -12,3 +12,7 @@ export abstract class UnhandledErrorHandler {
    */
   abstract unhandledError(error: any): void
 }
+
+export interface UnhandledErrorHandlerConstructor {
+  new (...args: any[]): UnhandledErrorHandler
+}

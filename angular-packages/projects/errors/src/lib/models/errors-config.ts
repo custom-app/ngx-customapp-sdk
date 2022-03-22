@@ -1,5 +1,6 @@
 import {ErrorsText, NormalizedError} from './errors-text';
-import {UnhandledErrorHandler} from './unhandled-error-handler';
+import {UnhandledErrorHandlerConstructor} from './unhandled-error-handler';
+import {ErrorsReporterConstructor} from './errors-reporter';
 
 /**
  * Convention: all errors, thrown by the request function (an http request or a socket request),
@@ -94,7 +95,7 @@ export interface ErrorsConfig {
   /**
    * Provides a function to send the error report to the backend. Must implement ErrorsReporter abstract class
    */
-  reporter: any,
+  reporter: ErrorsReporterConstructor,
   /**
    * The only method of this service is called, when an error is thrown
    * anywhere in an Angular app, and not caught by the app.
@@ -102,5 +103,5 @@ export interface ErrorsConfig {
    * asking user to reload the page. Useful when building a finance application,
    * where errors cannot be tolerated.
    */
-  unhandled?: UnhandledErrorHandler,
+  unhandled?: UnhandledErrorHandlerConstructor,
 }
