@@ -24,18 +24,6 @@ export interface WebSocketOpenOptions {
      * @param reconnectState {@link ReconnectState}
      */
     shouldReconnect?: (reconnectState: ReconnectState) => boolean,
-    /**
-     * To determine, if auth message have to be sent.
-     * If not passed, auth message is always sent (same as if `() => true` is passed).
-     * @param reconnectState {@link ReconnectState}
-     */
-    authorize?: (reconnectState: ReconnectState) => boolean,
-    /**
-     * To determine, if subscribe requests have to be sent.
-     * If not passed, always tries to subscribe (same as if `() => true` is passed)
-     * @param reconnectState {@link ReconnectState}
-     */
-    subscribe?: (reconnectState: ReconnectState) => boolean,
   },
   /**
    * If you try to open an already opened socket, the error will be thrown by default.
