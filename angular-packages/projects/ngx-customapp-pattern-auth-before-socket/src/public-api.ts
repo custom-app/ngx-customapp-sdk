@@ -2,7 +2,7 @@
  * Public API Surface of pattern-auth-before-authorized-socket
  */
 
-export * from './lib/pattern-auth-before-authorized-socket.module';
+export * from './lib/pattern-auth-before-socket.module';
 
 export * from './lib/models/common-web-socket-config'
 export * from './lib/models/individual-web-socket-config'

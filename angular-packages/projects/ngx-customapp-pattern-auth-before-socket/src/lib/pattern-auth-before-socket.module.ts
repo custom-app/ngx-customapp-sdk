@@ -15,12 +15,12 @@ import {SocketsEffects} from './store/sockets.effects';
   ],
   exports: []
 })
-export class PatternAuthBeforeAuthorizedSocketModule {
+export class PatternAuthBeforeSocketModule {
   static forRoot<RequestType, ResponseType, UnderlyingDataType extends string | ArrayBufferLike | Blob | ArrayBufferView, UserInfo>(
     chain: WebSocketChain<RequestType, ResponseType, UnderlyingDataType, UserInfo>
-  ): ModuleWithProviders<PatternAuthBeforeAuthorizedSocketModule> {
+  ): ModuleWithProviders<PatternAuthBeforeSocketModule> {
     return {
-      ngModule: PatternAuthBeforeAuthorizedSocketModule,
+      ngModule: PatternAuthBeforeSocketModule,
       providers: [
         {
           provide: WEB_SOCKET_CHAIN,
