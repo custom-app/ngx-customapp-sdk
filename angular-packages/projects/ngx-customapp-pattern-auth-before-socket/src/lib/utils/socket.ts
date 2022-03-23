@@ -2,7 +2,7 @@ import {WebSocketController} from 'customapp-rxjs-websocket';
 import {CommonWebSocketConfig} from '../models/common-web-socket-config';
 import {IndividualWebSocketConfig} from '../models/individual-web-socket-config';
 import {map, mergeMap, Observable, take, takeUntil, zipWith} from 'rxjs';
-import {JwtGroup, JwtInfo} from 'jwt';
+import {JwtGroup, JwtInfo} from 'ngx-customapp-jwt';
 
 export interface SocketResponses<ResponseType> {
   auth: ResponseType | undefined,

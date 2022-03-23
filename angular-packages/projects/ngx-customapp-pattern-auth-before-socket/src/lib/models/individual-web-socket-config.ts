@@ -1,5 +1,5 @@
 import {WebSocketControllerConfig} from 'customapp-rxjs-websocket';
-import {JwtGroup, JwtInfo} from 'jwt';
+import {JwtGroup, JwtInfo} from 'ngx-customapp-jwt';
 import {Observable} from 'rxjs';
 
 /**

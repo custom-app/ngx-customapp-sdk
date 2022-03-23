@@ -5,21 +5,21 @@
   "projects": {
     "ngx-customapp-jwt": {
       "projectType": "library",
-      "root": "projects/jwt",
-      "sourceRoot": "projects/jwt/src",
+      "root": "projects/ngx-customapp-jwt",
+      "sourceRoot": "projects/ngx-customapp-jwt/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/jwt/ng-package.json"
+            "project": "projects/ngx-customapp-jwt/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/jwt/tsconfig.lib.prod.json"
+              "tsConfig": "projects/ngx-customapp-jwt/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/jwt/tsconfig.lib.json"
+              "tsConfig": "projects/ngx-customapp-jwt/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -27,30 +27,30 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/jwt/src/test.ts",
-            "tsConfig": "projects/jwt/tsconfig.spec.json",
-            "karmaConfig": "projects/jwt/karma.conf.js"
+            "main": "projects/ngx-customapp-jwt/src/test.ts",
+            "tsConfig": "projects/ngx-customapp-jwt/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-customapp-jwt/karma.conf.js"
           }
         }
       }
     },
     "ngx-customapp-errors": {
       "projectType": "library",
-      "root": "projects/errors",
-      "sourceRoot": "projects/errors/src",
+      "root": "projects/ngx-customapp-errors",
+      "sourceRoot": "projects/ngx-customapp-errors/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/errors/ng-package.json"
+            "project": "projects/ngx-customapp-errors/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/errors/tsconfig.lib.prod.json"
+              "tsConfig": "projects/ngx-customapp-errors/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/errors/tsconfig.lib.json"
+              "tsConfig": "projects/ngx-customapp-errors/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -58,30 +58,30 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/errors/src/test.ts",
-            "tsConfig": "projects/errors/tsconfig.spec.json",
-            "karmaConfig": "projects/errors/karma.conf.js"
+            "main": "projects/ngx-customapp-errors/src/test.ts",
+            "tsConfig": "projects/ngx-customapp-errors/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-customapp-errors/karma.conf.js"
           }
         }
       }
     },
     "ngx-customapp-proto-http": {
       "projectType": "library",
-      "root": "projects/proto-http",
-      "sourceRoot": "projects/proto-http/src",
+      "root": "projects/ngx-customapp-proto-http",
+      "sourceRoot": "projects/ngx-customapp-proto-http/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/proto-http/ng-package.json"
+            "project": "projects/ngx-customapp-proto-http/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/proto-http/tsconfig.lib.prod.json"
+              "tsConfig": "projects/ngx-customapp-proto-http/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/proto-http/tsconfig.lib.json"
+              "tsConfig": "projects/ngx-customapp-proto-http/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -89,30 +89,30 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/proto-http/src/test.ts",
-            "tsConfig": "projects/proto-http/tsconfig.spec.json",
-            "karmaConfig": "projects/proto-http/karma.conf.js"
+            "main": "projects/ngx-customapp-proto-http/src/test.ts",
+            "tsConfig": "projects/ngx-customapp-proto-http/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-customapp-proto-http/karma.conf.js"
           }
         }
       }
     },
-    "ngx-customapp-pattern-auth-before-authorized-socket": {
+    "ngx-customapp-pattern-auth-before-socket": {
       "projectType": "library",
-      "root": "projects/pattern-auth-before-authorized-socket",
-      "sourceRoot": "projects/pattern-auth-before-authorized-socket/src",
+      "root": "projects/ngx-customapp-pattern-auth-before-socket",
+      "sourceRoot": "projects/ngx-customapp-pattern-auth-before-socket/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/pattern-auth-before-authorized-socket/ng-package.json"
+            "project": "projects/ngx-customapp-pattern-auth-before-socket/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/pattern-auth-before-authorized-socket/tsconfig.lib.prod.json"
+              "tsConfig": "projects/ngx-customapp-pattern-auth-before-socket/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/pattern-auth-before-authorized-socket/tsconfig.lib.json"
+              "tsConfig": "projects/ngx-customapp-pattern-auth-before-socket/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -120,9 +120,9 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/pattern-auth-before-authorized-socket/src/test.ts",
-            "tsConfig": "projects/pattern-auth-before-authorized-socket/tsconfig.spec.json",
-            "karmaConfig": "projects/pattern-auth-before-authorized-socket/karma.conf.js"
+            "main": "projects/ngx-customapp-pattern-auth-before-socketsrc/test.ts",
+            "tsConfig": "projects/ngx-customapp-pattern-auth-before-socket/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-customapp-pattern-auth-before-socket/karma.conf.js"
           }
         }
       }

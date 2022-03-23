@@ -6498,9 +6498,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ngx-customapp-errors@workspace:dist/errors":
+"ngx-customapp-errors@workspace:dist/ngx-customapp-errors":
   version: 0.0.0-use.local
-  resolution: "ngx-customapp-errors@workspace:dist/errors"
+  resolution: "ngx-customapp-errors@workspace:dist/ngx-customapp-errors"
   dependencies:
     tslib: ^2.3.0
   peerDependencies:
@@ -6509,9 +6509,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"ngx-customapp-jwt@workspace:dist/jwt":
+"ngx-customapp-jwt@workspace:dist/ngx-customapp-jwt":
   version: 0.0.0-use.local
-  resolution: "ngx-customapp-jwt@workspace:dist/jwt"
+  resolution: "ngx-customapp-jwt@workspace:dist/ngx-customapp-jwt"
   dependencies:
     tslib: ^2.3.0
   peerDependencies:
@@ -6522,22 +6522,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"ngx-customapp-pattern-auth-before-authorized-socket@workspace:dist/pattern-auth-before-authorized-socket":
+"ngx-customapp-proto-http@workspace:dist/ngx-customapp-proto-http":
   version: 0.0.0-use.local
-  resolution: "ngx-customapp-pattern-auth-before-authorized-socket@workspace:dist/pattern-auth-before-authorized-socket"
-  dependencies:
-    tslib: ^2.3.0
-  peerDependencies:
-    "@angular/common": ^13.2.0
-    "@angular/core": ^13.2.0
-    ngx-customapp-errors: "*"
-    ngx-customapp-jwt: "*"
-  languageName: unknown
-  linkType: soft
-
-"ngx-customapp-proto-http@workspace:dist/proto-http":
-  version: 0.0.0-use.local
-  resolution: "ngx-customapp-proto-http@workspace:dist/proto-http"
+  resolution: "ngx-customapp-proto-http@workspace:dist/ngx-customapp-proto-http"
   dependencies:
     tslib: ^2.3.0
   peerDependencies:

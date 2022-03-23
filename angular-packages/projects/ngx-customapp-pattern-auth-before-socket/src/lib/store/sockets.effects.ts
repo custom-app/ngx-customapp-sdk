@@ -1,7 +1,7 @@
 import {Inject, Injectable} from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
-import {JWT_ACTIONS, JwtActions} from 'jwt';
-import {ErrorsService} from 'errors'
+import {JWT_ACTIONS, JwtActions} from 'ngx-customapp-jwt';
+import {ErrorsService} from 'ngx-customapp-errors'
 import {catchError, map, mergeMap, of} from 'rxjs';
 import {WebSocketsOwnerService} from '../services/web-sockets-owner.service';
 import {

@@ -18,7 +18,7 @@ import {
 } from 'rxjs';
 import {createSocket, SocketResponses} from '../utils/socket';
 import {Store} from '@ngrx/store';
-import {JWT_SELECTORS, JwtAppRootStateBase, JwtSelectors, JwtService} from 'jwt';
+import {JWT_SELECTORS, JwtAppRootStateBase, JwtSelectors, JwtService} from 'ngx-customapp-jwt';
 import {WebSocketChainLink} from '../models/web-socket-chain-link';
 
 export const closeTimeout = 10 * 1000;

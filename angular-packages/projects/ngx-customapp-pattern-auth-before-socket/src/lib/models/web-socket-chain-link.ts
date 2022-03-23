@@ -1,6 +1,6 @@
 import {IndividualWebSocketConfig, SocketId} from './individual-web-socket-config';
 import {Observable} from 'rxjs';
-import {JwtGroup, JwtInfo} from 'jwt';
+import {JwtGroup, JwtInfo} from 'ngx-customapp-jwt';
 import {SocketResponses} from '../utils/socket';
 
 export interface WebSocketChainLink<RequestType, ResponseType, UserInfo> {

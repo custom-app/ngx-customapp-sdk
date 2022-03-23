@@ -1,5 +1,5 @@
 {
-  "name": "ngx-customapp-pattern-auth-before-authorized-socket",
+  "name": "ngx-customapp-pattern-auth-before-socket",
   "version": "1.0.0",
   "peerDependencies": {
     "@angular/common": "^13.2.0",
