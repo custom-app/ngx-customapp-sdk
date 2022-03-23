@@ -9,6 +9,8 @@ export {
   defaultWebSocketMessageBufferSize
 } from './web-socket-message-buffer'
 
+export {makeWsUrl} from './utils/url'
+
 export {BufferOverflowStrategy} from './models/buffer-overflow-strategy'
 export {ReconnectState} from './models/reconnect-state'
 export {WebSocketControllerConfig} from './models/websocket-controller-config'

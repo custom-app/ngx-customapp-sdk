@@ -31,14 +31,14 @@ export class WebSocketsOwnerService<RequestType,
   UnderlyingDataType extends string | ArrayBufferLike | Blob | ArrayBufferView,
   UserInfo,
   Credentials,
-  UserId,
   AuthResponse,
+  UserId = number
   > {
 
   constructor(
     @Inject(WEB_SOCKET_CHAIN) private chain: WebSocketChain<RequestType, ResponseType, UnderlyingDataType, UserInfo>,
     private store: Store<JwtAppRootStateBase<UserInfo>>,
-    private jwtService: JwtService<Credentials, AuthResponse, UserInfo>,
+    private jwtService: JwtService<Credentials, AuthResponse, UserInfo, UserId>,
     @Inject(JWT_SELECTORS) private s: JwtSelectors<UserInfo>
   ) {
   }

@@ -6,6 +6,7 @@ export type CommonWebSocketConfig<RequestType, ResponseType, UnderlyingDataType 
     'deserializer' |
     'setRequestId' |
     'getResponseId' |
+    'isErrorResponse' |
     'requestTimeout' |
     'WebSocketCtor' |
     'binaryType' |

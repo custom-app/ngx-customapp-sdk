@@ -22,3 +22,5 @@ export * from './lib/store/jwt.actions'
 export * from './lib/store/jwt.selectors'
 export * from './lib/store/jwt.effects'
 export * from './lib/services/jwt.service'
+
+export * from './lib/guards/jwt.guard'

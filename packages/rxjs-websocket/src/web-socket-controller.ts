@@ -519,6 +519,13 @@ export class WebSocketController<RequestType,
     return this.messages$.pipe(
       filter(response => getResponseId(response) === requestId),
       take(1),
+      mergeMap((response) => {
+        if (this._safeCall(false, this._config.isErrorResponse, response)) {
+          return throwError(response)
+        } else {
+          return of(response)
+        }
+      }),
       timeout({first: requestTimeout}),
     )
   }

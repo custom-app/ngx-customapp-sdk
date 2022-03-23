@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "doc": "typedoc --excludePrivate",
-    "watch": "yarn workspaces foreach -piv run watch"
+    "watch": "yarn workspaces foreach -piv run watch",
+    "build": "yarn workspaces foreach -piv run build"
   },
   "license": "MIT",
   "private": true,
@@ -16,8 +17,5 @@
     "typedoc": "^0.22.12",
     "typedoc-plugin-missing-exports": "^0.22.6",
     "typescript": "^4.6.2"
-  },
-  "resolutions": {
-    "frontend": "portal:/Users/santalov/WebstormProjects/loop/frontend"
   }
 }

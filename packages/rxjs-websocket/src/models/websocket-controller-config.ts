@@ -68,6 +68,12 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
   getResponseId: (response: ResponseType) => number,
 
   /**
+   * If provided, {@link WebSocketController.request} will error with the response, when this function returns
+   * true on the response.
+   */
+  isErrorResponse?: (response: ResponseType) => boolean,
+
+  /**
    * If there is no response during `requestTimeout` after sending the request, the rxjs `TimeoutError` is
    * thrown into observable.
    *

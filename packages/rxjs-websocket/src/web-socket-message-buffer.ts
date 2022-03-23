@@ -2,7 +2,10 @@ import {BufferOverflowStrategy} from './models/buffer-overflow-strategy';
 import {WebSocketControllerConfig} from './models/websocket-controller-config';
 
 
-export const defaultWebSocketMessageBufferSize = 1;
+/**
+ * Prepared for most common case: one slot for data request and one for subscription request for that data.
+ */
+export const defaultWebSocketMessageBufferSize = 2;
 
 export const defaultWebSocketBufferOverflow: BufferOverflowStrategy = 'dropOld'
 

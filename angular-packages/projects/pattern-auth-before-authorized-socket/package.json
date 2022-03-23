@@ -5,7 +5,8 @@
     "@angular/common": "^13.2.0",
     "@angular/core": "^13.2.0",
     "ngx-customapp-errors": "*",
-    "ngx-customapp-jwt": "*"
+    "ngx-customapp-jwt": "*",
+    "customapp-rxjs-websocket": "*"
   },
   "dependencies": {
     "tslib": "^2.3.0"
