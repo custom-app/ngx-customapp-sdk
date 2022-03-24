@@ -51,7 +51,7 @@ import {ErrorsReporterConstructor} from './errors-reporter';
  *   displayError$ = createEffect(() => this.actions$.pipe(
  *     ofType(getOrdersCurrentErrored),
  *     tap(({error}) => {
- *       this.errorsService.displayError(error);
+ *       this.notifyService.displayError(error);
  *     })
  *   ), {dispatch: false})
  * ```

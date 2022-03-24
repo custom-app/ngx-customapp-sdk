@@ -1,7 +1,10 @@
 {
   "entryPoints": [
     "packages/rxjs-websocket/src/index.ts",
-    "angular-packages/projects/jwt/src/public-api.ts"
+    "angular-packages/projects/ngx-customapp-errors/src/public-api.ts",
+    "angular-packages/projects/ngx-customapp-jwt/src/public-api.ts",
+    "angular-packages/projects/ngx-customapp-pattern-auth-before-socket/src/public-api.ts",
+    "angular-packages/projects/ngx-customapp-proto-http/src/public-api.ts"
   ],
   "out": "docs"
 }
