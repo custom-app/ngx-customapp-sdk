@@ -89,11 +89,11 @@ export interface ErrorsConfig {
   errorResponseToNormalizedError: (errorResponse: any) => NormalizedError
   /**
    * Can be used to extract non-translated information about error.
-   * @param errorResponse the error response from the backend, detected by isErrorResponse function.
+   * @param errorResponse the error response from the backend, detected by {@link ErrorsConfig.isErrorResponse} function.
    */
   errorResponseToAppendix?: (errorResponse: any) => string
   /**
-   * Provides a function to send the error report to the backend. Must implement ErrorsReporter abstract class
+   * Provides a function to send the error report to the backend. Must implement {@link ErrorsReporter} abstract class
    */
   reporter: ErrorsReporterConstructor,
   /**
