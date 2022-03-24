@@ -4,11 +4,11 @@
   "scripts": {
     "watch:jwt": "yarn build:jwt --watch --configuration=development",
     "build:jwt": "ng build ngx-customapp-jwt",
-    "watch:errors": "yarn build:errors --watch --configuration development",
+    "watch:errors": "yarn build:errors --watch --configuration=development",
     "build:errors": "ng build ngx-customapp-errors",
-    "watch:proto-http": "yarn build:proto-http --watch --configuration development",
+    "watch:proto-http": "yarn build:proto-http --watch --configuration=development",
     "build:proto-http": "ng build ngx-customapp-proto-http",
-    "watch:pattern-auth-before-socket": "yarn build --watch --configuratio=development",
+    "watch:pattern-auth-before-socket": "yarn build --watch --configuration=development",
     "build:pattern-auth-before-socket": "ng build ngx-customapp-pattern-auth-before-socket",
     "build": "yarn build:jwt && yarn build:errors && yarn build:proto-http && yarn build:pattern-auth-before-socket"
   },

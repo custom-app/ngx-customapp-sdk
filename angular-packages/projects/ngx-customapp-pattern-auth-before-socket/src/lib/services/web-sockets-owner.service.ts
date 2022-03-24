@@ -16,9 +16,9 @@ import {
   withLatestFrom,
   zip
 } from 'rxjs';
-import {createSocket, SocketResponses} from '../utils/socket';
+import {createSocket, socketResponses, SocketResponses} from '../utils/socket';
 import {Store} from '@ngrx/store';
-import {JWT_SELECTORS, JwtAppRootStateBase, JwtSelectors, JwtService} from 'ngx-customapp-jwt';
+import {JWT_SELECTORS, JwtAppRootStateBase, JwtGroup, JwtInfo, JwtSelectors, JwtService} from 'ngx-customapp-jwt';
 import {WebSocketChainLink} from '../models/web-socket-chain-link';
 
 export const closeTimeout = 10 * 1000;
@@ -32,8 +32,7 @@ export class WebSocketsOwnerService<RequestType,
   UserInfo,
   Credentials,
   AuthResponse,
-  UserId = number
-  > {
+  UserId = number> {
 
   constructor(
     @Inject(WEB_SOCKET_CHAIN) private chain: WebSocketChain<RequestType, ResponseType, UnderlyingDataType, UserInfo>,
@@ -41,8 +40,15 @@ export class WebSocketsOwnerService<RequestType,
     private jwtService: JwtService<Credentials, AuthResponse, UserInfo, UserId>,
     @Inject(JWT_SELECTORS) private s: JwtSelectors<UserInfo>
   ) {
+    this._jwtAndUserInfo$ = this.jwtService
+      .freshJwt()
+      .pipe(
+        withLatestFrom(this.store.select(this.s.selectJwtUser))
+      )
+    this._initFirstChainLink()
   }
 
+  private readonly _jwtAndUserInfo$: Observable<[JwtGroup<JwtInfo> | undefined, UserInfo | undefined]>
   private _sockets: Record<SocketId, WebSocketController<RequestType, ResponseType, UnderlyingDataType>> = {}
 
   get sockets() {
@@ -58,6 +64,14 @@ export class WebSocketsOwnerService<RequestType,
     return arr
   }
 
+  private _initFirstChainLink() {
+    const commonConfig = this.chain.commonConfig
+    const chainLink = this.chain.chain
+    chainLink.sockets.forEach(individualConfig => {
+      this.sockets[individualConfig.socketId] = createSocket(commonConfig, individualConfig, this._jwtAndUserInfo$)
+    })
+  }
+
   /**
    * Init all the sockets according to config. Shuld be called only once per login.
    */
@@ -66,25 +80,26 @@ export class WebSocketsOwnerService<RequestType,
     const commonConfig = this.chain.commonConfig
     const commonOpenOptions = this.chain.commonOpenOptions
     let currentChainLink: WebSocketChainLink<RequestType, ResponseType, UserInfo> = this.chain.chain
-    const jwtAndUserInfo$ = this
-      .jwtService
-      .freshJwt()
-      .pipe(
-        withLatestFrom(this.store.select(this.s.selectJwtUser))
-      )
+    // first chain link in WebSocketChain is initialized (but not opened) in the constructor.
+    let firstRun = true
     const launch = () => {
       forkJoin(
         currentChainLink
           .sockets
           .map(individualConfig => {
-            const {socket, responses$} = createSocket(commonConfig, individualConfig, jwtAndUserInfo$)
-            this.sockets[individualConfig.socketId] = socket
+            let socket: WebSocketController<RequestType, ResponseType, UnderlyingDataType>
+            if (firstRun) {
+              socket = this.sockets[individualConfig.socketId]
+            } else {
+              socket = createSocket(commonConfig, individualConfig, this._jwtAndUserInfo$)
+              this.sockets[individualConfig.socketId] = socket
+            }
             socket.open(commonOpenOptions)
-            return responses$
+            return socketResponses(socket)
           })
       ).pipe(
         mergeMap(responses =>
-          jwtAndUserInfo$
+          this._jwtAndUserInfo$
             .pipe(
               take(1),
               mergeMap(([jwt, userInfo]) => {
@@ -115,6 +130,7 @@ export class WebSocketsOwnerService<RequestType,
       ).subscribe(
         nextChainLink => {
           currentChainLink = nextChainLink
+          firstRun = false
           launch()
         }
       )

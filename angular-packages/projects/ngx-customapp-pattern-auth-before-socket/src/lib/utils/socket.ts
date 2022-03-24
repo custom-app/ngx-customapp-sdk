@@ -16,11 +16,8 @@ export function createSocket<RequestType,
   commonConfig: CommonWebSocketConfig<RequestType, ResponseType, UnderlyingDataType>,
   individualConfig: IndividualWebSocketConfig<RequestType, ResponseType, UserInfo>,
   jwtAndUserInfo$: Observable<[JwtGroup<JwtInfo> | undefined, UserInfo | undefined]>
-): {
-  socket: WebSocketController<RequestType, ResponseType, UnderlyingDataType>,
-  responses$: Observable<SocketResponses<ResponseType>>
-} {
-  const socket = new WebSocketController<RequestType, ResponseType, UnderlyingDataType>({
+): WebSocketController<RequestType, ResponseType, UnderlyingDataType> {
+  return new WebSocketController<RequestType, ResponseType, UnderlyingDataType>({
     ...commonConfig,
     url: individualConfig.url,
     protocol: individualConfig.protocol,
@@ -45,7 +42,12 @@ export function createSocket<RequestType,
       isResponseSuccessful: individualConfig.subscribe.isResponseSuccessful
     })
   })
-  const responses$ = socket.subscribed$.pipe(
+}
+
+export function socketResponses<RequestType, ResponseType, UnderlyingDataType extends string | ArrayBufferLike | Blob | ArrayBufferView>(
+  socket: WebSocketController<RequestType, ResponseType, UnderlyingDataType>
+): Observable<SocketResponses<ResponseType>> {
+  return socket.subscribed$.pipe(
     zipWith(socket.authorized$),
     take(1),
     takeUntil(socket.closedForever$),
@@ -54,8 +56,4 @@ export function createSocket<RequestType,
       auth
     }))
   )
-  return {
-    socket,
-    responses$
-  }
 }

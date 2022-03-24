@@ -6522,6 +6522,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"ngx-customapp-pattern-auth-before-socket@workspace:dist/ngx-customapp-pattern-auth-before-socket":
+  version: 0.0.0-use.local
+  resolution: "ngx-customapp-pattern-auth-before-socket@workspace:dist/ngx-customapp-pattern-auth-before-socket"
+  dependencies:
+    tslib: ^2.3.0
+  peerDependencies:
+    "@angular/common": ^13.2.0
+    "@angular/core": ^13.2.0
+    customapp-rxjs-websocket: "*"
+    ngx-customapp-errors: "*"
+    ngx-customapp-jwt: "*"
+  languageName: unknown
+  linkType: soft
+
 "ngx-customapp-proto-http@workspace:dist/ngx-customapp-proto-http":
   version: 0.0.0-use.local
   resolution: "ngx-customapp-proto-http@workspace:dist/ngx-customapp-proto-http"

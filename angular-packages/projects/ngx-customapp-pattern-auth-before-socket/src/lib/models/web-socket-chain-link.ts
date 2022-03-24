@@ -4,6 +4,9 @@ import {JwtGroup, JwtInfo} from 'ngx-customapp-jwt';
 import {SocketResponses} from '../utils/socket';
 
 export interface WebSocketChainLink<RequestType, ResponseType, UserInfo> {
+  /**
+   * Configuration for the sockets to be opened concurrently
+   */
   sockets: IndividualWebSocketConfig<RequestType, ResponseType, UserInfo>[],
   /**
    * A function to be called when all sockets come to the `subscribed` state. The returned observable is
