@@ -12,13 +12,14 @@ import {
   Observable,
   Subject,
   take,
+  tap,
   timeout,
   withLatestFrom,
   zip
 } from 'rxjs';
 import {createSocket, socketResponses, SocketResponses} from '../utils/socket';
 import {Store} from '@ngrx/store';
-import {JWT_SELECTORS, JwtAppRootStateBase, JwtGroup, JwtInfo, JwtSelectors, JwtService} from 'ngx-customapp-jwt';
+import {JWT_SELECTORS, JwtGroup, JwtInfo, JwtSelectors, JwtService} from 'ngx-customapp-jwt';
 import {WebSocketChainLink} from '../models/web-socket-chain-link';
 
 export const closeTimeout = 10 * 1000;
@@ -36,7 +37,7 @@ export class WebSocketsOwnerService<RequestType,
 
   constructor(
     @Inject(WEB_SOCKET_CHAIN) private chain: WebSocketChain<RequestType, ResponseType, UnderlyingDataType, UserInfo>,
-    private store: Store<JwtAppRootStateBase<UserInfo>>,
+    private store: Store<any>, // used only for one selector: selectJwtUser
     private jwtService: JwtService<Credentials, AuthResponse, UserInfo, UserId>,
     @Inject(JWT_SELECTORS) private s: JwtSelectors<UserInfo>
   ) {
@@ -82,6 +83,7 @@ export class WebSocketsOwnerService<RequestType,
     let currentChainLink: WebSocketChainLink<RequestType, ResponseType, UserInfo> = this.chain.chain
     // first chain link in WebSocketChain is initialized (but not opened) in the constructor.
     let firstRun = true
+    console.log('init sockets', this.chain)
     const launch = () => {
       forkJoin(
         currentChainLink
@@ -98,6 +100,7 @@ export class WebSocketsOwnerService<RequestType,
             return socketResponses(socket)
           })
       ).pipe(
+        tap(responses => console.log('init socket responses', responses)),
         mergeMap(responses =>
           this._jwtAndUserInfo$
             .pipe(

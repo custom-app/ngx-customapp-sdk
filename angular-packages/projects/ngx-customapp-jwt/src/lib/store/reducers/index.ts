@@ -23,13 +23,6 @@ export interface JwtRootState<UserInfo> {
   [fromUserStash.userStashFeatureKey]: fromUserStash.State<UserInfo>;
 }
 
-/**
- * Used to create selectors, not expected to be used anywhere else
- */
-export interface JwtAppRootStateBase<UserInfo> {
-  [jwtFeatureKey]: JwtRootState<UserInfo>,
-}
-
 const actions = jwtActions<any, any, any>()
 
 export const reducers: ActionReducerMap<JwtRootState<any>> = {

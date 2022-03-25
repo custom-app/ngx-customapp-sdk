@@ -11,6 +11,7 @@ export * from './lib/models/web-socket-chain-link'
 
 export * from './lib/services/web-sockets-owner.service'
 
+export * from './lib/store/sockets.effects'
 export * from './lib/store/sockets.actions'
 export * from './lib/store/sockets.selectors'
 export * from './lib/store/reducers'

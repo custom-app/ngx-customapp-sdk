@@ -37,6 +37,7 @@ export class JwtService<Credentials,
   }
 
   private _setJwt(jwt: JwtGroup<JwtInfo>): void {
+    console.log('set jwt', jwt)
     this._jwt = jwt
     localStorage.setItem(this._storageKey, JSON.stringify(jwt))
   }
@@ -88,7 +89,10 @@ export class JwtService<Credentials,
       .pipe(
         tap(authResponse => {
           const jwt = this.config.authResponseToJwt(authResponse)
-          this._setJwt(jwt)
+          // authorization by token may not return fresh tokens
+          if (jwt?.accessToken && jwt?.refreshToken) {
+            this._setJwt(jwt)
+          }
         })
       )
   }
@@ -133,7 +137,9 @@ export class JwtService<Credentials,
    */
   withFreshJwt(callback: (jwt?: JwtGroup<JwtInfo>) => void, callWithFreshOnly?: boolean): void {
     const jwt = this._jwt
+    console.log('withFreshJwt', 'current jwt', jwt)
     if (!jwt?.refreshToken || isJwtExpired(jwt.refreshToken)) {
+      console.log('withFreshJwt', 'refresh expired', jwt)
       this.noFreshJwtListener.noFreshJwt()
       if (!callWithFreshOnly) {
         callback()
@@ -141,6 +147,7 @@ export class JwtService<Credentials,
       return
     }
     if (!jwt.accessToken || isJwtExpired(jwt.accessToken)) {
+      console.log('withFreshJwt', 'access expired', jwt)
       this._waitingForRefresh.push(callback)
       if (!this._refresh) {
         this._refresh = this
@@ -164,7 +171,7 @@ export class JwtService<Credentials,
           })
       }
     } else {
-      callback()
+      callback(jwt)
     }
   }
 

@@ -6,19 +6,19 @@ import * as fromCloseInProcess from './close-in-process.reducer';
 
 export const socketsFeatureKey = packageName;
 
-export interface State {
+export interface SocketsRootState {
 
   [fromInitInProcess.initInProcessFeatureKey]: fromInitInProcess.State;
   [fromCloseInProcess.closeInProcessFeatureKey]: fromCloseInProcess.State;
 }
 
-export const reducers: ActionReducerMap<State> = {
+export const reducers: ActionReducerMap<SocketsRootState> = {
 
   [fromInitInProcess.initInProcessFeatureKey]: fromInitInProcess.reducer,
   [fromCloseInProcess.closeInProcessFeatureKey]: fromCloseInProcess.reducer,
 };
 
 
-export const metaReducers: MetaReducer<State>[] = [];
+export const metaReducers: MetaReducer<SocketsRootState>[] = [];
 
-export const selectSocketsState = createFeatureSelector<State>(socketsFeatureKey)
+export const selectSocketsState = createFeatureSelector<SocketsRootState>(socketsFeatureKey)

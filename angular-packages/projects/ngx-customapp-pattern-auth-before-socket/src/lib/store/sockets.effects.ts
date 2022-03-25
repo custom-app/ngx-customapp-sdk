@@ -2,7 +2,7 @@ import {Inject, Injectable} from '@angular/core';
 import {Actions, createEffect, ofType} from '@ngrx/effects';
 import {JWT_ACTIONS, JwtActions} from 'ngx-customapp-jwt';
 import {ErrorsService} from 'ngx-customapp-errors'
-import {catchError, map, mergeMap, of} from 'rxjs';
+import {catchError, map, mergeMap, of, tap} from 'rxjs';
 import {WebSocketsOwnerService} from '../services/web-sockets-owner.service';
 import {
   closeSockets,
@@ -25,18 +25,22 @@ export class SocketsEffects {
   ) {
   }
 
+  openOnLogin$ = createEffect(() => this.actions$.pipe(
+    ofType(this.a.loginSucceed),
+    mergeMap(() => of(initSockets()))
+  ))
+
   initSockets$ = createEffect(() => this.actions$.pipe(
-    ofType(this.a.loginSucceed, this.a.loginAsSucceed),
-    mergeMap(() =>
-      this.sockets
-        .init()
-        .pipe(
-          map(() => initSocketsSucceed),
-          catchError(this.errorsService.toUserError),
-          catchError(this.errorsService.reportError),
-          catchError(error => of(initSocketsErrored({error})))
-        )
-    )
+    ofType(initSockets),
+    tap((action) => console.log('init sockets effect', action)),
+    mergeMap(() => this.sockets
+      .init()
+      .pipe(
+        map(() => initSocketsSucceed()),
+        catchError(this.errorsService.reportError),
+        catchError(this.errorsService.toUserError),
+        catchError(error => of(initSocketsErrored({error})))
+      )),
   ))
 
   closeSockets$ = createEffect(() => this.actions$.pipe(

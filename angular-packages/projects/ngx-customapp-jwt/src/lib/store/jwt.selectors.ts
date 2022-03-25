@@ -5,19 +5,20 @@ import * as fromLoginInProcess from './reducers/login-in-process.reducer';
 import * as fromLoginAsInProcess from './reducers/login-as-in-process.reducer';
 import * as fromLogoutInProcess from './reducers/logout-in-process.reducer';
 import * as fromUserStash from './reducers/user-stash.reducer'
+import {JwtAppRootStateBase} from '../models/jwt-root-state-base';
 
 
 export interface JwtSelectors<UserInfo> {
-  selectJwtRootState: Selector<fromJwtRoot.JwtAppRootStateBase<UserInfo>, fromJwtRoot.JwtRootState<UserInfo>>,
-  selectJwtUser: Selector<fromJwtRoot.JwtAppRootStateBase<UserInfo>, UserInfo | undefined>,
-  selectJwtLoginInProcess: Selector<fromJwtRoot.JwtAppRootStateBase<UserInfo>, fromLoginInProcess.State>,
-  selectJwtLoginAsInProcess: Selector<fromJwtRoot.JwtAppRootStateBase<UserInfo>, fromLoginAsInProcess.State>
-  selectJwtLogoutInProcess: Selector<fromJwtRoot.JwtAppRootStateBase<UserInfo>, fromLogoutInProcess.State>,
-  selectUserStash: Selector<fromJwtRoot.JwtAppRootStateBase<UserInfo>, fromUserStash.State<UserInfo>>,
+  selectJwtRootState: Selector<JwtAppRootStateBase<UserInfo>, fromJwtRoot.JwtRootState<UserInfo>>,
+  selectJwtUser: Selector<JwtAppRootStateBase<UserInfo>, UserInfo | undefined>,
+  selectJwtLoginInProcess: Selector<JwtAppRootStateBase<UserInfo>, fromLoginInProcess.State>,
+  selectJwtLoginAsInProcess: Selector<JwtAppRootStateBase<UserInfo>, fromLoginAsInProcess.State>
+  selectJwtLogoutInProcess: Selector<JwtAppRootStateBase<UserInfo>, fromLogoutInProcess.State>,
+  selectUserStash: Selector<JwtAppRootStateBase<UserInfo>, fromUserStash.State<UserInfo>>,
 }
 
 export function jwtSelectors<UserInfo>(): JwtSelectors<UserInfo> {
-  const selectJwtRootState = createFeatureSelector<fromJwtRoot.JwtAppRootStateBase<UserInfo>,
+  const selectJwtRootState = createFeatureSelector<JwtAppRootStateBase<UserInfo>,
     fromJwtRoot.JwtRootState<UserInfo>>(fromJwtRoot.jwtFeatureKey)
   const selectJwtUser = createSelector(
     selectJwtRootState,

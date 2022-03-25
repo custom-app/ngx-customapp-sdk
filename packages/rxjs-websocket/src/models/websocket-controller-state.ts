@@ -3,10 +3,10 @@
  * Default transitions are: closed -> pending -> opened -> authorized -> subscribed -> closing -> closed.
  */
 export enum WebSocketControllerState {
-  pending,
-  opened,
-  authorized,
-  subscribed,
-  closing,
-  closed,
+  pending = 'pending',
+  opened = 'opened',
+  authorized = 'authorized',
+  subscribed = 'subscribed',
+  closing = 'closing',
+  closed = 'closed',
 }

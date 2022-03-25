@@ -130,6 +130,9 @@
   },
   "defaultProject": "ngx-customapp-jwt",
   "cli": {
-    "defaultCollection": "@ngrx/schematics"
+    "defaultCollection": "@ngrx/schematics",
+    "cache": {
+      "enabled": false
+    }
   }
 }

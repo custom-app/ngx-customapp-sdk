@@ -1,18 +1,4 @@
-import {
-  AsyncSubject,
-  catchError,
-  filter,
-  first,
-  forkJoin,
-  mergeMap,
-  Observable,
-  of,
-  Subject,
-  take,
-  tap,
-  throwError,
-  timeout
-} from 'rxjs';
+import {AsyncSubject, filter, first, forkJoin, mergeMap, Observable, of, Subject, throwError, timeout} from 'rxjs';
 import {WebSocketIsAlreadyOpened} from './errors';
 import {MessageRequirements, WebSocketMessageBuffer} from './web-socket-message-buffer';
 import {WrappedSocket} from './wrapped-socket';
@@ -192,6 +178,7 @@ export class WebSocketController<RequestType,
   }
 
   private _opened(e: Event): void {
+    console.log('opened', e)
     this._state = WebSocketControllerState.opened
     this._opened$.next(e)
     this._sendBuffered(MessageRequirements.any)
@@ -222,6 +209,7 @@ export class WebSocketController<RequestType,
   private _closed(e: CloseEvent): void {
     this._state = WebSocketControllerState.closed
     this._closed$.next(e)
+    // subjects are added here when close() called.
     this._closedManually$.forEach(closed$ => {
       closed$.next()
       closed$.complete()
@@ -230,13 +218,14 @@ export class WebSocketController<RequestType,
   }
 
   /**
-   * Opens websocket and sets up reconnect according to options.
+   * Opens websocket and sets up reconnect according to the options.
    * @param options {@link WebSocketOpenOptions}
    * @throws WebSocketIsAlreadyOpened
    */
   open(
     options: WebSocketOpenOptions
   ): void {
+    console.log('open, socket state', this.state)
     if (this.state !== WebSocketControllerState.closed) {
       if (!options.doNotThrowWhenOpened) {
         throw new WebSocketIsAlreadyOpened()
@@ -254,6 +243,7 @@ export class WebSocketController<RequestType,
         ? new WebSocketCtor(url, protocol)
         : new WebSocketCtor(url)
       if (binaryType) {
+        console.log('binary type', binaryType)
         ws.binaryType = binaryType
       }
       socket = new WrappedSocket(ws)
@@ -262,9 +252,11 @@ export class WebSocketController<RequestType,
       this._error$.next(e)
       return;
     }
+    console.log('socket created')
     // working with socket var, instead of this._socket,
     // to prevent occasional duplicates (when the socket in this._socket is different from socket we are working with)
     socket.ws.onopen = (e: Event) => {
+      console.log('socket onopen', e)
       if (!this._socket) {
         socket.ws.close();
         return
@@ -272,6 +264,7 @@ export class WebSocketController<RequestType,
       this._opened(e)
     }
     socket.ws.onerror = (error) => {
+      console.log('socket onerror', error)
       this._error$.next(error)
       if (!socket.closedManually) {
         this._reopen(options)
@@ -279,10 +272,13 @@ export class WebSocketController<RequestType,
       this._reconnectState.erroredCounter++
     }
     socket.ws.onclose = (e: CloseEvent) => {
-      this._closed(e)
-      if (!socket.closedManually) {
+      console.log('socket onclose', e, 'closedManually', socket.closedManually, 'state', this.state)
+      if (!socket.closedManually && this.state === WebSocketControllerState.subscribed) {
+        // reopen only when socket is not closed manually and at least one authorization and subscription succeed.
+        this._closed(e)
         this._reopen(options)
       } else {
+        this._closed(e)
         this._closedForever$.next()
       }
     }
@@ -292,7 +288,9 @@ export class WebSocketController<RequestType,
         deserializer = (v: MessageEvent<UnderlyingDataType>) => v as unknown as ResponseType
       }
       try {
-        this._messages$.next(deserializer(e))
+        const msg = deserializer(e)
+        console.log('socket onmessage1', msg)
+        this._messages$.next(msg)
       } catch (e) {
         this._error$.next(e)
       }
@@ -317,16 +315,18 @@ export class WebSocketController<RequestType,
   }
 
   private _authorize(): void {
+    console.log('authorize1')
     const {authorize} = this._config
     if (authorize) {
       const {createRequest, isResponseSuccessful} = authorize
       createRequest().pipe(
         first()
       ).subscribe(msg => {
+        console.log('auth message created', msg)
         if (msg) {
           if (isResponseSuccessful) {
             const response$ = this._requestDirect(msg)
-            const successful$ = response$.pipe(
+            response$.pipe(
               mergeMap(response => {
                 if (isResponseSuccessful(response)) {
                   return of(response)
@@ -334,13 +334,16 @@ export class WebSocketController<RequestType,
                   return throwError(() => response)
                 }
               }),
-              tap(response => this._authorized(response)),
-              catchError(err => {
+            ).subscribe({
+              next: response => {
+                console.log('authorized response successful', response)
+                this._authorized(response)
+              }, error: err => {
+                console.log('authorized response error', err)
+                this._authorized$.error(err)
                 this.close()
-                return throwError(err)
-              })
-            )
-            successful$.subscribe()
+              }
+            })
           } else {
             this._sendDirect(msg)
             this._authorized()
@@ -368,7 +371,7 @@ export class WebSocketController<RequestType,
             const responses$ = forkJoin(
               msgList.map(msg => this._requestDirect(msg))
             )
-            const successful$ = responses$.pipe(
+            responses$.pipe(
               filter(responses => responses.every(isResponseSuccessful)),
               mergeMap(responses => {
                 const unsuccessful = responses.find(resp => !isResponseSuccessful(resp))
@@ -377,13 +380,16 @@ export class WebSocketController<RequestType,
                 }
                 return of(responses)
               }),
-              tap(responses => this._subscribed(responses)),
-              catchError(err => {
+            ).subscribe({
+              next: responses => {
+                console.log('subscribe responses success', responses)
+                this._subscribed(responses)
+              }, error: err => {
+                console.log('subscribe responses error', err)
+                this._subscribed$.error(err)
                 this.close()
-                return throwError(err)
-              })
-            )
-            successful$.subscribe()
+              }
+            })
           } else {
             this._subscribed()
           }
@@ -401,6 +407,7 @@ export class WebSocketController<RequestType,
    * Closes the socket, cancels the reconnection.
    */
   close(): Observable<void> {
+    console.log('manual close, state', this.state)
     if (this._socket) {
       // to prevent occasional reopening
       this._socket.closedManually = true
@@ -459,6 +466,7 @@ export class WebSocketController<RequestType,
   }
 
   private _sendDirect(msg: RequestType): void {
+    console.log('socket send direct msg', msg)
     let {serializer} = this._config
     if (!serializer) {
       serializer = (v: RequestType) => v as unknown as UnderlyingDataType
@@ -518,7 +526,8 @@ export class WebSocketController<RequestType,
     requestTimeout = requestTimeout === undefined ? defaultRequestTimeout : requestTimeout;
     return this.messages$.pipe(
       filter(response => getResponseId(response) === requestId),
-      take(1),
+      first(),
+      timeout({first: requestTimeout}),
       mergeMap((response) => {
         if (this._safeCall(false, this._config.isErrorResponse, response)) {
           return throwError(response)
@@ -526,7 +535,6 @@ export class WebSocketController<RequestType,
           return of(response)
         }
       }),
-      timeout({first: requestTimeout}),
     )
   }
 }

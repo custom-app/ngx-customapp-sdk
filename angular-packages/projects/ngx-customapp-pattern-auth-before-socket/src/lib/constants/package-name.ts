@@ -1,1 +1,1 @@
-export const packageName = 'pattern-auth-before-authorized-socket'
+export const packageName = 'pattern-auth-before-socket'
