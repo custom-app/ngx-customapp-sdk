@@ -1,0 +1,254 @@
+<!DOCTYPE html><html class="default"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>ngx-customapp-sdk</title><meta name="description" content="Documentation for ngx-customapp-sdk"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script async src="assets/search.js" id="search-script"></script></head><body><script>document.body.classList.add(localStorage.getItem("tsd-theme") || "os")</script><header><div class="tsd-page-toolbar"><div class="container"><div class="table-wrap"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget search no-caption">Search</label><input type="text" id="tsd-search-field"/></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">ngx-customapp-sdk</a></div><div class="table-cell" id="tsd-widgets"><div id="tsd-filter"><a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a><div class="tsd-filter-group"><div class="tsd-select" id="tsd-filter-visibility"><span class="tsd-select-label">All</span><ul class="tsd-select-list"><li data-value="public">Public</li><li data-value="protected">Public/Protected</li><li data-value="private" class="selected">All</li></ul></div> <input type="checkbox" id="tsd-filter-inherited" checked/><label class="tsd-widget" for="tsd-filter-inherited">Inherited</label><input type="checkbox" id="tsd-filter-externals" checked/><label class="tsd-widget" for="tsd-filter-externals">Externals</label></div></div><a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a></div></div></div></div><div class="tsd-page-title"><div class="container"><h1> ngx-customapp-sdk</h1></div></div></header><div class="container container-main"><div class="row"><div class="col-8 col-content"><div class="tsd-panel tsd-typography">
+<a href="#ngx-customapp-sdk" id="ngx-customapp-sdk" style="color: inherit; text-decoration: none;">
+  <h1>ngx-customapp-sdk</h1>
+</a>
+<p>SDK allowing you to quickly setup authorization and websocket life cycle in an Angular app. Some utils are also included</p>
+
+<a href="#contents" id="contents" style="color: inherit; text-decoration: none;">
+  <h1>Contents</h1>
+</a>
+<ul>
+<li><a href="#design">Design</a><ul>
+<li><a href="#tech-stack">Tech stack</a></li>
+<li><a href="#requirements">Requirements</a></li>
+<li><a href="#packages">Packages</a></li>
+<li><a href="#authorization-and-websocket-patterns">Authorization and websocket patterns</a><ul>
+<li><a href="#pattern-1-just-auth">Pattern 1, &quot;Just auth&quot;</a></li>
+<li><a href="#pattern-2-auth-before-a-public-socket">Pattern 2 &quot;Auth before a public socket&quot;</a></li>
+<li><a href="#pattern-3-auth-after-a-public-socket">Pattern 3 &quot;Auth after a public socket&quot;</a></li>
+<li><a href="#pattern-4-auth-before-an-authorized-socket">Pattern 4 &quot;Auth before an authorized socket&quot;</a></li>
+<li><a href="#pattern-5-auth-after-an-authorized-socket">Pattern 5 &quot;Auth after an authorized socket&quot;</a></li>
+</ul>
+</li>
+<li><a href="#package-structure">Package structure</a><ul>
+<li><a href="#customapp-utils">customapp-utils</a></li>
+<li><a href="#customapp-rxjs-websocket">customapp-rxjs-websocket</a></li>
+<li><a href="#ngx-customapp-jwt">ngx-customapp-jwt</a></li>
+<li><a href="#ngx-customapp-proto-http">ngx-customapp-proto-http</a></li>
+<li><a href="#ngx-customapp-forms">ngx-customapp-forms</a></li>
+<li><a href="#ngx-customapp-pattern-auth-before-authorized-socket">ngx-customapp-pattern-auth-before-authorized-socket</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<a href="#design" id="design" style="color: inherit; text-decoration: none;">
+  <h1>Design</h1>
+</a>
+
+<a href="#tech-stack" id="tech-stack" style="color: inherit; text-decoration: none;">
+  <h2>Tech stack</h2>
+</a>
+<p>Suited for Angular.</p>
+<p>Monorepo package management through <a href="https://yarnpkg.com/features/workspaces">yarn workspace</a>.</p>
+<p>Testing with <a href="https://karma-runner.github.io/latest/index.html">Karma</a> and <a href="https://jasmine.github.io/">Jasmine</a></p>
+<p>Documentation is maintained with <a href="https://typedoc.org/">TypeDoc</a> and <a href="https://www.npmjs.com/package/typedoc-ngx-theme">typedoc-ngx-theme</a></p>
+
+<a href="#requirements" id="requirements" style="color: inherit; text-decoration: none;">
+  <h2>Requirements</h2>
+</a>
+<p>SDK must be as easy to setup as possible, but allow comprehensive customisation. This includes:</p>
+<ul>
+<li>Support for a custom message serialization and usage of custom models (e.g. <a href="https://www.npmjs.com/package/typedoc-ngx-theme">protobuff</a>).</li>
+<li>Everything, that is Angular agnostic, must have a dedicated package, so it could be used without Angular.</li>
+<li>It must be possible to use only features, that you need. Websockets, authorisation, protobuf, interceptors, account management must not be required.</li>
+<li>Bundle must be optimized.</li>
+<li>It should be tested as much as possible.</li>
+<li>It must be easy to maintain.</li>
+<li>It must have a good english documentation.</li>
+<li>Some examples.</li>
+</ul>
+<p>SDK must implement following functions:</p>
+<ul>
+<li>A websocket life cycle management with authorization and without.</li>
+<li>A support for multiple sockets and a support for conditionally opening them in a specified order.</li>
+<li>Subscribe/unsubscribe requests management.</li>
+<li>JWT and authorization headers management, refreshing jwt before opening sockets and before each request.</li>
+<li>Sync JWT between different packages. Prohibit concurrent refreshes.</li>
+<li>Login, logout functions and account management in the context of authorization.</li>
+<li>A support for changing accounts back and forth (Admin can log in as client and login back to admin).</li>
+<li>A Support for receiving account info both inside a websocket life cycle and outside it.</li>
+<li>Access management (access guards).</li>
+<li>A Forms framework.</li>
+<li>Sync for difference in server time. Support setting time delta after auth, after socket auth or even with dedicated request.</li>
+<li>Some unpredictable functionality (just leave some extra settings and extra methods).</li>
+</ul>
+
+<a href="#packages" id="packages" style="color: inherit; text-decoration: none;">
+  <h2>Packages</h2>
+</a>
+<p>To meet all the requierements following packages necessary:</p>
+<ul>
+<li>A package with widely used utils</li>
+<li>A package for a websocket life cycle management</li>
+<li>A package for an authorization and JWT and access management</li>
+<li>A package for working with protobuff over http and websocket</li>
+<li>A package for every pattern</li>
+<li>A package for a forms framework</li>
+</ul>
+
+<a href="#authorization-and-websocket-patterns" id="authorization-and-websocket-patterns" style="color: inherit; text-decoration: none;">
+  <h2>Authorization and websocket patterns</h2>
+</a>
+<p>To determine exact classes and functions these packages must implement, we first need to consider authorisation and socket management patterns.</p>
+
+<a href="#pattern-1-quotjust-authquot" id="pattern-1-quotjust-authquot" style="color: inherit; text-decoration: none;">
+  <h3>Pattern 1, &quot;Just auth&quot;</h3>
+</a>
+<p>Flow:</p>
+<ul>
+<li>The user logs in.</li>
+<li>An http request with user credentials is being sent.</li>
+<li>An http response with JWT tokens and maybe user info is received.</li>
+<li>May be a server time delta is requested or already received and saved.</li>
+<li>JWT tokens being saved and included in headers of every request (except explicitly stated).</li>
+<li>No subscriptions and sockets.</li>
+<li>The user can logout, logout from every device, may be change an account back and forth.</li>
+</ul>
+
+<a href="#pattern-2-quotauth-before-a-public-socketquot" id="pattern-2-quotauth-before-a-public-socketquot" style="color: inherit; text-decoration: none;">
+  <h3>Pattern 2 &quot;Auth before a public socket&quot;</h3>
+</a>
+<p>Flow:</p>
+<ul>
+<li>The user logs in.</li>
+<li>An http request with user credentials is being sent.</li>
+<li>An http response with JWT tokens and maybe the user info is received.</li>
+<li>May be server a time delta is requested or already received and saved, may be after the socket is opened.</li>
+<li>JWT tokens being saved and included in headers of every request (except explicitly stated).</li>
+<li>The public socket is opened, may be multiple, may be in specified order, may be with subscriptions.</li>
+<li>The user can logout, logout from every device, may be change an account back and forth.</li>
+<li>After a logout socket is closed</li>
+</ul>
+
+<a href="#pattern-3-quotauth-after-a-public-socketquot" id="pattern-3-quotauth-after-a-public-socketquot" style="color: inherit; text-decoration: none;">
+  <h3>Pattern 3 &quot;Auth after a public socket&quot;</h3>
+</a>
+<p>Flow:</p>
+<ul>
+<li>The public socket is opened, may be multiple, may be in specified order, may be with subscriptions.</li>
+<li>May be a server time delta is requested or already received and saved, may be after auth.</li>
+<li>The user logs in</li>
+<li>An http request with user credentials is being sent.</li>
+<li>An http response with JWT tokens and maybe the user info is received.</li>
+<li>JWT tokens being saved and included in headers of every request (except explicitly stated).</li>
+<li>Th user can logout, logout from every device, may be change an account back and forth.</li>
+<li>After a logout the socket is not closed. The socket does not depend on an account info.</li>
+</ul>
+
+<a href="#pattern-4-quotauth-before-an-authorized-socketquot" id="pattern-4-quotauth-before-an-authorized-socketquot" style="color: inherit; text-decoration: none;">
+  <h3>Pattern 4 &quot;Auth before an authorized socket&quot;</h3>
+</a>
+<p>Flow:</p>
+<ul>
+<li>The user logs in.</li>
+<li>An http request with user credentials is being sent.</li>
+<li>An http response with JWT tokens and maybe user info is received.</li>
+<li>May be a server time delta is requested or already received and saved, may be after a socket opened.</li>
+<li>JWT tokens being saved and included in headers of every request (except explicitly stated).</li>
+<li>The socket opened.</li>
+<li>An auth request is sent in the socket.</li>
+<li>An auth response received from the socket.</li>
+<li>Subscription requests are sent in the socket.</li>
+<li>Subscription responses received from the socket.</li>
+<li>May be more sockets are opened and more auth and subscription messages are sent.</li>
+<li>The user can log out, logout from every device, may be change an account back and forth.</li>
+<li>After logout all the sockets are closed.</li>
+</ul>
+
+<a href="#pattern-5-quotauth-after-an-authorized-socketquot" id="pattern-5-quotauth-after-an-authorized-socketquot" style="color: inherit; text-decoration: none;">
+  <h3>Pattern 5 &quot;Auth after an authorized socket&quot;</h3>
+</a>
+<p>Flow:</p>
+<ul>
+<li>The user logs in.</li>
+<li>The socket is opened.</li>
+<li>An auth request is sent in the socket.</li>
+<li>An auth response received from the socket.</li>
+<li>Subscription requests are sent in the socket.</li>
+<li>Subscription responses received from the socket.</li>
+<li>May be more sockets are opened and more auth and subscription requests are sent.</li>
+<li>May be a server time delta is requested or already received and saved, may be after a socket opened.</li>
+<li>JWT tokens being saved and included in headers of every request (except explicitly stated).</li>
+<li>The user can logout, logout from every device, may be change an account back and fourth.</li>
+<li>After logout all of the sockets are closed.</li>
+</ul>
+
+<a href="#package-structure" id="package-structure" style="color: inherit; text-decoration: none;">
+  <h2>Package structure</h2>
+</a>
+<p>There are packages, their requirements and exported functionality listed below.</p>
+
+<a href="#customapp-utils" id="customapp-utils" style="color: inherit; text-decoration: none;">
+  <h3>customapp-utils</h3>
+</a>
+<p>A package with widely used utils</p>
+
+<a href="#customapp-rxjs-websocket" id="customapp-rxjs-websocket" style="color: inherit; text-decoration: none;">
+  <h3>customapp-rxjs-websocket</h3>
+</a>
+<p>A package for a websocket life cycle management.
+Requirements and functionality:</p>
+<ul>
+<li>Based on RxJs</li>
+<li>Works with a single type for request messages and a single type for response messages.</li>
+<li>Support an auto reconnect.</li>
+<li>A support for a request buffer. A support for not adding requests to the buffer, different buffers for authorized and unauthorized requests, and a support for setting the queue length.</li>
+<li>Support sending an authorization request(s) just after the opening. Reconnect have to repeat the autorization.</li>
+<li>Support sending a subscription request(s) just after the authorization.</li>
+<li>Counts successful and unsuccessful opening tries.</li>
+<li>Offers to set a predicate for reopening socket.</li>
+<li>Offers subscriptions for states: pending, opened, authorized, subscribed, closing, closed.</li>
+<li>Offers subscriptions for not successful state transitions: notAuthorized, notSubscribed.</li>
+<li>But there is no &quot;notAuthorized&quot; or &quot;notSubscribed&quot; state, the socket is closed immediately.</li>
+<li>The error observable is provided, but it is useless, cos there is generally no way to handle a websocket error, </li>
+<li>other than close the socket, which is made internally.</li>
+<li>Support for custom serializer and deserializer.</li>
+<li>Functions for request-response pattern.</li>
+</ul>
+
+<a href="#ngx-customapp-jwt" id="ngx-customapp-jwt" style="color: inherit; text-decoration: none;">
+  <h3>ngx-customapp-jwt</h3>
+</a>
+<p>A package for an authorization and a JWT management</p>
+<p>Requirements and functionality:</p>
+<ul>
+<li>Based on RxJs and NgRx.</li>
+<li>Stores the JWT in the localStorage.</li>
+<li>Does not expose a key, which is used to access the JWT in the localStorage. You do not need to access localStorage manualy.</li>
+<li>Provides an http interceptor, which can pin JWT to every http request and refresh it, if necessary.</li>
+<li>Provides a service which is responsible for maintaining tokens fresh.</li>
+<li>Provides store for sending auth request, saving response and account info, sending logout messages.</li>
+<li>Provides an access guard and models for managing permissions.</li>
+</ul>
+
+<a href="#ngx-customapp-proto-http" id="ngx-customapp-proto-http" style="color: inherit; text-decoration: none;">
+  <h3>ngx-customapp-proto-http</h3>
+</a>
+<p>A package that handle details of working with proto over http. Helps to manage headers, errors, serialization, deserialization.
+Requirements and functionality:</p>
+<ul>
+<li>Based on RxJs.</li>
+<li>Base service for sending http request.</li>
+<li>Version interceptor.</li>
+<li>Service for handling and reporting errors.</li>
+<li>Utils for handling different types of body when parsing proto response.</li>
+</ul>
+
+<a href="#ngx-customapp-forms" id="ngx-customapp-forms" style="color: inherit; text-decoration: none;">
+  <h3>ngx-customapp-forms</h3>
+</a>
+<p>A package for a forms framework
+Requirements and functionality:</p>
+<ul>
+<li>Suited for <a href="https://angular.io/guide/forms">template driven forms</a>.</li>
+<li>Compatible with Material inputs, Carbon Components.</li>
+<li>Implements useful utils for handling validation errors, preventing double clicks and managing disabled state of submit button.</li>
+</ul>
+
+<a href="#ngx-customapp-pattern-auth-before-authorized-socket" id="ngx-customapp-pattern-auth-before-authorized-socket" style="color: inherit; text-decoration: none;">
+  <h3>ngx-customapp-pattern-auth-before-authorized-socket</h3>
+</a>
+<p>Connects together rxjs-websocket, jwt, proto-http packages to implement <a href="#pattern-4-auth-before-an-authorized-socket">Pattern 4 &quot;Auth before an authorized socket&quot;</a></p>
+</div></div><div class="col-4 col-menu menu-sticky-wrap menu-highlight"><nav class="tsd-navigation primary"><ul><li class="current"><a href="modules.html">Modules</a></li><li class=" tsd-kind-module"><a href="modules/angular_packages_projects_ngx_customapp_errors_src_public_api.html">angular-<wbr/>packages/projects/ngx-<wbr/>customapp-<wbr/>errors/src/public-<wbr/>api</a></li><li class=" tsd-kind-module"><a href="modules/angular_packages_projects_ngx_customapp_jwt_src_public_api.html">angular-<wbr/>packages/projects/ngx-<wbr/>customapp-<wbr/>jwt/src/public-<wbr/>api</a></li><li class=" tsd-kind-module"><a href="modules/angular_packages_projects_ngx_customapp_pattern_auth_before_socket_src_public_api.html">angular-<wbr/>packages/projects/ngx-<wbr/>customapp-<wbr/>pattern-<wbr/>auth-<wbr/>before-<wbr/>socket/src/public-<wbr/>api</a></li><li class=" tsd-kind-module"><a href="modules/angular_packages_projects_ngx_customapp_proto_http_src_public_api.html">angular-<wbr/>packages/projects/ngx-<wbr/>customapp-<wbr/>proto-<wbr/>http/src/public-<wbr/>api</a></li><li class=" tsd-kind-module"><a href="modules/packages_rxjs_websocket_src.html">packages/rxjs-<wbr/>websocket/src</a></li></ul></nav></div></div></div><footer class="with-border-bottom"><div class="container"><h2>Legend</h2><div class="tsd-legend-group"><ul class="tsd-legend"><li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li><li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li><li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li><li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li><li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li><li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li><li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li></ul></div><h2>Settings</h2><p>Theme <select id="theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></p></div></footer><div class="container tsd-generator"><p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div><div class="overlay"></div><script src="assets/main.js"></script></body></html>
