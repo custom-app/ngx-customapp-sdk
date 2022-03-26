@@ -1,9 +1,12 @@
 {
   "name": "customapp-rxjs-websocket",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A package for a websocket life cycle management. Not only for angular",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
   "repository": "https://github.com/loyal-inform/ngx-customapp-sdk.git",
   "license": "MIT",
   "scripts": {
