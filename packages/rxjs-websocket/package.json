@@ -6,7 +6,6 @@
   "typings": "dist/index.d.ts",
   "repository": "https://github.com/loyal-inform/ngx-customapp-sdk.git",
   "license": "MIT",
-  "private": true,
   "scripts": {
     "build": "tsc",
     "prepare": "yarn build",
