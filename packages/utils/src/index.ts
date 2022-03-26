@@ -7,4 +7,5 @@ export function condCall<ArgsType extends any[], ReturnType>(
     return func(...args)
   }
   return defaultValue
+
 }
