@@ -48,13 +48,18 @@ export function getErrorText(
   error: string,
   locale: LocaleId,
   errorsText: ErrorsText,
-  errorResponseToAppendix?: (error: any) => string
+  errorResponseToAppendix?: (error: any) => string | undefined
 ): string {
   if (error) {
     const errText = errorsText[locale][error.trim().toLowerCase()];
     if (errText) {
       if (errorResponseToAppendix) {
-        return errText + errorResponseToAppendix(error);
+        try {
+          const appendix = errorResponseToAppendix(error)
+          return errText + (appendix && appendix !== 'undefined' ? appendix : '')
+        } catch (e) {
+          return errText
+        }
       } else {
         return errText
       }

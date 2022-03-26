@@ -42,6 +42,7 @@ export class WebSocketController<RequestType,
   private _messages$ = new Subject<ResponseType>()
 
   private _state: WebSocketControllerState = WebSocketControllerState.closed
+  private _state$ = new Subject<WebSocketControllerState>()
 
   // To notify about every state
   private _pending$ = new Subject<void>()
@@ -91,6 +92,14 @@ export class WebSocketController<RequestType,
    */
   get state(): WebSocketControllerState {
     return this._state
+  }
+
+  /**
+   * Notifies about state transitions
+   * {@link WebSocketControllerState}
+   */
+  get state$(): Observable<WebSocketControllerState> {
+    return this._state$
   }
 
   /**
@@ -171,22 +180,27 @@ export class WebSocketController<RequestType,
     return this._closedForever$
   }
 
+  private _setState(state: WebSocketControllerState): void {
+    this._state = state
+    this._state$.next(state)
+  }
+
   // function for handling side effects of the state transition
   private _pending(): void {
-    this._state = WebSocketControllerState.pending
+    this._setState(WebSocketControllerState.pending)
     this._pending$.next()
   }
 
   private _opened(e: Event): void {
     console.log('opened', e)
-    this._state = WebSocketControllerState.opened
+    this._setState(WebSocketControllerState.opened)
     this._opened$.next(e)
     this._sendBuffered(MessageRequirements.any)
     this._authorize()
   }
 
   private _authorized(authResponse?: ResponseType): void {
-    this._state = WebSocketControllerState.authorized
+    this._setState(WebSocketControllerState.authorized)
     this._authorized$.next(authResponse)
     this._sendBuffered(MessageRequirements.auth)
     this._subscribe()
@@ -194,7 +208,7 @@ export class WebSocketController<RequestType,
 
   // not related to the RxJs. Subscribe means to send the subscription request and wait for a response
   private _subscribed(subscribeResponses?: ResponseType[]): void {
-    this._state = WebSocketControllerState.authorized
+    this._setState(WebSocketControllerState.subscribed)
     this._subscribed$.next(subscribeResponses)
     this._reconnectState.subscribedCounter++
     this._reconnectState.wasPrevOpenSuccessful = true
@@ -202,12 +216,12 @@ export class WebSocketController<RequestType,
   }
 
   private _closing(): void {
+    this._setState(WebSocketControllerState.closing)
     this._closing$.next()
-    this._state = WebSocketControllerState.closing
   }
 
   private _closed(e: CloseEvent): void {
-    this._state = WebSocketControllerState.closed
+    this._setState(WebSocketControllerState.closed)
     this._closed$.next(e)
     // subjects are added here when close() called.
     this._closedManually$.forEach(closed$ => {
@@ -360,6 +374,7 @@ export class WebSocketController<RequestType,
 
   // not related to the RxJs. Subscribe means to send the subscription request and wait for a response
   private _subscribe(): void {
+    console.log('subscirbe')
     const {subscribe} = this._config
     if (subscribe) {
       const {createRequests, isResponseSuccessful} = subscribe

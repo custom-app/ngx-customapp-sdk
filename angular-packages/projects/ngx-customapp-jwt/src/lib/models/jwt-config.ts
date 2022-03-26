@@ -4,6 +4,144 @@ import {JwtApi, JwtApiConstructor} from './jwt-api';
 import {NoFreshJwtListenerConstructor} from './no-fresh-jwt-listener';
 import {ActionCreator} from '@ngrx/store'
 
+/**
+ * ### Usage
+ *
+ * Create the config.
+ *
+ * Import JwtModule.forRoot(jwtConfig).
+ *
+ * Add types to the NgRx AppState.
+ * ```typescript
+ * import {jwtFeatureKey, JwtRootState} from 'ngx-customapp-jwt';
+ * import {UserInfo} from './user-info';
+ *
+ * export interface AppState {
+ *    // ... other fields of your state
+ *   [jwtFeatureKey]: JwtRootState<UserInfo>
+ * }
+ * ```
+ *
+ * Use jwtActions() function to create actions.
+ *
+ * ```typescript
+ * export const {
+ *   login,
+ *   loginSucceed,
+ *   loginErrored,
+ *
+ *   logout,
+ *   logoutSucceed,
+ *   logoutErrored,
+ * } = jwtActions<UserCredentials, AuthResponse.AsObject, UserInfo>()
+ * ```
+ *
+ *
+ * Use jwtSelectors() function to create selectors.
+ *
+ * ```typescript
+ * export const {
+ *   selectJwtUser,
+ *   selectJwtLoginInProcess,
+ *   selectJwtLogoutInProcess
+ * } = jwtSelectors<UserInfo>()
+ * ```
+ *
+ * Dispatch login({credentials}) to log in.
+ *
+ * ```typescript
+ * this.store.dispatch(
+ *   login({
+ *     credentials: {
+ *       authType: UserAuthType.logPass,
+ *       login: userLogin,
+ *       passHash
+ *     }
+ *   })
+ * )
+ * ```
+ * Dispatch logout({fromAllDevices}) to log out.
+ *
+ * ```typescript
+ * this.store.dispatch(
+ *   logout({fromAllDevices: false})
+ * );
+ * ```
+ *
+ * Handle the navigation after logging in.
+ *
+ * ```typescript
+ * @Injectable()
+ * export class AuthEffects {
+ *  navIntoApp$ = createEffect(() => this.actions$.pipe(
+ *     ofType(loginSucceed),
+ *     tap(() => {
+ *       this.router.navigate([appMainPage]);
+ *     })
+ *   ), {dispatch: false})
+ * }
+ * ```
+ *
+ * Handle the navigation after logging out.
+ *
+ * ```typescript
+ * @Injectable()
+ * export class AuthEffects {
+ *  navIntoApp$ = createEffect(() => this.actions$.pipe(
+ *     ofType(logoutSucceed),
+ *     tap(() => {
+ *       this.router.navigate([appAuthPage]);
+ *     })
+ *   ), {dispatch: false})
+ * }
+ * ```
+ *
+ * Display errors.
+ * ```typescript
+ * @Injectable()
+ * export class AuthEffects {
+ *  showError$ = createEffect(() => this.actions$.pipe(
+ *     ofType(loginErrored, logoutErrored),
+ *     tap(({error}) => {
+ *       // error returned by JwtApi.login or JwtApi.logout functions.
+ *       this.notifyService.displayError(error);
+ *     })
+ *   ), {dispatch: false})
+ * }
+ * ```
+ *
+ * Add JwtInterceptor to the app.module providers, and every request will be sent with JWT in the header.
+ *
+ * ```typescript
+ * import {JwtInterceptor} from 'ngx-customapp-jwt'
+ *
+ * @NgModule({
+ *   // ... imports, declarations, bootstrap
+ *   providers: [
+ *     {
+ *       provide: HTTP_INTERCEPTORS,
+ *       useClass: JwtInterceptor,
+ *       multi: true,
+ *     }
+ *   ]
+ * })
+ * export class AppModule {
+ * }
+ * ```
+ *
+ * If you have configured jwtGuard, add JwtGuard to the routing, to handle paths, that require the user to be authorized.
+ *
+ * ```
+ * {
+ *   path: 'main',
+ *   component: UiShellComponent,
+ *   canActivate: [AuthGuard],
+ *   children: [
+ *     // ... child paths
+ *   ]
+ * },
+ * ```
+ */
 export interface JwtConfig<Credentials,
   AuthResponse,
   UserInfo,

@@ -3,16 +3,17 @@ import {JwtInfo} from './jwt-info';
 import {JwtGroup} from './jwt-group';
 
 /**
- * Provides methods to interact with backend
+ * Provides methods to interact with backend.
  * Errors, thrown by the methods, MUST be human-readable strings. You can implement
- * this using ngx-custmapp-errors package. You could also learn more about error handling convention
+ * this using ngx-custmapp-errors package (if you want, also use ngx-customapp-proto-http).
+ * You could also learn more about error handling convention
  * by reading the ngx-customapp-errors docs.
  */
 export abstract class JwtApi<Credentials,
   AuthResponse,
   UserId = number> {
   /**
-   * Should make an auth request to the server.
+   * Should make an auth request to the server. Usually supports logging in by a password or by a JWT.
    * @param credentials Login and password or something else, depending on the target application
    * @returns Usually returns information about the user and JWT tokens.
    * JWT is retrieved from auth response with {@link JwtConfig.authResponseToJwt}.

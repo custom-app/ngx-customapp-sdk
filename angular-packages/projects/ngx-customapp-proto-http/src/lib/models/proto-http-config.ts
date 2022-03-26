@@ -1,6 +1,28 @@
 /**
  * RequestType is supposed to be YourProtoRequestMessage.AsObject.
  * ResponseType is supposed to be YourProtoResponseMessage.AsObject.
+ *
+ * ### Usage
+ *
+ * - Configure the ngx-customapp-errors package, cos it will be used by this package.
+ * - Configure this package.
+ * - Import ProtoHttpModule.forRoot(config) in your app.module
+ * - Use RequestService to make requests
+ * - Add VersionInterceptor to the app.module providers, if you wish.
+ * ```typescript
+ * @NgModule({
+ *   // ... imports, declarations, bootstrap
+ *   providers: [
+ *     {
+ *       provide: HTTP_INTERCEPTORS,
+ *       useClass: VersionInterceptor,
+ *       multi: true,
+ *     }
+ *   ]
+ * })
+ * export class AppModule {
+ * }
+ * ```
  */
 export interface ProtoHttpConfig<RequestType, ResponseType> {
   /**

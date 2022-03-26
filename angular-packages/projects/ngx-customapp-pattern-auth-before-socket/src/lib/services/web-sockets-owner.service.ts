@@ -41,15 +41,15 @@ export class WebSocketsOwnerService<RequestType,
     private jwtService: JwtService<Credentials, AuthResponse, UserInfo, UserId>,
     @Inject(JWT_SELECTORS) private s: JwtSelectors<UserInfo>
   ) {
-    this._jwtAndUserInfo$ = this.jwtService
-      .freshJwt()
-      .pipe(
-        withLatestFrom(this.store.select(this.s.selectJwtUser))
-      )
     this._initFirstChainLink()
   }
 
-  private readonly _jwtAndUserInfo$: Observable<[JwtGroup<JwtInfo> | undefined, UserInfo | undefined]>
+  private _jwtAndUserInfo = (): Observable<[JwtGroup<JwtInfo> | undefined, UserInfo | undefined]> => this.jwtService
+    .freshJwt()
+    .pipe(
+      withLatestFrom(this.store.select(this.s.selectJwtUser))
+    )
+
   private _sockets: Record<SocketId, WebSocketController<RequestType, ResponseType, UnderlyingDataType>> = {}
 
   get sockets() {
@@ -69,7 +69,7 @@ export class WebSocketsOwnerService<RequestType,
     const commonConfig = this.chain.commonConfig
     const chainLink = this.chain.chain
     chainLink.sockets.forEach(individualConfig => {
-      this.sockets[individualConfig.socketId] = createSocket(commonConfig, individualConfig, this._jwtAndUserInfo$)
+      this.sockets[individualConfig.socketId] = createSocket(commonConfig, individualConfig, this._jwtAndUserInfo)
     })
   }
 
@@ -93,7 +93,7 @@ export class WebSocketsOwnerService<RequestType,
             if (firstRun) {
               socket = this.sockets[individualConfig.socketId]
             } else {
-              socket = createSocket(commonConfig, individualConfig, this._jwtAndUserInfo$)
+              socket = createSocket(commonConfig, individualConfig, this._jwtAndUserInfo)
               this.sockets[individualConfig.socketId] = socket
             }
             socket.open(commonOpenOptions)
@@ -102,7 +102,7 @@ export class WebSocketsOwnerService<RequestType,
       ).pipe(
         tap(responses => console.log('init socket responses', responses)),
         mergeMap(responses =>
-          this._jwtAndUserInfo$
+          this._jwtAndUserInfo()
             .pipe(
               take(1),
               mergeMap(([jwt, userInfo]) => {

@@ -1,7 +1,7 @@
 import {WebSocketController} from 'customapp-rxjs-websocket';
 import {CommonWebSocketConfig} from '../models/common-web-socket-config';
 import {IndividualWebSocketConfig} from '../models/individual-web-socket-config';
-import {map, mergeMap, Observable, take, takeUntil, zipWith} from 'rxjs';
+import {map, mergeMap, Observable, take, takeUntil, tap, zipWith} from 'rxjs';
 import {JwtGroup, JwtInfo} from 'ngx-customapp-jwt';
 
 export interface SocketResponses<ResponseType> {
@@ -15,15 +15,16 @@ export function createSocket<RequestType,
   UserInfo>(
   commonConfig: CommonWebSocketConfig<RequestType, ResponseType, UnderlyingDataType>,
   individualConfig: IndividualWebSocketConfig<RequestType, ResponseType, UserInfo>,
-  jwtAndUserInfo$: Observable<[JwtGroup<JwtInfo> | undefined, UserInfo | undefined]>
+  jwtAndUserInfo: () => Observable<[JwtGroup<JwtInfo> | undefined, UserInfo | undefined]>
 ): WebSocketController<RequestType, ResponseType, UnderlyingDataType> {
   return new WebSocketController<RequestType, ResponseType, UnderlyingDataType>({
     ...commonConfig,
     url: individualConfig.url,
     protocol: individualConfig.protocol,
     authorize: individualConfig.authorize && ({
-      createRequest: () => jwtAndUserInfo$
+      createRequest: () => jwtAndUserInfo()
         .pipe(
+          tap(jwt => console.log('jwt and user info subscribed', jwt)),
           take(1),
           mergeMap(([jwt, userInfo]) =>
             individualConfig.authorize!.createRequest(userInfo, jwt)
@@ -32,7 +33,7 @@ export function createSocket<RequestType,
       isResponseSuccessful: individualConfig.authorize.isResponseSuccessful,
     }),
     subscribe: individualConfig.subscribe && ({
-      createRequests: (socketAuthResponse) => jwtAndUserInfo$
+      createRequests: (socketAuthResponse) => jwtAndUserInfo()
         .pipe(
           take(1),
           mergeMap(([jwt, userInfo]) =>

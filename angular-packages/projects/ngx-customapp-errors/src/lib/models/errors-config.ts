@@ -3,6 +3,16 @@ import {UnhandledErrorHandlerConstructor} from './unhandled-error-handler';
 import {ErrorsReporterConstructor} from './errors-reporter';
 
 /**
+ *
+ * ### Usage:
+ *
+ * - Write the config.
+ * - Import ErrorsModule.forRoot(config) once in your app.
+ * - Add ```typescript{provide: ErrorHandler, useClass: ErrorsHandler}``` to the app.module providers array.
+ * - Use ErrorsService, available across the app, to report and transform errors.
+ * - Stick to the conventions, described below.
+ *
+ *
  * Convention: all errors, thrown by the request function (an http request or a socket request),
  * have a string type and are a human-readable messages, understandable by the user.
  * To do so, pipe request observable through {@link ErrorsService.toUserError}.
@@ -91,7 +101,7 @@ export interface ErrorsConfig {
    * Can be used to extract non-translated information about error.
    * @param errorResponse the error response from the backend, detected by {@link ErrorsConfig.isErrorResponse} function.
    */
-  errorResponseToAppendix?: (errorResponse: any) => string
+  errorResponseToAppendix?: (errorResponse: any) => string | undefined
   /**
    * Provides a function to send the error report to the backend. Must implement {@link ErrorsReporter} abstract class
    */
