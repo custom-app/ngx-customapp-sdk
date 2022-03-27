@@ -1,24 +1,15 @@
-# Errors
+## ngx-customapp-errors
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.2.0.
+A package for handling errors according to our own conventions.
 
-## Code scaffolding
+[Documentation starts here](https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_errors_src_public_api.ErrorsConfig.html)
+.
 
-Run `ng generate component component-name --project errors` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project errors`.
-> Note: Don't forget to add `--project errors` or else it will be added to the default project in your `angular.json` file. 
+A part of the [ngx-customapp-sdk](https://custom-app.github.io/ngx-customapp-sdk/).
 
-## Build
+This package:
 
-Run `ng build errors` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Publishing
-
-After building your library with `ng build errors`, go to the dist folder `cd dist/errors` and run `npm publish`.
-
-## Running unit tests
-
-Run `ng test errors` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- Is an Angular package.
+- Reports all errors, except ones from doNoSend list, to the backend.
+- Works with normalized error strings.
+- Just after handling and reporting the error, it is transformed into a human-readable error and shown to the user.

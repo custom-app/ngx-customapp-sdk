@@ -1,24 +1,17 @@
-# ProtoHttp
+## ngx-customapp-proto-http
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.2.0.
+A package that handle details of working with proto over http. Helps to manage headers, errors, serialization,
+deserialization.
 
-## Code scaffolding
+[Documentation starts here](https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_proto_http_src_public_api.ProtoHttpConfig.html)
 
-Run `ng generate component component-name --project proto-http` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project proto-http`.
-> Note: Don't forget to add `--project proto-http` or else it will be added to the default project in your `angular.json` file. 
+A part of the [ngx-customapp-sdk](https://custom-app.github.io/ngx-customapp-sdk/).
 
-## Build
+This package:
 
-Run `ng build proto-http` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Publishing
-
-After building your library with `ng build proto-http`, go to the dist folder `cd dist/proto-http` and run `npm publish`.
-
-## Running unit tests
-
-Run `ng test proto-http` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- Is an Angular package.
+- Depends on ngx-customapp-errors
+- Based on RxJs.
+- Provides `RequestService` for sending http request.
+- Optional version interceptor, to add a version header to every http request.
+- Utils for handling different types of body when parsing proto response.

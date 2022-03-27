@@ -1,24 +1,17 @@
-# Jwt
+## ngx-customapp-jwt
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.2.0.
+A package for an authorization and a JWT management.
 
-## Code scaffolding
+[Documentation starts here](https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_jwt_src_public_api.JwtConfig.html)
 
-Run `ng generate component component-name --project jwt` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project jwt`.
-> Note: Don't forget to add `--project jwt` or else it will be added to the default project in your `angular.json` file. 
+A part of the [ngx-customapp-sdk](https://custom-app.github.io/ngx-customapp-sdk/).
 
-## Build
+This package:
 
-Run `ng build jwt` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Publishing
-
-After building your library with `ng build jwt`, go to the dist folder `cd dist/jwt` and run `npm publish`.
-
-## Running unit tests
-
-Run `ng test jwt` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- Is an Angular package.
+- Based on RxJs and NgRx.
+- Stores the JWT in the localStorage.
+- Provides an http interceptor, which can pin the JWT to every http request and refresh it, if necessary.
+- Provides a `JwtService` which is responsible for maintaining tokens fresh.
+- Provides store for logging in, sending auth request, saving an account info, logging out.
+- Supports logging in as another user.

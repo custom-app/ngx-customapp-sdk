@@ -24,7 +24,8 @@
 </a>
 <p>Suited for Angular.</p>
 <ul>
-<li>Supports a custom message serialization and usage of custom models (e.g. <a href="https://www.npmjs.com/package/typedoc-ngx-theme">protobuff</a>).</li>
+<li>Supports a custom message serialization and usage of custom models (
+e.g. <a href="https://www.npmjs.com/package/typedoc-ngx-theme">protobuff</a>).</li>
 <li>A websocket life cycle management with authorization and without.</li>
 <li>Supports multiple sockets and conditionally opening them in a specified order.</li>
 <li>JWT and authorization headers management, refreshing jwt before opening sockets and before each request.</li>
@@ -41,14 +42,17 @@
 <a href="#customapp-rxjs-websocket" id="customapp-rxjs-websocket" style="color: inherit; text-decoration: none;">
   <h2>customapp-rxjs-websocket</h2>
 </a>
-<p>A package for a websocket life cycle management.
-<a href="https://custom-app.github.io/ngx-customapp-sdk/interfaces/packages_rxjs_websocket_src.WebSocketControllerConfig.html">Documentation starts here</a></p>
+<p>A package for a websocket life cycle management.</p>
+<p><a href="https://custom-app.github.io/ngx-customapp-sdk/interfaces/packages_rxjs_websocket_src.WebSocketControllerConfig.html">Documentation starts here</a></p>
+<p>This package:</p>
 <ul>
 <li>Is not only an Angular package.</li>
 <li>Based on RxJs.</li>
 <li>Works with a single type for request messages and a single type for response messages.</li>
-<li>Support an auto reconnect. That is a part of the error handling, cos usually there is no way to handle the socket error, other than just reopen socket.</li>
-<li>A support for a request buffer. A support for not adding requests to the buffer, different buffers for authorized and unauthorized requests, and a support for setting the queue length.</li>
+<li>Support an auto reconnect. That is a part of the error handling, cos usually there is no way to handle the socket
+error, other than just reopen socket.</li>
+<li>A support for a request buffer. A support for not adding requests to the buffer, different buffers for authorized and
+unauthorized requests, and a support for setting the queue length.</li>
 <li>Supports sending an authorization request(s) just after the opening. Reconnect have to repeat the autorization.</li>
 <li>Supports sending a subscription request(s) just after the authorization.</li>
 <li>Counts successful and unsuccessful opening tries.</li>
@@ -60,8 +64,9 @@
 <a href="#ngx-customapp-jwt" id="ngx-customapp-jwt" style="color: inherit; text-decoration: none;">
   <h2>ngx-customapp-jwt</h2>
 </a>
-<p>A package for an authorization and a JWT management.
-<a href="https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_jwt_src_public_api.JwtConfig.html">Documentation starts here</a></p>
+<p>A package for an authorization and a JWT management.</p>
+<p><a href="https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_jwt_src_public_api.JwtConfig.html">Documentation starts here</a></p>
+<p>This package:</p>
 <ul>
 <li>Is an Angular package.</li>
 <li>Based on RxJs and NgRx.</li>
@@ -75,8 +80,9 @@
 <a href="#ngx-customapp-errors" id="ngx-customapp-errors" style="color: inherit; text-decoration: none;">
   <h2>ngx-customapp-errors</h2>
 </a>
-<p>A package for handling errors according to our own conventions.
-<a href="https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_errors_src_public_api.ErrorsConfig.html">Documentation starts here</a></p>
+<p>A package for handling errors according to our own conventions.</p>
+<p><a href="https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_errors_src_public_api.ErrorsConfig.html">Documentation starts here</a></p>
+<p>This package:</p>
 <ul>
 <li>Is an Angular package.</li>
 <li>Reports all errors, except ones from doNoSend list, to the backend.</li>
@@ -87,8 +93,10 @@
 <a href="#ngx-customapp-proto-http" id="ngx-customapp-proto-http" style="color: inherit; text-decoration: none;">
   <h2>ngx-customapp-proto-http</h2>
 </a>
-<p>A package that handle details of working with proto over http. Helps to manage headers, errors, serialization, deserialization.
-<a href="https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_proto_http_src_public_api.ProtoHttpConfig.html">Documentation starts here</a></p>
+<p>A package that handle details of working with proto over http. Helps to manage headers, errors, serialization,
+deserialization.</p>
+<p><a href="https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_proto_http_src_public_api.ProtoHttpConfig.html">Documentation starts here</a></p>
+<p>This package:</p>
 <ul>
 <li>Is an Angular package.</li>
 <li>Depends on ngx-customapp-errors</li>
@@ -101,8 +109,10 @@
 <a href="#ngx-customapp-pattern-auth-before-socket" id="ngx-customapp-pattern-auth-before-socket" style="color: inherit; text-decoration: none;">
   <h2>ngx-customapp-pattern-auth-before-socket</h2>
 </a>
-<p>Connects together rxjs-websocket and jwt packages to implement pattern &quot;Auth before an authorized or unauthorized socket&quot;.
-<a href="https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_pattern_auth_before_socket_src_public_api.WebSocketChain.html">Documentation starts here</a></p>
+<p>Connects together rxjs-websocket and jwt packages to implement pattern &quot;Auth before an authorized or unauthorized
+socket&quot;.</p>
+<p><a href="https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_pattern_auth_before_socket_src_public_api.WebSocketChain.html">Documentation starts here</a></p>
+<p>This package:</p>
 <ul>
 <li>Is an Angular package.</li>
 <li>Depends on customapp-rxjs-websocket and ngx-customapp-jwt packages.</li>

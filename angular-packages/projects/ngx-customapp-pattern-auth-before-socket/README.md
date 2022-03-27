@@ -1,24 +1,31 @@
-# PatternAuthBeforeAuthorizedSocket
+## ngx-customapp-pattern-auth-before-socket
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.2.0.
+Connects together rxjs-websocket and jwt packages to implement pattern "Auth before an authorized or unauthorized
+socket".
 
-## Code scaffolding
+[Documentation starts here](https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_pattern_auth_before_socket_src_public_api.WebSocketChain.html)
 
-Run `ng generate component component-name --project pattern-auth-before-authorized-socket` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project pattern-auth-before-authorized-socket`.
-> Note: Don't forget to add `--project pattern-auth-before-authorized-socket` or else it will be added to the default project in your `angular.json` file. 
+A part of the [ngx-customapp-sdk](https://custom-app.github.io/ngx-customapp-sdk/).
 
-## Build
+This package:
 
-Run `ng build pattern-auth-before-authorized-socket` to build the project. The build artifacts will be stored in the `dist/` directory.
+- Is an Angular package.
+- Depends on customapp-rxjs-websocket and ngx-customapp-jwt packages.
+- Based on RxJs and NgRx
+- Provides actions to init sockets and close. Sockets support the auto reconnect and the message buffer.
+- Supports opening multiple sockets concurrently and in sequence.
 
-## Publishing
+Implemented flow:
 
-After building your library with `ng build pattern-auth-before-authorized-socket`, go to the dist folder `cd dist/pattern-auth-before-authorized-socket` and run `npm publish`.
-
-## Running unit tests
-
-Run `ng test pattern-auth-before-authorized-socket` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- The user logs in.
+- An http request with user credentials is sent to the backend.
+- An http response with JWT and maybe user info is received.
+- JWT tokens being saved and included in headers of every request (except explicitly stated).
+- The socket opened.
+- An optional auth request is sent in the socket.
+- An auth response received from the socket.
+- Optional Subscription requests are sent in the socket.
+- Subscription responses received from the socket.
+- Optionally more sockets are opened and more auth and subscription messages are sent.
+- The user can log out, logout from every device, maybe log in as another user.
+- After logout all the sockets are closed.
