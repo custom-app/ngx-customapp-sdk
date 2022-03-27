@@ -7,11 +7,71 @@ import {ActionCreator} from '@ngrx/store'
 /**
  * ### Usage
  *
- * Create the config.
+ * Install.
  *
- * Import JwtModule.forRoot(jwtConfig).
+ * ```sh
+ * yarn add ngx-customapp-jwt
+ * ```
+ *
+ * Create the config.
+ * Example of the `JwtApi` implementation.
+ *
+ * ```typescript
+ * @Injectable({
+ *   providedIn: 'root'
+ * })
+ * export class JwtApiService implements JwtApi<UserCredentials, AuthResponse.AsObject> {
+ *
+ *   constructor(
+ *     // provided by ngx-customapp-proto-http package. Handles serialization, deserialization and errors.
+ *     private request: RequestService<api.Request.AsObject, api.Response.AsObject>
+ *   ) {
+ *   }
+ *
+ *   login(credentials: UserCredentials): Observable<AuthResponse.AsObject> {
+ *     const req = {
+ *       id: 0,
+ *       auth: userCredentialsToAuthRequest(credentials),
+ *     }
+ *     console.log('request', req)
+ *     return this.request.request(
+ *       authEndpoint,
+ *       req,
+ *       undefined, // no headers
+ *       true // disable jwt interceptor
+ *     ).pipe(
+ *       map(response => response.auth!)
+ *     )
+ *   }
+ *
+ *   logout(accessToken: TokenInfo.AsObject, fromAllDevices: boolean | undefined): Observable<void> {
+ *     return this.request.request(
+ *       fromAllDevices ? fullLogoutEndpoint : logoutEndpoint,
+ *       undefined, // no request body
+ *       new HttpHeaders().set(authHeader.name, authHeader.createValue(accessToken)), // add access token to the header
+ *       true // disable jwt interceptor
+ *     ).pipe(
+ *       map(() => void 0)
+ *     )
+ *   }
+ *
+ *   refresh(refreshToken: TokenInfo.AsObject): Observable<TokenResponse.AsObject> {
+ *     return this.request.request(
+ *       tokenRefreshEndpoint,
+ *       undefined, // no request body
+ *       new HttpHeaders().set(authHeader.name, authHeader.createValue(refreshToken)), // add refresh token to the header
+ *       true, // disable jwt interceptor
+ *     ).pipe(
+ *       map(response => response.tokens!)
+ *     )
+ *   }
+ * }
+ * ```
+ *
+ * Import `JwtModule.forRoot(jwtConfig)`.
  *
  * Add types to the NgRx AppState.
+ *
  * ```typescript
  * import {jwtFeatureKey, JwtRootState} from 'ngx-customapp-jwt';
  * import {UserInfo} from './user-info';

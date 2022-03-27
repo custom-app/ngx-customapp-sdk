@@ -15,7 +15,6 @@ import {WebSocketSendOptions} from './models/websocket-send-options';
 export const defaultReconnectInterval = 10000; // 10 seconds
 export const defaultRequestTimeout = 2 * 60 * 1000; // 2 minutes
 
-// TODO describe how to use and examples
 /**
  * Class, that wraps the socket and takes control over authorization, subscription and reconnection.
  */

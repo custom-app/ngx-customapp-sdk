@@ -6,12 +6,24 @@ import {ErrorsReporterConstructor} from './errors-reporter';
  *
  * ### Usage:
  *
- * - Write the config.
- * - Import ErrorsModule.forRoot(config) once in your app.
- * - Add ```typescript{provide: ErrorHandler, useClass: ErrorsHandler}``` to the app.module providers array.
- * - Use ErrorsService, available across the app, to report and transform errors.
- * - Stick to the conventions, described below.
+ * Install
+ * ```sh
+ * yarn add ngx-customapp-errors
+ * ```
  *
+ * Write the config.
+ *
+ * Import ErrorsModule.forRoot(config) once in your app.
+ *
+ * If you wish to report unhandled errors, add
+ * ```typescript
+ *   {provide: ErrorHandler, useClass: ErrorsHandler}
+ * ```
+ * to the app.module providers array.
+ *
+ * Use `ErrorsService`, available across the app, to report and transform errors.
+ *
+ * Stick to the conventions, described below.
  *
  * Convention: all errors, thrown by the request function (an http request or a socket request),
  * have a string type and are a human-readable messages, understandable by the user.

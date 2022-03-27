@@ -4,11 +4,28 @@
  *
  * ### Usage
  *
- * - Configure the ngx-customapp-errors package, cos it will be used by this package.
- * - Configure this package.
- * - Import ProtoHttpModule.forRoot(config) in your app.module
- * - Use RequestService to make requests
- * - Add VersionInterceptor to the app.module providers, if you wish.
+ * Install
+ *
+ * ```sh
+ * yarn add ngx-customapp-proto-http
+ * ```
+ *
+ * Install and configure the [ngx-customapp-errors](https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_errors_src_public_api.ErrorsConfig.html)
+ * package, cos it will be used by this package.
+ *
+ * Write the config.
+ *
+ *
+ * Import ProtoHttpModule.forRoot(config) in your app.module.
+ *
+ * Use RequestService to make requests.
+ *
+ * ```typescript
+ *
+ * ```
+ *
+ * Add VersionInterceptor to the app.module providers, if you wish.
+ *
  * ```typescript
  * @NgModule({
  *   // ... imports, declarations, bootstrap

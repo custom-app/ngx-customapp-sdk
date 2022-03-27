@@ -1,5 +1,8 @@
+import {BufferOverflowStrategy} from './buffer-overflow-strategy';
+import {Observable} from 'rxjs';
+
 /**
- * Describes websocket behaviour, serialization, deserialization, authorization, subscriptions etc.
+ * This interface describes websocket behaviour, serialization, deserialization, authorization, subscriptions etc.
  * The auto reconnect settings are passed to the {@link WebSocketController.open} method.
  *
  * It is supposed that you usually communicate with a server using request-response pattern.
@@ -12,6 +15,8 @@
  * The id must be number. If you need to use a string or something else, transform this number
  * to the string in the set function, and back to the number in the get function.
  *
+ * ## Usage
+ *
  * @typeParam RequestType The type of messages, that will be consumed
  * by {@link WebSocketController.send} and {@link WebSocketController.request} methods.
  * @typeParam ResponseType The type, of messages, that will be produced by {@link WebSocketController.messages$} observable.
@@ -22,9 +27,6 @@
  * (even that original WebSocket [supports](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/binaryType)).
  * If you send binary data, send ONLY binary data. If you send text frames, send ONLY text frames.
  * */
-import {BufferOverflowStrategy} from './buffer-overflow-strategy';
-import {Observable} from 'rxjs';
-
 export interface WebSocketControllerConfig<RequestType, ResponseType, UnderlyingDataType extends string | ArrayBufferLike | Blob | ArrayBufferView = string> {
   /**
    * The url of the socket server to connect to,

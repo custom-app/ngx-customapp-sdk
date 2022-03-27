@@ -4,21 +4,29 @@ import {WebSocketOpenOptions} from 'customapp-rxjs-websocket';
 
 /**
  * Sockets configured as a chain, where each chain link represents group of sockets to be initialized
- * and opened concurrently, but chain links are initialized consequently. New chain link is obtained
+ * and opened concurrently, but chain links are initialized in sequence. New chain link is obtained
  * through the call of the {@link WebSocketChainLink.socketsReady} function. The sockets from the first
  * chain link are initialized immediately (but not opened) and available in {@link WebSocketsOwnerService}
  * from the beginning.
  *
  * ### Usage
  *
- * Add the customapp-rxjs-websocket package
+ * Install
+ *
+ * ```sh
+ * yarn add ngx-customapp-pattern-auth-before-socket
+ * ```
+ *
+ * Install the customapp-rxjs-websocket package (it is a peer dependency).
  *
  * ```sh
  * yarn add customapp-rxjs-websocket
  * ```
  *
- * Configure ngx-customapp-errors and ngx-customapp-jwt packages. You may want to use ngx-customapp-proto-http during
- * the configuration.
+ * Install and configure
+ * [ngx-customapp-errors](https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_errors_src_public_api.ErrorsConfig.html) and
+ * [ngx-customapp-jwt](https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_jwt_src_public_api.JwtConfig.html)
+ * packages. You may want to use [ngx-customapp-proto-http](https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_proto_http_src_public_api.ProtoHttpConfig.html) during the configuration.
  *
  * Import PatternAuthBeforeSocketModule.forRoot(config).
  *
