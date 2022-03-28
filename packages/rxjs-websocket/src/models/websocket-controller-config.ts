@@ -99,9 +99,8 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
      */
     createRequest: () => Observable<RequestType | undefined>,
     /**
-     * Helps to determine if the authorization completed successfully. If not passed,
-     * socket will become authorized immediately after sending auth request. If any response must be considered
-     * successful, pass `() => true`.
+     * Helps to determine if the authorization completed successfully. If not passed, any response is considered
+     * successful.
      * @param response param for the auth response.
      */
     isResponseSuccessful?: (response: ResponseType) => boolean
@@ -114,6 +113,7 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
    * Updates will be handled as ordinary messages - passed to the {@link WebSocketController.messages$} observable.
    *
    * When not passed, socket state transition authorized->subscribed still happens, but instant.
+   * Subscription requests MUST have a response.
    */
   subscribe?: {
     /**
@@ -128,8 +128,7 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
     createRequests: (authResponse?: ResponseType) => Observable<RequestType[] | undefined>,
     /**
      * Helps to determine if the subscription completed successfully. If not passed,
-     * socket will become authorized immediately after sending auth request. If any response must be considered
-     * successful, pass `() => true`.
+     * any response is considered successful.
      * Will be called for every subscribe response.
      * @param response param for the auth response.
      */
