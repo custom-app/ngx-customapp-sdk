@@ -18,7 +18,13 @@ export class LoginAsCalledWhenUnauthorized extends Error {
     super('You are trying to use loginAs feature, you have not logged in as a normal user, so there are' +
       'no valid JWT available. It is supposed, that loginAs feature is only used by the authorized user,' +
       'otherwise it is just regular login');
+  }
+}
 
+export class LoginAsApiMethodDoesNotHaveJwtInAuthResponse extends Error {
+  constructor() {
+    super('Your loginAs backend api method have returned AuthResponse, which has no JWT in it. Fresh ' +
+      ' JWT of another user are required to make requests as that user.');
   }
 
 }

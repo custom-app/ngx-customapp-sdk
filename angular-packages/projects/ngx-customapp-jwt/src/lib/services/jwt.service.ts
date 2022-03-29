@@ -1,13 +1,17 @@
 import {Inject, Injectable} from '@angular/core';
 import {JwtApi} from '../models/jwt-api';
-import {bindCallback, EMPTY, mergeMap, Observable, Subscription, tap, throwError} from 'rxjs';
+import {bindCallback, EMPTY, mergeMap, Observable, of, Subscription, tap, throwError} from 'rxjs';
 import {JwtConfig} from '../models/jwt-config';
-import {isJwtExpired} from '../utils';
+import {isJwtExpired, jwtNotNull} from '../utils';
 import {NoFreshJwtListener} from '../models/no-fresh-jwt-listener';
 import {defaultJwtStorageKey} from '../constants/jwt-storage-key';
 import {JwtGroup} from '../models/jwt-group';
 import {JwtInfo} from '../models/jwt-info';
-import {LoginAsCalledWhenUnauthorized, LoginAsMethodUnimplemented} from '../errors';
+import {
+  LoginAsApiMethodDoesNotHaveJwtInAuthResponse,
+  LoginAsCalledWhenUnauthorized,
+  LoginAsMethodUnimplemented
+} from '../errors';
 import {JWT_CONFIG} from '../constants/di-token';
 
 @Injectable({
@@ -90,7 +94,7 @@ export class JwtService<Credentials,
         tap(authResponse => {
           const jwt = this.config.authResponseToJwt(authResponse)
           // authorization by token may not return fresh tokens
-          if (jwt?.accessToken?.token && jwt?.refreshToken?.token) {
+          if (jwt && jwtNotNull(jwt)) {
             this._setJwt(jwt)
           }
         })
@@ -99,6 +103,7 @@ export class JwtService<Credentials,
 
   /**
    * Makes a call to the {@link JwtApi.loginAs}, but handles the jwt in response.
+   * loginAs endpoint MUST have fresh JWT in auth response.
    */
   loginAs(userId: UserId): Observable<AuthResponse> {
     return this
@@ -115,10 +120,15 @@ export class JwtService<Credentials,
             .jwtApi
             .loginAs(jwt.accessToken, userId)
             .pipe(
-              tap(authResponse => {
+              mergeMap(authResponse => {
                 const jwt = this.config.authResponseToJwt(authResponse)
-                this._stashJwt()
-                this._setJwt(jwt)
+                if (jwt && jwtNotNull(jwt)) {
+                  this._stashJwt()
+                  this._setJwt(jwt)
+                  return of(authResponse)
+                } else {
+                  return throwError(() => new LoginAsApiMethodDoesNotHaveJwtInAuthResponse())
+                }
               })
             )
         })
