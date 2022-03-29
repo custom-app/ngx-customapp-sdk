@@ -207,10 +207,11 @@ export interface JwtConfig<Credentials,
   UserInfo,
   UserId = number> {
   /**
-   * Function to retrieve the jwt from auth response.
+   * Function to retrieve the jwt from auth response. There might be no fresh
+   * JWT, when authorizing by token, so the function can return undefined.
    * @param authResponse
    */
-  authResponseToJwt: (authResponse: AuthResponse) => JwtGroup<JwtInfo>,
+  authResponseToJwt: (authResponse: AuthResponse) => JwtGroup<JwtInfo> | undefined,
   authResponseToUserInfo: (authResponse: AuthResponse) => UserInfo,
   /**
    * Used by the JwtInterceptor http interceptor to set the auth header with jwt pinned for every request.
