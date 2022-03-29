@@ -90,7 +90,7 @@ export class JwtService<Credentials,
         tap(authResponse => {
           const jwt = this.config.authResponseToJwt(authResponse)
           // authorization by token may not return fresh tokens
-          if (jwt?.accessToken && jwt?.refreshToken) {
+          if (jwt?.accessToken?.token && jwt?.refreshToken?.token) {
             this._setJwt(jwt)
           }
         })
