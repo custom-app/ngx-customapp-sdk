@@ -5,7 +5,7 @@ export const logoutInProcessFeatureKey = 'logoutInProcess';
 
 export type State = boolean
 
-export function logoutInProcessReducer(actions: JwtActions<any, any, any>) {
+export function reducers(actions: JwtActions<any, any, any>) {
   const initialState: State = false
   const {logout, logoutSucceed, logoutErrored} = actions
   return createReducer<State>(

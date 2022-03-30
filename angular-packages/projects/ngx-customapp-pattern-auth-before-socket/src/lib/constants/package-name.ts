@@ -1,1 +1,1 @@
-export const packageName = 'pattern-auth-before-socket'
+export const packageName = 'ngx-customapp-pattern-auth-before-socket'

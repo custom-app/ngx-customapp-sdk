@@ -28,8 +28,8 @@ export class JwtGuard<Credentials,
     private actions$: Actions,
     private store: Store<JwtAppRootStateBase<UserInfo>>,
   ) {
-    this.actionAppReady = this.config.jwtGuard?.actionAppReady || this.a.loginSucceed
-    this.actionAppNotReady = this.config.jwtGuard?.actionAppNotReady || this.a.loginErrored
+    this.actionAppReady = this.config.jwtGuard?.actionAppReady || this.a.loginAgainSucceed
+    this.actionAppNotReady = this.config.jwtGuard?.actionAppNotReady || this.a.loginAgainErrored
   }
 
   canActivate(
@@ -53,7 +53,7 @@ export class JwtGuard<Credentials,
                     const jwtToCredentials = this.config.jwtGuard?.jwtToCredentials
                     if (accessJwt && jwtToCredentials) {
                       const credentials = jwtToCredentials(accessJwt)
-                      this.store.dispatch(this.a.login({credentials}))
+                      this.store.dispatch(this.a.loginAgain({credentials}))
                       return this.actions$
                         .pipe(
                           ofType(this.actionAppReady, this.actionAppNotReady),

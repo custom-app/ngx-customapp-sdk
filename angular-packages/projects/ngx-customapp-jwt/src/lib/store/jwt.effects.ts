@@ -2,7 +2,7 @@ import {Inject, Injectable} from '@angular/core';
 import {Actions, concatLatestFrom, createEffect, ofType} from '@ngrx/effects';
 import {Store} from '@ngrx/store'
 import {JwtActions} from './jwt.actions';
-import {catchError, map, mergeMap, of, tap, throwError} from 'rxjs';
+import {catchError, map, mergeMap, of, throwError} from 'rxjs';
 import {JwtService} from '../services/jwt.service'
 import {JwtConfig} from '../models/jwt-config';
 import {JwtSelectors} from './jwt.selectors';
@@ -22,18 +22,28 @@ export class JwtEffects<Credentials, AuthResponse, UserInfo, UserId = number> {
     @Inject(JWT_ACTIONS) private a: JwtActions<Credentials, AuthResponse, UserInfo, UserId>,
     @Inject(JWT_SELECTORS) private s: JwtSelectors<UserInfo>,
   ) {
-    console.log('jwt effects')
   }
 
   login$ = createEffect(() => this.actions$.pipe(
     ofType(this.a.login),
-    tap((action) => console.log('login', action)),
     mergeMap(({credentials}) =>
       this.jwtService
         .login(credentials)
         .pipe(
           map(response => this.a.loginSucceed({response})),
           catchError(error => of(this.a.loginErrored({error})))
+        )
+    )
+  ))
+
+  loginAgain$ = createEffect(() => this.actions$.pipe(
+    ofType(this.a.loginAgain),
+    mergeMap(({credentials}) =>
+      this.jwtService
+        .login(credentials)
+        .pipe(
+          map(response => this.a.loginAgainSucceed({response})),
+          catchError(error => of(this.a.loginAgainErrored({error})))
         )
     )
   ))
@@ -78,7 +88,7 @@ export class JwtEffects<Credentials, AuthResponse, UserInfo, UserId = number> {
   ))
 
   loginSetUser$ = createEffect(() => this.actions$.pipe(
-    ofType(this.a.loginSucceed),
+    ofType(this.a.loginSucceed, this.a.loginAgainSucceed),
     mergeMap(({response}) => of(
       this.a.setUser({
         user: this.config.authResponseToUserInfo(response)

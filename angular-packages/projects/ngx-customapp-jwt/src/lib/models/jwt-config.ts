@@ -189,17 +189,32 @@ import {ActionCreator} from '@ngrx/store'
  * }
  * ```
  *
- * If you have configured jwtGuard, add JwtGuard to the routing, to handle paths, that require the user to be authorized.
+ * If you have configured {@link JwtConfig.jwtGuard}, add the {@link JwtGuard} to the routing,
+ * to handle paths, that require the user to be authorized.
  *
- * ```
+ * ```typescript
  * {
  *   path: 'main',
  *   component: UiShellComponent,
- *   canActivate: [AuthGuard],
+ *   canActivate: [JwtGuard],
  *   children: [
  *     // ... child paths
  *   ]
  * },
+ * ```
+ *
+ * You can also listen for the result of the authorization, triggered by the {@link JwtGuard}.
+ *
+ * ```typescript
+ * @Injectable()
+ * export class AuthEffects {
+ *  showError$ = createEffect(() => this.actions$.pipe(
+ *     ofType(loginAgainSucceed, loginAgainErrored),
+ *     tap(action => {
+ *       // do something with the auth response or the error.
+ *     })
+ *   ), {dispatch: false})
+ * }
  * ```
  */
 export interface JwtConfig<Credentials,
@@ -253,11 +268,11 @@ export interface JwtConfig<Credentials,
      */
     jwtToCredentials: (jwt: JwtInfo) => Credentials,
     /**
-     * The action on which navigation will be continued. The default is `loginSucceed`.
+     * The action on which navigation will be continued. The default is `loginAgainSucceed`.
      */
     actionAppReady?: ActionCreator,
     /**
-     * The action on which navigation will be cancelled.
+     * The action on which navigation will be cancelled. The default is `loginAgainErrored`.
      */
     actionAppNotReady?: ActionCreator,
   }

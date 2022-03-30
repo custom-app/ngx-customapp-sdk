@@ -1,1 +1,1 @@
-export const packageName = 'ngx-customapp-sdk'
+export const packageName = 'ngx-customapp-jwt'

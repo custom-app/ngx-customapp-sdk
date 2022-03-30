@@ -5,7 +5,7 @@ export const userFeatureKey = 'user';
 
 export type State<UserInfo> = UserInfo | undefined
 
-export function userReducer<UserInfo>(actions: JwtActions<any, any, UserInfo>) {
+export function reducers<UserInfo>(actions: JwtActions<any, any, UserInfo>) {
   const initialState: State<UserInfo> = undefined
   const {setUser} = actions
   return createReducer<State<UserInfo>>(

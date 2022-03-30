@@ -7,6 +7,10 @@ const types = {
   loginSucceed: `[${packageName}] login succeed`,
   loginErrored: `[${packageName}] login errored`,
 
+  loginAgain: `[${packageName}] login again`,
+  loginAgainSucceed: `[${packageName}] login again succeed`,
+  loginAgainErrored: `[${packageName}] login again errored`,
+
   loginAs: `[${packageName}] login as`,
   loginAsSucceed: `[${packageName}] login as succeed`,
   loginAsErrored: `[${packageName}] login as errored`,
@@ -27,6 +31,10 @@ export interface JwtActions<Credentials, AuthResponse, UserInfo, UserId = number
   loginSucceed: ActionCreatorShort<typeof types.loginSucceed, { response: AuthResponse }>,
   loginErrored: ActionCreatorShort<typeof types.loginErrored, Error>,
 
+  loginAgain: ActionCreatorShort<typeof types.loginAgain, { credentials: Credentials }>,
+  loginAgainSucceed: ActionCreatorShort<typeof types.loginAgainSucceed, { response: AuthResponse }>,
+  loginAgainErrored: ActionCreatorShort<typeof types.loginAgainErrored, Error>,
+
   loginAs: ActionCreatorShort<typeof types.loginAs, { userId: UserId }>,
   loginAsSucceed: ActionCreatorShort<typeof types.loginAsSucceed, { response: AuthResponse }>,
   loginAsErrored: ActionCreatorShort<typeof types.loginAsErrored, Error>,
@@ -40,6 +48,32 @@ export interface JwtActions<Credentials, AuthResponse, UserInfo, UserId = number
   setUser: ActionCreatorShort<typeof types.setUser, { user: UserInfo | undefined }>
 }
 
+/**
+ * Actions of the JWT store.
+ *
+ * `login` - to be dispatched from login page (or, may be, login effects, if you have complex authorization)
+ *
+ * `loginSucceed`, `loginErrored` - to indicate the result of the authorization.
+ *
+ * `loginAgain` - internal, is dispatched from the JwtGuard. Mostly the same, as `login`,
+ * but can have different effects (e.g. no navigation after `loginAgainSucceed`).
+ *
+ * `loginAgainSucceed`, `loginAgainErrored` - to indicate the result of the authorization,
+ * triggered by the `loginAgain` action.
+ *
+ * `loginAs` - to be dispatched by the authorized user, who wants to log in as another user. Contains the target user's UserId.
+ *
+ * `loginAsSucceed`, `loginAsErrored` - to indicate the result of the authorization as another user.
+ *
+ * `logout` - to be dispatched by the authorized user. If there have been dispatched `loginAs` before, JWTs
+ * of the current user are destroyed (via calling {@link JwtApi.logout}), and JWTs and the UserInfo of the previous
+ * user are restored from the store.
+ *
+ * `logoutSucceed`, `logoutErrored` - to indicate the result of the logout.
+ *
+ * `stashUser`, `unstashUser`, `setUser` - internal, are used to implement restoration of the
+ * previous user (if there have been dispatched `loginAs`) during logout.
+ */
 export function jwtActions<Credentials, AuthResponse, UserInfo, UserId = number>(): JwtActions<Credentials, AuthResponse, UserInfo, UserId> {
   return {
     login: createAction(
@@ -52,6 +86,19 @@ export function jwtActions<Credentials, AuthResponse, UserInfo, UserId = number>
     ),
     loginErrored: createAction(
       types.loginErrored,
+      props<{ error: string }>(),
+    ),
+
+    loginAgain: createAction(
+      types.loginAgain,
+      props<{ credentials: Credentials }>()
+    ),
+    loginAgainSucceed: createAction(
+      types.loginAgainSucceed,
+      props<{ response: AuthResponse }>(),
+    ),
+    loginAgainErrored: createAction(
+      types.loginAgainErrored,
       props<{ error: string }>(),
     ),
 

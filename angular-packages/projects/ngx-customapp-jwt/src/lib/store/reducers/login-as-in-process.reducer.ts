@@ -5,7 +5,7 @@ export const loginAsInProcessFeatureKey = 'loginAsInProcess';
 
 export type State = boolean
 
-export function loginAsInProcessReducer(actions: JwtActions<any, any, any>) {
+export function reducers(actions: JwtActions<any, any, any>) {
   const initialState: State = false
   const {loginAs, loginAsSucceed, loginAsErrored} = actions
   return createReducer<State>(

@@ -5,7 +5,7 @@ export const userStashFeatureKey = 'userStash';
 
 export type State<UserInfo> = UserInfo[]
 
-export function userStashReducer<UserInfo>(actions: JwtActions<any, any, UserInfo>) {
+export function reducers<UserInfo>(actions: JwtActions<any, any, UserInfo>) {
   const initialState: State<UserInfo> = []
   const {stashUser, unstashUser} = actions
   return createReducer<State<UserInfo>>(
