@@ -252,5 +252,13 @@ export interface JwtConfig<Credentials,
      * @param jwt fresh JWT.
      */
     jwtToCredentials: (jwt: JwtInfo) => Credentials,
+    /**
+     * The action on which navigation will be continued. The default is `loginSucceed`.
+     */
+    actionAppReady?: ActionCreator,
+    /**
+     * The action on which navigation will be cancelled.
+     */
+    actionAppNotReady?: ActionCreator,
   }
 }
