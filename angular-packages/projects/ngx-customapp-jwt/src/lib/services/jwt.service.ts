@@ -64,18 +64,17 @@ export class JwtService<Credentials,
     }
   }
 
-  private _stashJwt(): void {
+  // stash functions are not setting jwt into the local storage, so there are
+  // JWTs of the first user after the page is reloaded.
+  private _stashJwt(jwt: JwtGroup<JwtInfo>): void {
     if (this._jwt) {
       this._jwtStash.push(this._jwt)
-      this._deleteJwt()
     }
+    this._jwt = jwt
   }
 
   private _unstashJwt(): void {
-    const jwt = this._jwtStash.pop()
-    if (jwt) {
-      this._setJwt(jwt)
-    }
+    this._jwt = this._jwtStash.pop()
   }
 
   /**
@@ -123,8 +122,7 @@ export class JwtService<Credentials,
               mergeMap(authResponse => {
                 const jwt = this.config.authResponseToJwt(authResponse)
                 if (jwt && jwtNotNull(jwt)) {
-                  this._stashJwt()
-                  this._setJwt(jwt)
+                  this._stashJwt(jwt)
                   return of(authResponse)
                 } else {
                   return throwError(() => new LoginAsApiMethodDoesNotHaveJwtInAuthResponse())
