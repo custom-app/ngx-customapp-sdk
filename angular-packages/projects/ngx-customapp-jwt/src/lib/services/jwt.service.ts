@@ -1,6 +1,6 @@
 import {Inject, Injectable} from '@angular/core';
 import {JwtApi} from '../models/jwt-api';
-import {bindCallback, EMPTY, mergeMap, Observable, of, Subscription, tap, throwError} from 'rxjs';
+import {bindCallback, catchError, EMPTY, mergeMap, Observable, of, Subscription, tap} from 'rxjs';
 import {JwtConfig} from '../models/jwt-config';
 import {isJwtExpired, jwtNotNull} from '../utils';
 import {NoFreshJwtListener} from '../models/no-fresh-jwt-listener';
@@ -96,6 +96,10 @@ export class JwtService<Credentials,
           if (jwt && jwtNotNull(jwt)) {
             this._setJwt(jwt)
           }
+        }),
+        catchError(error => {
+          this._deleteJwt();
+          throw error;
         })
       )
   }
@@ -110,10 +114,10 @@ export class JwtService<Credentials,
       .pipe(
         mergeMap(jwt => {
           if (!jwt?.accessToken) {
-            return throwError(() => new LoginAsCalledWhenUnauthorized())
+            throw new LoginAsCalledWhenUnauthorized()
           }
           if (!this.jwtApi.loginAs) {
-            return throwError(() => new LoginAsMethodUnimplemented())
+            throw new LoginAsMethodUnimplemented()
           }
           return this
             .jwtApi
@@ -125,7 +129,7 @@ export class JwtService<Credentials,
                   this._stashJwt(jwt)
                   return of(authResponse)
                 } else {
-                  return throwError(() => new LoginAsApiMethodDoesNotHaveJwtInAuthResponse())
+                  throw new LoginAsApiMethodDoesNotHaveJwtInAuthResponse()
                 }
               })
             )

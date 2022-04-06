@@ -1,6 +1,6 @@
 import {Inject, Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot, UrlTree} from '@angular/router';
-import {mergeMap, Observable, of, take} from 'rxjs';
+import {mergeMap, Observable, of, take, tap} from 'rxjs';
 import {JWT_ACTIONS, JWT_CONFIG, JWT_SELECTORS} from '../constants/di-token';
 import {JwtConfig} from '../models/jwt-config';
 import {JwtService} from '../services/jwt.service';
@@ -9,6 +9,7 @@ import {JwtActions} from '../store/jwt.actions';
 import {Action, ActionCreator, Store} from '@ngrx/store';
 import {JwtAppRootStateBase} from '../models/jwt-root-state-base';
 import {JwtSelectors} from '../store/jwt.selectors';
+import {NoFreshJwtListener} from '../models/no-fresh-jwt-listener';
 
 
 @Injectable({
@@ -27,6 +28,7 @@ export class JwtGuard<Credentials,
     private jwtService: JwtService<Credentials, AuthResponse, UserInfo>,
     private actions$: Actions,
     private store: Store<JwtAppRootStateBase<UserInfo>>,
+    private noFreshJwtListener: NoFreshJwtListener,
   ) {
     this.actionAppReady = this.config.jwtGuard?.actionAppReady || this.a.loginAgainSucceed
     this.actionAppNotReady = this.config.jwtGuard?.actionAppNotReady || this.a.loginAgainErrored
@@ -60,7 +62,12 @@ export class JwtGuard<Credentials,
                           take(1),
                           mergeMap(action => of(
                             (action as Action).type === this.actionAppReady.type
-                          ))
+                          )),
+                          tap(accessGranted => {
+                            if (!accessGranted) {
+                              this.noFreshJwtListener.noFreshJwt();
+                            }
+                          })
                         )
                     } else {
                       return of(false)

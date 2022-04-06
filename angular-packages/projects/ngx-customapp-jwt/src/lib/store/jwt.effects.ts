@@ -24,18 +24,6 @@ export class JwtEffects<Credentials, AuthResponse, UserInfo, UserId = number> {
   ) {
   }
 
-  login$ = createEffect(() => this.actions$.pipe(
-    ofType(this.a.login),
-    mergeMap(({credentials}) =>
-      this.jwtService
-        .login(credentials)
-        .pipe(
-          map(response => this.a.loginSucceed({response})),
-          catchError(error => of(this.a.loginErrored({error})))
-        )
-    )
-  ))
-
   loginAgain$ = createEffect(() => this.actions$.pipe(
     ofType(this.a.loginAgain),
     mergeMap(({credentials}) =>
@@ -44,6 +32,18 @@ export class JwtEffects<Credentials, AuthResponse, UserInfo, UserId = number> {
         .pipe(
           map(response => this.a.loginAgainSucceed({response})),
           catchError(error => of(this.a.loginAgainErrored({error})))
+        )
+    )
+  ))
+
+  login$ = createEffect(() => this.actions$.pipe(
+    ofType(this.a.login),
+    mergeMap(({credentials}) =>
+      this.jwtService
+        .login(credentials)
+        .pipe(
+          map(response => this.a.loginSucceed({response})),
+          catchError(error => of(this.a.loginErrored({error})))
         )
     )
   ))
