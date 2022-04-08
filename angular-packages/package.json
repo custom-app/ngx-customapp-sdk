@@ -10,7 +10,7 @@
     "build:proto-http": "ng build ngx-customapp-proto-http",
     "watch:pattern-auth-before-socket": "yarn build --watch --configuration=development",
     "build:pattern-auth-before-socket": "ng build ngx-customapp-pattern-auth-before-socket",
-    "build": "yarn build:jwt && yarn build:errors && yarn build:proto-http && yarn build:pattern-auth-before-socket"
+    "build": "yarn build:jwt && yarn && yarn build:errors && yarn && yarn build:proto-http && yarn && yarn build:pattern-auth-before-socket && yarn"
   },
   "private": true,
   "workspaces": [

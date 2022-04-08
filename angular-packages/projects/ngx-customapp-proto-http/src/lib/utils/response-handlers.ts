@@ -62,7 +62,7 @@ function responseHandler<T, ResponseType>(
   } else {
     // successful response should always have protobuf header.
     return throwError(() =>
-      Error(
+     new Error(
         `expected to receiver ${protobufHeader.value} but got ${type}`
       )
     );
