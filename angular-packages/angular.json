@@ -126,6 +126,37 @@
           }
         }
       }
+    },
+    "ngx-customapp-forms": {
+      "projectType": "library",
+      "root": "projects/ngx-customapp-forms",
+      "sourceRoot": "projects/ngx-customapp-forms/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/ngx-customapp-forms/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-customapp-forms/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ngx-customapp-forms/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-customapp-forms/src/test.ts",
+            "tsConfig": "projects/ngx-customapp-forms/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-customapp-forms/karma.conf.js"
+          }
+        }
+      }
     }
   },
   "defaultProject": "ngx-customapp-jwt",

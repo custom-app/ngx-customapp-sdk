@@ -8,9 +8,11 @@
     "build:errors": "ng build ngx-customapp-errors",
     "watch:proto-http": "yarn build:proto-http --watch --configuration=development",
     "build:proto-http": "ng build ngx-customapp-proto-http",
-    "watch:pattern-auth-before-socket": "yarn build --watch --configuration=development",
+    "watch:pattern-auth-before-socket": "yarn build:pattern-auth-before-socket --watch --configuration=development",
     "build:pattern-auth-before-socket": "ng build ngx-customapp-pattern-auth-before-socket",
-    "build": "yarn build:jwt && yarn && yarn build:errors && yarn && yarn build:proto-http && yarn && yarn build:pattern-auth-before-socket && yarn"
+    "build:forms": "ng build ngx-customapp-forms",
+    "watch:forms": "yarn build:forms --watch --configuration=development",
+    "build": "yarn build:jwt && yarn && yarn build:errors && yarn && yarn build:proto-http && yarn && yarn build:pattern-auth-before-socket && yarn && yarn build:forms && yarn"
   },
   "private": true,
   "workspaces": [

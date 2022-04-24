@@ -17,6 +17,10 @@
         "dist/jwt/jwt",
         "dist/jwt"
       ],
+      "ngx-customapp-forms": [
+        "dist/ngx-customapp-forms/ngx-customapp-forms",
+        "dist/ngx-customapp-forms"
+      ],
       "pattern-auth-before-authorized-socket": [
         "dist/pattern-auth-before-authorized-socket/pattern-auth-before-authorized-socket",
         "dist/pattern-auth-before-authorized-socket"
