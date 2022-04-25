@@ -9,7 +9,11 @@ import {
   closeSocketsFinished,
   initSockets,
   initSocketsErrored,
-  initSocketsSucceed
+  initSocketsSucceed, loginAgainAndInitSocketsErrored,
+  loginAgainAndInitSocketsSucceed,
+  loginAndInitSocketsErrored,
+  loginAndInitSocketsSucceed, loginAsAndInitSocketsErrored,
+  loginAsAndInitSocketsSucceed
 } from './sockets.actions';
 
 
@@ -26,7 +30,7 @@ export class SocketsEffects {
   }
 
   openOnLogin$ = createEffect(() => this.actions$.pipe(
-    ofType(this.a.loginSucceed),
+    ofType(this.a.loginSucceed, this.a.loginAgainSucceed),
     mergeMap(() => of(initSockets()))
   ))
 
@@ -41,6 +45,51 @@ export class SocketsEffects {
         catchError(this.errorsService.toUserError),
         catchError(error => of(initSocketsErrored({error})))
       )),
+  ))
+
+  // make initSockets and login atomic
+  resultLoginAndInitSockets$ = createEffect(() => this.actions$.pipe(
+    ofType(this.a.login, this.a.loginAgain, this.a.loginAs),
+    mergeMap((loginAction) => this.actions$.pipe(
+      ofType(initSocketsSucceed, initSocketsErrored, this.a.loginErrored, this.a.loginAgainErrored, this.a.loginAsErrored),
+      mergeMap(action => {
+        if (action.type === initSocketsSucceed.type) {
+          if (loginAction.type === this.a.login.type) {
+            return of(
+              loginAndInitSocketsSucceed()
+            )
+          } else if (loginAction.type === this.a.loginAgainSucceed.type) {
+            return of(
+              loginAgainAndInitSocketsSucceed()
+            )
+          } else {
+            // loginAction.type === this.loginAsSucceed.type
+            return of(
+              loginAsAndInitSocketsSucceed()
+            )
+          }
+        } else {
+          // action is one of the
+          // initSocketsErrored, this.a.loginErrored, this.a.loginAgainErrored, this.a.loginAsErrored,
+          // but typescript does not understand it
+          const error = (action as any).error
+          if (loginAction.type === this.a.login.type) {
+            return of(
+              loginAndInitSocketsErrored({error})
+            )
+          } else if (loginAction.type === this.a.loginAgainSucceed.type) {
+            return of(
+              loginAgainAndInitSocketsErrored({error})
+            )
+          } else {
+            // loginAction.type === this.loginAsSucceed.type
+            return of(
+              loginAsAndInitSocketsErrored({error})
+            )
+          }
+        }
+      })
+    ))
   ))
 
   closeSockets$ = createEffect(() => this.actions$.pipe(

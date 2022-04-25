@@ -1,4 +1,16 @@
-import {AsyncSubject, filter, first, forkJoin, mergeMap, Observable, of, Subject, throwError, timeout} from 'rxjs';
+import {
+  AsyncSubject,
+  BehaviorSubject,
+  filter,
+  first,
+  forkJoin,
+  mergeMap,
+  Observable,
+  of,
+  Subject,
+  throwError,
+  timeout
+} from 'rxjs';
 import {WebSocketIsAlreadyOpened} from './errors';
 import {MessageRequirements, WebSocketMessageBuffer} from './web-socket-message-buffer';
 import {WrappedSocket} from './wrapped-socket';
@@ -41,7 +53,7 @@ export class WebSocketController<RequestType,
   private _messages$ = new Subject<ResponseType>()
 
   private _state: WebSocketControllerState = WebSocketControllerState.closed
-  private _state$ = new Subject<WebSocketControllerState>()
+  private _state$ = new BehaviorSubject<WebSocketControllerState>(this._state)
 
   // To notify about every state
   private _pending$ = new Subject<void>()

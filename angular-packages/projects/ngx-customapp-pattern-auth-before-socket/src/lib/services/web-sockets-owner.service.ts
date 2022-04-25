@@ -5,7 +5,7 @@ import {SocketId} from '../models/individual-web-socket-config';
 import {WebSocketController} from 'customapp-rxjs-websocket';
 import {
   catchError,
-  EMPTY,
+  EMPTY, first,
   forkJoin,
   map,
   mergeMap,
@@ -74,7 +74,7 @@ export class WebSocketsOwnerService<RequestType,
   }
 
   /**
-   * Init all the sockets according to config. Shuld be called only once per login.
+   * Init all the sockets according to config. Should be called only once per login.
    */
   init(): Observable<void> {
     const initialized$ = new Subject<void>()
@@ -101,6 +101,9 @@ export class WebSocketsOwnerService<RequestType,
           })
       ).pipe(
         tap(responses => console.log('init socket responses', responses)),
+        // to handle case, when one of the socketResponse$ observable completed without emitting a value
+        // that means, that socket is not opened, and initialized$ should error
+        first(),
         mergeMap(responses =>
           this._jwtAndUserInfo()
             .pipe(
