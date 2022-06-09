@@ -16,7 +16,7 @@ import Spy = jasmine.Spy;
 import {JwtInfo} from '../models/jwt-info';
 import {JwtGroup} from '../models/jwt-group';
 import {defaultJwtStorageKey} from '../constants/jwt-storage-key';
-import {of} from 'rxjs';
+import {of, throwError} from 'rxjs';
 import {LoginAsApiMethodDoesNotHaveJwtInAuthResponse, LoginAsCalledWhenUnauthorized} from '../errors';
 
 // Required<> needed fot jasmine.Spy types inference to work on optional methods
@@ -132,9 +132,58 @@ describe('JwtService', () => {
       error: done.fail
     })
   })
-  xit('should logout and delete jwt')
-  xit('should not call logout when there is no fresh access token')
+  it('should logout and delete jwt', (done) => {
+    const jwt = testCreateJwtGroup()
+    initJwtService(JSON.stringify(jwt))
+    const fromAllDevices = true;
+    jwtApi.logout.and.returnValue(of(void 0))
+    jwtService.logout(fromAllDevices).subscribe({
+      next: (v) => {
+        expect(v).toEqual(undefined)
+        expect(jwtApi.logout).toHaveBeenCalledWith(jwt.accessToken!, fromAllDevices)
+        expect(jwtService.jwt).toBeFalsy()
+        expect(localStorage.removeItem).toHaveBeenCalledWith(defaultJwtStorageKey)
+        done()
+      },
+      error: done.fail
+    })
+  })
+  it('should refresh jwt when calling logout', (done) => {
+    const jwt = testCreateJwtGroup(-10000)
+    const freshJwt = testCreateJwtGroup()
+    initJwtService(JSON.stringify(jwt))
+    jwtApi.refresh.and.returnValue(of(freshJwt))
+    jwtApi.logout.and.returnValue(of(void 0))
+
+    jwtService.logout(true).subscribe({
+      next: () => {
+        expect(jwtApi.refresh).toHaveBeenCalledWith(jwt.refreshToken!)
+        expect(jwtApi.logout).toHaveBeenCalledWith(freshJwt.accessToken!, true)
+        expect(jwtService.jwt).toBeFalsy()
+        expect(localStorage.removeItem).toHaveBeenCalled()
+        done()
+      },
+      error: done.fail
+    })
+  })
+  it('should succeed not calling logout when there is no fresh access token', (done) => {
+    const jwt = testCreateJwtGroup(-10000)
+    initJwtService(JSON.stringify(jwt))
+    jwtApi.refresh.and.returnValue(throwError(() => 'cannot refresh'))
+
+    jwtService.logout().subscribe({
+      next: () => {
+        expect(jwtApi.refresh).toHaveBeenCalledWith(jwt.refreshToken!)
+        expect(jwtApi.logout).not.toHaveBeenCalled()
+        expect(jwtService.jwt).toBeFalsy()
+        expect(localStorage.removeItem).toHaveBeenCalled()
+        done()
+      },
+      error: done.fail
+    })
+  })
   xit('should not call logout when there are no jwt')
+  xit('should use custom jwt storage key')
   it('should login as and save jwt', (done) => {
     const initialJwt = testCreateJwtGroup()
     initJwtService(JSON.stringify(initialJwt))
@@ -179,10 +228,11 @@ describe('JwtService', () => {
     })
   })
   xit('should login as and logout back to the master user')
+  xit('should refresh tokens when trying to loginAs')
   xit('should call withFresh jwt when subscribing to fresh jwt')
-  xit('should call withFreshJwt when trying to loginAs')
   xit('fresh jwt should refresh tokens')
   xit('should call no fresh jwt listener when there was no jwt')
   xit('should call no fresh jwt listener when jwt were not refreshed')
-
+  xit('should handle concurrent calls to withFreshJwt')
+  xit('should properly call or not call callbacks when withFreshJwt is used concurrently')
 })

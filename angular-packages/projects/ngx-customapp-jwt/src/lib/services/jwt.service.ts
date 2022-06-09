@@ -1,6 +1,6 @@
 import {Inject, Injectable} from '@angular/core';
 import {JwtApi} from '../models/jwt-api';
-import {bindCallback, catchError, EMPTY, mergeMap, Observable, of, Subscription, tap} from 'rxjs';
+import {bindCallback, catchError, mergeMap, Observable, of, Subscription, tap} from 'rxjs';
 import {JwtConfig} from '../models/jwt-config';
 import {isJwtExpired, jwtNotNull} from '../utils';
 import {NoFreshJwtListener} from '../models/no-fresh-jwt-listener';
@@ -80,6 +80,12 @@ export class JwtService<Credentials,
 
   private _unstashJwt(): void {
     this._jwt = this._jwtStash.pop()
+  }
+
+  private _logoutSucceed(): void {
+    this._deleteJwt()
+    // will set the JWT of the previous user (if there have been) into this.jwt
+    this._unstashJwt()
   }
 
   /**
@@ -164,7 +170,6 @@ export class JwtService<Credentials,
       return
     }
     if (!jwt.accessToken || isJwtExpired(jwt.accessToken)) {
-      console.log('withFreshJwt', 'access expired', jwt)
       this._waitingForRefresh.push(callback)
       if (!this._refresh) {
         this._refresh = this
@@ -182,7 +187,7 @@ export class JwtService<Credentials,
             error: () => {
               this.noFreshJwtListener.noFreshJwt()
               if (!callWithFreshOnly) {
-                callback()
+                callback() // link callback with callWithFreshOnly flag
               }
             }
           })
@@ -216,13 +221,12 @@ export class JwtService<Credentials,
               .logout(jwt.accessToken, fromAllDevices)
               .pipe(
                 tap(() => {
-                  this._deleteJwt()
-                  // will set the JWT of the previous user (if there have been) into this.jwt
-                  this._unstashJwt()
+                  this._logoutSucceed()
                 })
               )
           } else {
-            return EMPTY
+            this._logoutSucceed()
+            return of(void 0)
           }
         })
       )

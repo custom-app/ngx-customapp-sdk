@@ -29,6 +29,7 @@ export abstract class JwtApi<Credentials,
   abstract loginAs?: (masterAccessToken: JwtInfo, userId: UserId) => Observable<AuthResponse>
   /**
    * Uses valid long-living refresh token to get new access and refresh tokens from backend.
+   * Returned observable should error when
    */
   abstract refresh: (refreshToken: JwtInfo) => Observable<JwtGroup<JwtInfo>>
   /**
