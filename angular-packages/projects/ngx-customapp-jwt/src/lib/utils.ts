@@ -6,6 +6,6 @@ export function isJwtExpired(jwt: JwtInfo, gap: number = jwtExpirationGapMs) {
   return jwt.expiresAt <= Date.now() + gap;
 }
 
-export function jwtNotNull(jwt: JwtGroup<JwtInfo>): boolean {
+export function jwtNotNull(jwt?: JwtGroup<JwtInfo>): boolean {
   return Boolean(jwt?.accessToken?.token && jwt?.refreshToken?.token)
 }

@@ -51,16 +51,12 @@ export class JwtService<Credentials,
     localStorage.removeItem(this._storageKey)
   }
 
-  private _checkJwt(): boolean {
-    return Boolean(this._jwt?.accessToken?.token && this._jwt.refreshToken?.token)
-  }
-
   private _loadJwt(): void {
     const jwtString = localStorage.getItem(this._storageKey)
     if (jwtString) {
       try {
         this._jwt = JSON.parse(jwtString)
-        if (!this._checkJwt()) {
+        if (!jwtNotNull(this._jwt)) {
           this._jwt = undefined
           localStorage.removeItem(this._storageKey)
         }
