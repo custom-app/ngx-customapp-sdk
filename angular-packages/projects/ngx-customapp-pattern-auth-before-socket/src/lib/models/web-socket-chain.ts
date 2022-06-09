@@ -42,9 +42,17 @@ import {WebSocketOpenOptions} from 'customapp-rxjs-websocket';
  *
  * The sockets will open after ngx-customapp-jwt loginSucceed or loginAsSucceed actions and closed after logoutSucceed action.
  *
- * You can wait for sockets to be open by listening for `initSocketsSucceed` or `initSocketsErrored` actions.
- * You can check, if the sockets are opening or closing by using `selectSocketsInitInProcess` or
- * `selectCloseInProcess` selectors.
+ * If you want to listen for sockets being initialized before navigating into the app, you shouldn't.
+ * If the app written properly, sockets will be successfully initialized after successful `login`, `loginAs` or `loginAgain`,
+ * cos you are supposed to use the same credentials. If you still want to handle such errors
+ * (when the user is logged in but socket is not available), react to the `initSocketsErrored`
+ * action by suggesting the user to log in again.
+ *
+ * If you still want to react to the sockets being successfully/unsuccessfully initialized,
+ * you should listen for `loginAndInitSocketsSucceed`, `loginAndInitSocketsErrored`,
+ * `loginAsAndInitSocketsSucceed`, `loginAsAndInitSocketsErrored`, `loginAgainAndInitSocketsSucceed`,
+ * `loginAgainAndInitSocketsErrored`. But use them carefully, cos all actions in general need
+ * different handler.
  *
  * To send the request into the socket and handle subscriptions, make a service.
  * ```typescript

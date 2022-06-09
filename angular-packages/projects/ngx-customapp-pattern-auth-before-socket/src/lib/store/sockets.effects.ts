@@ -110,7 +110,7 @@ export class SocketsEffects {
   ))
 
   closeOnLoginAs$ = createEffect(() => this.actions$.pipe(
-    ofType(this.a.loginAsSucceed),
+    ofType(this.a.loginAsSucceed, this.a.loginAsErrored),
     mergeMap(() => of(closeSockets()))
   ))
 
