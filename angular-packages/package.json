@@ -4,6 +4,7 @@
   "scripts": {
     "watch:jwt": "yarn build:jwt --watch --configuration=development",
     "build:jwt": "ng build ngx-customapp-jwt",
+    "test:jwt": "ng test ngx-customapp-jwt",
     "watch:errors": "yarn build:errors --watch --configuration=development",
     "build:errors": "ng build ngx-customapp-errors",
     "watch:proto-http": "yarn build:proto-http --watch --configuration=development",
