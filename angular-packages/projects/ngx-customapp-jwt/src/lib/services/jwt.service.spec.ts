@@ -430,7 +430,26 @@ describe('JwtService', () => {
       error: done.fail,
     })
   })
-  xit('should call withFreshJwt every time subscription to fresh jwt is made')
+  it('should call withFreshJwt first time subscription to fresh jwt is made', (done) => {
+    initJwtService()
+    spyOn(jwtService, 'withFreshJwt').and.callFake(fn => fn())
+    const fresh = jwtService.freshJwt(false)
+    expect(jwtService.withFreshJwt).not.toHaveBeenCalled()
+    fresh.subscribe({
+      next: () => {
+        expect(jwtService.withFreshJwt).toHaveBeenCalledTimes(1)
+        fresh.subscribe({
+          next: () => {
+            // it is the current behaviour of the bindCallback
+            expect(jwtService.withFreshJwt).toHaveBeenCalledTimes(1)
+            done()
+          },
+          error: done.fail
+        })
+      },
+      error: done.fail
+    })
+  })
   xit('withFreshJwt should refresh tokens and save them')
   xit('should call no fresh jwt listener when there was no jwt')
   xit('should call no fresh jwt listener when jwt were not refreshed and should delete tokens')

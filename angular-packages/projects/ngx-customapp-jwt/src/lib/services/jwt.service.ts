@@ -221,6 +221,7 @@ export class JwtService<Credentials,
 
   /**
    * Refreshes the tokens if needed and emits them as a value. If no fresh tokens available, will emit `undefined`.
+   * The first subscription will call {@link withFreshJwt}, but later subscribers will receive the same value.
    * @param doNotCallNoFreshJwt In most cases is false. If true, NoFreshJwtListener will not be notified about the JWT absence.
    */
   freshJwt: (doNotCallNoFreshJwt: boolean) => Observable<JwtGroup<JwtInfo> | undefined> =
