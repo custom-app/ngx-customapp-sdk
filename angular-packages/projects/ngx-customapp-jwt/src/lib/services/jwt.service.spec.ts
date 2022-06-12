@@ -450,9 +450,49 @@ describe('JwtService', () => {
       error: done.fail
     })
   })
-  xit('withFreshJwt should refresh tokens and save them')
-  xit('should call no fresh jwt listener when there was no jwt')
-  xit('should call no fresh jwt listener when jwt were not refreshed and should delete tokens')
+  it('withFreshJwt should refresh tokens and save them', (done) => {
+    const initialJwt = testCreateJwtGroup(-10000)
+    initJwtService(JSON.stringify(initialJwt))
+    const jwt = testCreateJwtGroup()
+
+    jwtApi.refresh.and.returnValue(of(jwt))
+    jwtService.withFreshJwt(refreshed => {
+      expect(refreshed).toEqual(jwt)
+      expect(jwtService.jwt).toEqual(jwt)
+      expect(localStorage.setItem).toHaveBeenCalledWith(defaultJwtStorageKey, JSON.stringify(jwt))
+      expect(localStorage.removeItem).not.toHaveBeenCalled()
+      done()
+    })
+  })
+  it('should call no fresh jwt listener when there was no jwt', (done) => {
+    initJwtService()
+
+    jwtService.withFreshJwt(() => {
+      expect(noFreshJwt.noFreshJwt).toHaveBeenCalled()
+      expect(jwtService.jwt).toBeFalsy()
+      done()
+    })
+  })
+  it('should not call no fresh jwt listener when stated explicitly', (done) => {
+    initJwtService()
+
+    jwtService.withFreshJwt(() => {
+      expect(noFreshJwt.noFreshJwt).not.toHaveBeenCalled()
+      expect(jwtService.jwt).toBeFalsy()
+      done()
+    }, false, true)
+  })
+  it('should call no fresh jwt listener when jwt were not refreshed and should delete tokens', (done) => {
+    const initialJwt = testCreateJwtGroup(-10000)
+    initJwtService(JSON.stringify(initialJwt))
+    jwtApi.refresh.and.returnValue(throwError(() => 'some unexpected error'))
+    jwtService.withFreshJwt(() => {
+      expect(noFreshJwt.noFreshJwt).toHaveBeenCalled()
+      expect(jwtService.jwt).toBeFalsy()
+      expect(localStorage.removeItem).toHaveBeenCalled()
+      done()
+    })
+  })
   xit('should not delete tokens if cannot refresh them after loginAs')
   xit('should handle concurrent calls to withFreshJwt')
   xit('should properly call or not call callbacks when withFreshJwt is used concurrently')

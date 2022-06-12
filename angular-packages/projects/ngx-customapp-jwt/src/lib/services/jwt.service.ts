@@ -183,6 +183,7 @@ export class JwtService<Credentials,
   withFreshJwt(callback: (jwt?: JwtGroup<JwtInfo>) => void, callWithFreshOnly?: boolean, doNotCallNoFreshJwt?: boolean): void {
     const jwt = this._jwt
     const noFreshJwt = () => {
+      this._deleteJwt()
       if (!doNotCallNoFreshJwt) {
         this.noFreshJwtListener.noFreshJwt()
       }
