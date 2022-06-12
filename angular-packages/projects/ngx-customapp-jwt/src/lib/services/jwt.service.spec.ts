@@ -7,7 +7,7 @@ import {
   testAuthHeader,
   testAuthResponseToJwt,
   testAuthResponseToUserInfo, testCreateAuthResponse, testCreateCredentials,
-  testCreateJwtGroup
+  testCreateJwtGroup, testJwtToCredentials
 } from '../tests/helpers.spec';
 import {TestBed} from '@angular/core/testing';
 import {JwtService} from './jwt.service';
@@ -18,6 +18,7 @@ import {JwtGroup} from '../models/jwt-group';
 import {defaultJwtStorageKey} from '../constants/jwt-storage-key';
 import {of, throwError} from 'rxjs';
 import {LoginAsApiMethodDoesNotHaveJwtInAuthResponse, LoginAsCalledWhenUnauthorized} from '../errors';
+import {JwtConfig} from '../models/jwt-config';
 
 // Required<> needed fot jasmine.Spy types inference to work on optional methods
 type JwtApiSpy = SpyObj<Required<JwtApi<TestCredentials, TestAuthResponse>>>
@@ -29,7 +30,7 @@ describe('JwtService', () => {
   let noFreshJwt: NoFreshJwtSpy;
   let getItemSpy: Spy;
 
-  const initJwtService = (initialJwt?: string) => {
+  const initJwtService = (initialJwt?: string, jwtStorageKey?: string) => {
     spyOn(localStorage, 'setItem')
     spyOn(localStorage, 'removeItem')
     getItemSpy = spyOn(localStorage, 'getItem')
@@ -49,12 +50,13 @@ describe('JwtService', () => {
         'noFreshJwt'
       ]
     )
-    let jwtConfig = {
+    const jwtConfig: JwtConfig<TestCredentials, TestAuthResponse, TestUserInfo> = {
       authResponseToJwt: testAuthResponseToJwt,
       authResponseToUserInfo: testAuthResponseToUserInfo,
       authHeader: testAuthHeader,
       jwtApi: jwtApiSpy,
       noFreshJwt: noFreshJwtSpy,
+      jwtStorageKey
     }
     TestBed.configureTestingModule({
       providers: [
@@ -132,6 +134,22 @@ describe('JwtService', () => {
       error: done.fail
     })
   })
+  it('should remove jwt when login errored', (done) => {
+    const initialJwt = testCreateJwtGroup()
+    initJwtService(JSON.stringify(initialJwt))
+    expect(jwtService.jwt).toBeTruthy()
+    const credentials = testJwtToCredentials(initialJwt.accessToken!)
+    jwtApi.login.and.returnValue(throwError(() => 'invalid tokens'))
+    // login using jwt from memory. In that case, error means jwt are invalid
+    jwtService.login(credentials).subscribe({
+      next: () => done.fail('login expected to fail'),
+      error: () => {
+        expect(localStorage.removeItem).toHaveBeenCalled()
+        expect(jwtService.jwt).toBeFalsy()
+        done()
+      }
+    })
+  })
   it('should logout and delete jwt', (done) => {
     const jwt = testCreateJwtGroup()
     initJwtService(JSON.stringify(jwt))
@@ -182,8 +200,55 @@ describe('JwtService', () => {
       error: done.fail
     })
   })
-  xit('should not call logout when there are no jwt')
-  xit('should use custom jwt storage key')
+  it('should not call logout and not refresh when there is no fresh refresh token', (done) => {
+    const jwt = testCreateJwtGroup(-10000, -2000)
+    initJwtService(JSON.stringify(jwt))
+
+    expect(jwtService.jwt).toBeTruthy()
+    jwtService.logout().subscribe({
+      next: () => {
+        expect(jwtApi.logout).not.toHaveBeenCalled()
+        expect(jwtApi.refresh).not.toHaveBeenCalled()
+        expect(localStorage.removeItem).toHaveBeenCalled()
+        // it is expected that there are not fresh jwt after logout,
+        // so side effects should not be produced
+        expect(noFreshJwt.noFreshJwt).not.toHaveBeenCalled()
+        expect(jwtService.jwt).toBeFalsy()
+        done()
+      },
+      error: done.fail
+    })
+  })
+  it('should not call logout if there are no jwt', (done) => {
+    initJwtService()
+    expect(jwtService.jwt).toBeFalsy()
+    jwtService.logout().subscribe({
+      next: () => {
+        expect(jwtApi.logout).not.toHaveBeenCalled()
+        expect(jwtApi.refresh).not.toHaveBeenCalled()
+        expect(noFreshJwt.noFreshJwt).not.toHaveBeenCalled()
+        done()
+      },
+      error: done.fail
+    })
+  })
+  it('should use custom jwt storage key', (done) => {
+    const key = 'customJwtStorageKey'
+    initJwtService(undefined, key)
+    expect(jwtService.jwt).toBeFalsy()
+    const authResp = testCreateAuthResponse(true)
+    const jwt = testAuthResponseToJwt(authResp)
+    const credentials = testCreateCredentials()
+    jwtApi.login.and.returnValue(of(authResp))
+    jwtService.login(credentials).subscribe({
+      next: () => {
+        expect(jwtService.jwt).toBeTruthy()
+        expect(localStorage.setItem).toHaveBeenCalledWith(key, JSON.stringify(jwt))
+        done()
+      },
+      error: done.fail
+    })
+  })
   it('should login as and save jwt', (done) => {
     const initialJwt = testCreateJwtGroup()
     initJwtService(JSON.stringify(initialJwt))
@@ -227,6 +292,7 @@ describe('JwtService', () => {
       }
     })
   })
+  xit('should not remove jwt if loginAs errored')
   xit('should login as and logout back to the master user')
   xit('should refresh tokens when trying to loginAs')
   xit('should call withFresh jwt when subscribing to fresh jwt')

@@ -109,6 +109,8 @@ export class JwtService<Credentials,
           }
         }),
         catchError(error => {
+          // if login errored, that means either there were no jwt at the moment, the login called,
+          // or the jwt were invalid all the time
           this._deleteJwt();
           throw error;
         })
@@ -121,7 +123,7 @@ export class JwtService<Credentials,
    */
   loginAs(userId: UserId): Observable<AuthResponse> {
     return this
-      .freshJwt()
+      .freshJwt(false)
       .pipe(
         mergeMap(jwt => {
           if (!jwt?.accessToken) {
@@ -157,16 +159,20 @@ export class JwtService<Credentials,
    *
    * @param callback The function to be called after JWT were refreshed.
    * @param callWithFreshOnly If true, the callback will not be called when JWT are not refreshable.
+   * @param doNotCallNoFreshJwt If true, NoFreshJwtListener will not be notified about the JWT absence.
    */
-  withFreshJwt(callback: (jwt?: JwtGroup<JwtInfo>) => void, callWithFreshOnly?: boolean): void {
+  withFreshJwt(callback: (jwt?: JwtGroup<JwtInfo>) => void, callWithFreshOnly?: boolean, doNotCallNoFreshJwt?: boolean): void {
     const jwt = this._jwt
-    console.log('withFreshJwt', 'current jwt', jwt)
-    if (!jwt?.refreshToken || isJwtExpired(jwt.refreshToken)) {
-      console.log('withFreshJwt', 'refresh expired', jwt)
-      this.noFreshJwtListener.noFreshJwt()
+    const noFreshJwt = () => {
+      if (!doNotCallNoFreshJwt) {
+        this.noFreshJwtListener.noFreshJwt()
+      }
       if (!callWithFreshOnly) {
         callback()
       }
+    }
+    if (!jwt?.refreshToken || isJwtExpired(jwt.refreshToken)) {
+      noFreshJwt()
       return
     }
     if (!jwt.accessToken || isJwtExpired(jwt.accessToken)) {
@@ -185,10 +191,7 @@ export class JwtService<Credentials,
               this._refresh = undefined
             },
             error: () => {
-              this.noFreshJwtListener.noFreshJwt()
-              if (!callWithFreshOnly) {
-                callback() // link callback with callWithFreshOnly flag
-              }
+             noFreshJwt()
             }
           })
       }
@@ -199,9 +202,10 @@ export class JwtService<Credentials,
 
   /**
    * Refreshes the tokens if needed and emits them as a value. If no fresh tokens available, will emit `undefined`.
+   * @param doNotCallNoFreshJwt In most cases is false. If true, NoFreshJwtListener will not be notified about the JWT absence.
    */
-  freshJwt: () => Observable<JwtGroup<JwtInfo> | undefined> =
-    bindCallback((callback: (jwt: JwtGroup<JwtInfo> | undefined) => void) => this.withFreshJwt(callback))
+  freshJwt: (doNotCallNoFreshJwt: boolean) => Observable<JwtGroup<JwtInfo> | undefined> =
+    bindCallback((doNotCallNoFreshJwt: boolean, callback: (jwt: JwtGroup<JwtInfo> | undefined) => void) => this.withFreshJwt(callback, false, doNotCallNoFreshJwt))
 
   /**
    * Logs out the current user. If there was loginAs call previously (perhaps multiple calls),
@@ -211,8 +215,10 @@ export class JwtService<Credentials,
    */
   logout(fromAllDevices?: boolean): Observable<void> {
     return this
-      // will refresh expired access token, cos logout need to invalidate refresh token too.
-      .freshJwt()
+      // Will refresh expired access token, cos logout need to invalidate refresh token too.
+      // It is expected that there are not fresh jwt after logout,
+      // so side effects should not be produced
+      .freshJwt(true)
       .pipe(
         mergeMap(jwt => {
           if (jwt?.accessToken) {
