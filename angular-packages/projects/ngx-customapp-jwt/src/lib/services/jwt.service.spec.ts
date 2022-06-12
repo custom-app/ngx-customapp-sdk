@@ -292,11 +292,102 @@ describe('JwtService', () => {
       }
     })
   })
-  xit('should not remove jwt if loginAs errored')
-  xit('should login as and logout back to the master user')
+  it('should not remove jwt if loginAs errored', (done) => {
+    const initialJwt = testCreateJwtGroup()
+    initJwtService(JSON.stringify(initialJwt))
+    jwtApi.loginAs.and.returnValue(throwError(() => 'some unexpected error'))
+
+    jwtService.loginAs(10).subscribe({
+      next: () => done.fail('method expected to fail'),
+      error: () => {
+        expect(jwtService.jwt).toEqual(initialJwt)
+        jwtApi.logout.and.returnValue(of(void 0))
+        jwtService.logout().subscribe({
+          next: () => {
+            expect(jwtService.jwt).toBeFalsy()
+            done()
+          },
+          error: done.fail
+        })
+      }
+    })
+  })
+  it('should login as and logout back to the master user', (done) => {
+    const initialJwt = testCreateJwtGroup()
+    initJwtService(JSON.stringify(initialJwt))
+    const authResp = testCreateAuthResponse(true)
+    const jwt = testAuthResponseToJwt(authResp)
+    const authResp2 = testCreateAuthResponse(true)
+    const jwt2 = testAuthResponseToJwt(authResp2)
+
+    const checkLogoutAfterLoginAs = () => {
+      expect(jwtApi.login).not.toHaveBeenCalled()
+      expect(jwtApi.loginAs).not.toHaveBeenCalled()
+      expect(localStorage.removeItem).not.toHaveBeenCalled()
+      expect(localStorage.setItem).not.toHaveBeenCalled()
+      jwtApi.logout.calls.reset()
+    }
+
+    jwtApi.loginAs.and.returnValue(of(authResp))
+    jwtService.loginAs(10).subscribe({
+      next: resp => {
+        expect(resp).toEqual(authResp)
+        expect(jwtService.jwt).toEqual(jwt)
+        expect(localStorage.setItem).not.toHaveBeenCalled()
+        expect(jwtApi.loginAs).toHaveBeenCalledWith(initialJwt.accessToken!, 10)
+        jwtApi.loginAs.calls.reset()
+
+        jwtApi.loginAs.and.returnValue(of(authResp2))
+        jwtService.loginAs(20).subscribe({
+          next: resp2 => {
+            expect(resp2).toEqual(authResp2)
+            expect(jwtService.jwt).toEqual(jwt2)
+            expect(localStorage.setItem).not.toHaveBeenCalled()
+            expect(jwtApi.loginAs).toHaveBeenCalledWith(jwt?.accessToken!, 20)
+            expect(jwtService.loginAsDepth).toEqual(2)
+            jwtApi.loginAs.calls.reset()
+
+            jwtApi.logout.and.returnValue(of(void 0))
+            jwtService.logout(true).subscribe({
+              next: () => {
+                expect(jwtApi.logout).toHaveBeenCalledWith(jwt2?.accessToken!, true)
+                expect(jwtService.jwt).toEqual(jwt)
+                checkLogoutAfterLoginAs()
+
+                jwtApi.logout.and.returnValue(of(void 0))
+                jwtService.logout(true).subscribe({
+                  next: () => {
+                    expect(jwtApi.logout).toHaveBeenCalledWith(jwt?.accessToken!, true)
+                    expect(jwtService.jwt).toEqual(initialJwt)
+                    checkLogoutAfterLoginAs()
+
+                    jwtApi.logout.and.returnValue(of(void 0))
+                    jwtService.logout(true).subscribe({
+                      next: () => {
+                        expect(jwtApi.logout).toHaveBeenCalledWith(initialJwt.accessToken!, true)
+                        expect(jwtService.jwt).toBeFalsy()
+                        expect(localStorage.removeItem).toHaveBeenCalled()
+                        done()
+                      },
+                      error: done.fail,
+                    })
+                  },
+                  error: done.fail,
+                })
+              },
+              error: done.fail,
+            })
+          },
+          error: done.fail
+        })
+      },
+      error: done.fail
+    })
+  })
   xit('should refresh tokens when trying to loginAs')
-  xit('should call withFresh jwt when subscribing to fresh jwt')
-  xit('fresh jwt should refresh tokens')
+  xit('should save refreshed tokens to the local storage only if the user is master')
+  xit('should call withFreshJwt every time subscription to fresh jwt is made')
+  xit('withFreshJwt should refresh tokens')
   xit('should call no fresh jwt listener when there was no jwt')
   xit('should call no fresh jwt listener when jwt were not refreshed')
   xit('should handle concurrent calls to withFreshJwt')

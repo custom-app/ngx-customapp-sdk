@@ -41,14 +41,19 @@ export class JwtService<Credentials,
   }
 
   private _setJwt(jwt: JwtGroup<JwtInfo>): void {
-    console.log('set jwt', jwt)
     this._jwt = jwt
-    localStorage.setItem(this._storageKey, JSON.stringify(jwt))
+    if (this.isMasterUser) {
+      // JWT is saved only for master user, cos otherwise we need to preserve UserInfo stash,
+      // which might be not serializable
+      localStorage.setItem(this._storageKey, JSON.stringify(jwt))
+    }
   }
 
   private _deleteJwt(): void {
     this._jwt = undefined
-    localStorage.removeItem(this._storageKey)
+    if (this.isMasterUser) {
+      localStorage.removeItem(this._storageKey)
+    }
   }
 
   private _loadJwt(): void {
@@ -93,6 +98,20 @@ export class JwtService<Credentials,
    */
   get jwt(): JwtGroup<JwtInfo> | undefined {
     return this._jwt
+  }
+
+  /**
+   * Whether current JWT was obtained through loginAs function.
+   */
+  get isMasterUser(): boolean {
+    return this._jwtStash.length === 0
+  }
+
+  /**
+   * Returns the difference between the number of successful loginAs calls and logout calls.
+   */
+  get loginAsDepth(): number {
+    return this._jwtStash.length;
   }
 
   /**
@@ -191,7 +210,7 @@ export class JwtService<Credentials,
               this._refresh = undefined
             },
             error: () => {
-             noFreshJwt()
+              noFreshJwt()
             }
           })
       }
