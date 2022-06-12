@@ -178,7 +178,8 @@ describe('JwtService', () => {
         expect(jwtApi.refresh).toHaveBeenCalledWith(jwt.refreshToken!)
         expect(jwtApi.logout).toHaveBeenCalledWith(freshJwt.accessToken!, true)
         expect(jwtService.jwt).toBeFalsy()
-        expect(localStorage.removeItem).toHaveBeenCalled()
+        expect(localStorage.setItem).toHaveBeenCalledBefore(localStorage.removeItem) // should save refreshed tokens
+        expect(localStorage.removeItem).toHaveBeenCalled() // and then delete them
         done()
       },
       error: done.fail
@@ -384,12 +385,56 @@ describe('JwtService', () => {
       error: done.fail
     })
   })
-  xit('should refresh tokens when trying to loginAs')
-  xit('should save refreshed tokens to the local storage only if the user is master')
+  it('should refresh tokens when trying to loginAs', (done) => {
+    const initialJwt = testCreateJwtGroup(-10000)
+    initJwtService(JSON.stringify(initialJwt))
+    const jwt = testCreateJwtGroup()
+    const authResp = testCreateAuthResponse(true)
+
+    jwtApi.refresh.and.returnValue(of(jwt))
+    jwtApi.loginAs.and.returnValue(of(authResp))
+    jwtService.loginAs(10).subscribe({
+      next: () => {
+        expect(jwtApi.refresh).toHaveBeenCalledWith(initialJwt.refreshToken!)
+        expect(localStorage.setItem).toHaveBeenCalledWith(defaultJwtStorageKey, JSON.stringify(jwt))
+        expect(jwtApi.loginAs).toHaveBeenCalledWith(jwt.accessToken!, 10)
+        expect(jwtService.jwt).toEqual(testAuthResponseToJwt(authResp))
+        done()
+      },
+      error: done.fail,
+    })
+  })
+  it('should not save refreshed tokens to the localStorage after loginAs', (done) => {
+    const initialJwt = testCreateJwtGroup()
+    initJwtService(JSON.stringify(initialJwt))
+
+    const authResp = testCreateAuthResponse(true, -10000)
+    const jwt = testAuthResponseToJwt(authResp)
+    const freshJwt = testCreateJwtGroup()
+
+    jwtApi.loginAs.and.returnValue(of(authResp))
+    jwtService.loginAs(10).subscribe({
+      next: resp => {
+        expect(resp).toEqual(authResp)
+        expect(jwtService.jwt).toEqual(jwt)
+
+        jwtApi.refresh.and.returnValue(of(freshJwt))
+        jwtService.withFreshJwt(refreshedJwt => {
+          expect(refreshedJwt).toEqual(freshJwt)
+          expect(jwtApi.refresh).toHaveBeenCalledWith(jwt?.refreshToken!)
+          expect(localStorage.setItem).not.toHaveBeenCalled()
+          expect(localStorage.removeItem).not.toHaveBeenCalled()
+          done()
+        })
+      },
+      error: done.fail,
+    })
+  })
   xit('should call withFreshJwt every time subscription to fresh jwt is made')
-  xit('withFreshJwt should refresh tokens')
+  xit('withFreshJwt should refresh tokens and save them')
   xit('should call no fresh jwt listener when there was no jwt')
-  xit('should call no fresh jwt listener when jwt were not refreshed')
+  xit('should call no fresh jwt listener when jwt were not refreshed and should delete tokens')
+  xit('should not delete tokens if cannot refresh them after loginAs')
   xit('should handle concurrent calls to withFreshJwt')
   xit('should properly call or not call callbacks when withFreshJwt is used concurrently')
 })

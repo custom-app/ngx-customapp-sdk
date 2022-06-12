@@ -51,12 +51,12 @@ export function testCreateUser(): TestUserInfo {
   }
 }
 
-export function testCreateAuthResponse(includeJwt: boolean): TestAuthResponse {
+export function testCreateAuthResponse(includeJwt: boolean, accessDelta?: number, refreshDelta?: number): TestAuthResponse {
   const res: TestAuthResponse = {
     user: testCreateUser(),
   }
   if (includeJwt) {
-    res.jwt = testCreateJwtGroup()
+    res.jwt = testCreateJwtGroup(accessDelta, refreshDelta)
   }
   return res
 }
