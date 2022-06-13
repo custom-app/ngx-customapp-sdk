@@ -151,4 +151,13 @@ describe('JwtInterceptor', () => {
       }
     })
   })
+  it('should not add jwt when there is no jwt', fakeAsync(() => {
+    jwtService.freshJwt.and.returnValue(of(undefined))
+    http.post(
+      testUrl,
+      testBody,
+    ).subscribe()
+    const req = controller.expectOne(testUrl)
+    expect(req.request.headers.has(testAuthHeader.name)).toBeFalsy()
+  }))
 })
