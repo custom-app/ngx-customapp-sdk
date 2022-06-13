@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "doc": "typedoc --excludePrivate --excludeInternal",
+    "doc": "typedoc",
     "watch": "yarn workspaces foreach -piv run watch",
     "build": "yarn workspaces foreach -piv run build"
   },

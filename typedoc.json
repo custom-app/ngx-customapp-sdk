@@ -6,5 +6,11 @@
     "angular-packages/projects/ngx-customapp-pattern-auth-before-socket/src/public-api.ts",
     "angular-packages/projects/ngx-customapp-proto-http/src/public-api.ts"
   ],
-  "out": "docs"
+  "out": "docs",
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeExternals": true,
+  "exclude": [
+    "**/*+(index|.spec|.e2e).ts"
+  ]
 }
