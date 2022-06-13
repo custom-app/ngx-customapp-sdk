@@ -2,6 +2,7 @@ import {TestAuthResponse, TestCredentials, TestUserInfo} from './models.spec';
 import {JwtGroup} from '../models/jwt-group';
 import {JwtInfo} from '../models/jwt-info';
 import {jwtExpirationGapMs} from '../constants/jwt-expiration';
+import {defer} from 'rxjs';
 
 // all functions and constants prefixed with 'test'
 
@@ -67,4 +68,12 @@ export function testCreateCredentials(): TestCredentials {
   return {
     token: `example credentials ${testCredentialsCounter++}`
   }
+}
+
+export function asyncData<T>(data:T) {
+  return defer(() => Promise.resolve(data))
+}
+
+export function asyncError<T>(error: T) {
+  return defer(() => Promise.reject(error))
 }

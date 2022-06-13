@@ -4,12 +4,13 @@ import {TestAuthResponse, TestCredentials, TestUserInfo} from '../tests/models.s
 import {NoFreshJwtListener} from '../models/no-fresh-jwt-listener';
 import createSpyObj = jasmine.createSpyObj;
 import {
+  asyncData, asyncError,
   testAuthHeader,
   testAuthResponseToJwt,
   testAuthResponseToUserInfo, testCreateAuthResponse, testCreateCredentials,
   testCreateJwtGroup, testJwtToCredentials
 } from '../tests/helpers.spec';
-import {TestBed} from '@angular/core/testing';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {JwtService} from './jwt.service';
 import {JWT_CONFIG} from '../constants/di-token';
 import Spy = jasmine.Spy;
@@ -476,8 +477,9 @@ describe('JwtService', () => {
   it('should not call no fresh jwt listener when stated explicitly', (done) => {
     initJwtService()
 
-    jwtService.withFreshJwt(() => {
+    jwtService.withFreshJwt((jwt) => {
       expect(noFreshJwt.noFreshJwt).not.toHaveBeenCalled()
+      expect(jwt).toBeFalsy()
       expect(jwtService.jwt).toBeFalsy()
       done()
     }, false, true)
@@ -486,14 +488,115 @@ describe('JwtService', () => {
     const initialJwt = testCreateJwtGroup(-10000)
     initJwtService(JSON.stringify(initialJwt))
     jwtApi.refresh.and.returnValue(throwError(() => 'some unexpected error'))
-    jwtService.withFreshJwt(() => {
+    jwtService.withFreshJwt((jwt) => {
       expect(noFreshJwt.noFreshJwt).toHaveBeenCalled()
+      expect(jwt).toBeFalsy()
       expect(jwtService.jwt).toBeFalsy()
       expect(localStorage.removeItem).toHaveBeenCalled()
       done()
     })
   })
-  xit('should not delete tokens if cannot refresh them after loginAs')
-  xit('should handle concurrent calls to withFreshJwt')
-  xit('should properly call or not call callbacks when withFreshJwt is used concurrently')
+  it('should call no fresh jwt listener and not delete jwt from localStorage when jwt were not refreshed after loginAs', (done) => {
+    const initialJwt = testCreateJwtGroup()
+    initJwtService(JSON.stringify(initialJwt))
+    const authResp = testCreateAuthResponse(true, -10000)
+    jwtApi.loginAs.and.returnValue(of(authResp))
+
+    jwtService.loginAs(10).subscribe({
+      next: () => {
+        jwtApi.refresh.and.returnValue(throwError(() => 'some unexpected error'))
+        jwtService.withFreshJwt((freshJwt) => {
+          expect(freshJwt).toBeFalsy()
+          expect(jwtService.jwt).toBeFalsy()
+          expect(noFreshJwt.noFreshJwt).toHaveBeenCalled()
+          expect(localStorage.removeItem).not.toHaveBeenCalled()
+          expect(localStorage.setItem).not.toHaveBeenCalled()
+          done()
+        })
+      },
+      error: done.fail
+    })
+  })
+  it('should handle concurrent calls to withFreshJwt', fakeAsync(() => {
+    const initialJwt = testCreateJwtGroup(-10000)
+    initJwtService(JSON.stringify(initialJwt))
+    const jwt = testCreateJwtGroup()
+
+    jwtApi.refresh.and.returnValue(asyncData(jwt))
+    jwtService.withFreshJwt((refreshed) => {
+      expect(refreshed).toEqual(jwt)
+    })
+    jwtService.withFreshJwt((refreshed) => {
+      expect(refreshed).toEqual(jwt)
+    })
+    tick()
+    expect(jwtApi.refresh).toHaveBeenCalledOnceWith(initialJwt.refreshToken!)
+  }))
+  it('should preserve withFreshJwt call parameters of the first concurrent call', fakeAsync(() => {
+    const initialJwt = testCreateJwtGroup(-10000)
+    initJwtService(JSON.stringify(initialJwt))
+
+    jwtApi.refresh.and.returnValue(asyncError('some error'))
+    let callbackCallCounter = 0
+    jwtService.withFreshJwt(() => {
+      // should not be called
+      callbackCallCounter++
+      fail('the first one should call callback only when fresh jwt are available')
+    }, true, true)
+    jwtService.withFreshJwt(jwt => {
+      callbackCallCounter++
+      expect(jwt).toBeFalsy()
+    })
+    tick()
+    expect(jwtApi.refresh).toHaveBeenCalledOnceWith(initialJwt.refreshToken!)
+    expect(callbackCallCounter).toEqual(1)
+    expect(noFreshJwt.noFreshJwt).toHaveBeenCalledTimes(1)
+  }))
+  it('should preserve withFreshJwt call parameters of the second concurrent call', fakeAsync(() => {
+    const initialJwt = testCreateJwtGroup(-10000)
+    initJwtService(JSON.stringify(initialJwt))
+
+    jwtApi.refresh.and.returnValue(asyncError('some error'))
+    let callbackCallCounter = 0
+    jwtService.withFreshJwt(jwt => {
+      callbackCallCounter++
+      expect(jwt).toBeFalsy()
+    })
+    jwtService.withFreshJwt(() => {
+      // should not be called
+      callbackCallCounter++
+      fail('the first one should call callback only when fresh jwt are available')
+    }, true, true)
+    tick()
+    expect(jwtApi.refresh).toHaveBeenCalledOnceWith(initialJwt.refreshToken!)
+    expect(callbackCallCounter).toEqual(1)
+    expect(noFreshJwt.noFreshJwt).toHaveBeenCalledTimes(1)
+  }))
+  it('should not call old callbacks twice', fakeAsync(() => {
+    const initialJwt = testCreateJwtGroup(-10000)
+    initJwtService(JSON.stringify(initialJwt))
+
+    let callbackCallCounter = 0
+    jwtApi.refresh.and.returnValue(asyncError('some error'))
+    jwtService.withFreshJwt(() => {
+      console.log('first callback')
+      callbackCallCounter++
+    })
+    jwtService.withFreshJwt(() => {
+      console.log('second callback')
+      callbackCallCounter++
+    })
+    tick()
+    expect(callbackCallCounter).toEqual(2)
+    jwtApi.login.and.returnValue(of(testCreateAuthResponse(true, -10000)))
+    jwtService.login(testCreateCredentials()).subscribe()
+    tick()
+    jwtService.withFreshJwt(() => {
+      console.log('third callback')
+      callbackCallCounter++
+    })
+    tick(100)
+    expect(callbackCallCounter).toEqual(3)
+    expect(noFreshJwt.noFreshJwt).toHaveBeenCalledTimes(3)
+  }))
 })

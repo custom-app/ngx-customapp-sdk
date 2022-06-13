@@ -34,7 +34,7 @@ export class JwtInterceptor<Credentials, AuthResponse, UserInfo, UserId = number
       throw new JwtInterceptorDropsReportProgress()
     }
     return this.jwtService
-      .freshJwt()
+      .freshJwt(false)
       .pipe(
         mergeMap(jwt => {
           if (jwt?.accessToken) {

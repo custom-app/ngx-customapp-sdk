@@ -48,7 +48,7 @@ export class JwtGuard<Credentials,
               return of(true)
             } else {
               return this.jwtService
-                .freshJwt()
+                .freshJwt(false)
                 .pipe(
                   mergeMap(jwt => {
                     const accessJwt = jwt?.accessToken

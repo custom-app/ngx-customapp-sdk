@@ -13,6 +13,7 @@ import {
   LoginAsMethodUnimplemented
 } from '../errors';
 import {JWT_CONFIG} from '../constants/di-token';
+import {JwtRefreshCall} from '../models/jwt-refresh-call';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +27,7 @@ export class JwtService<Credentials,
   // the stack to store master JWT when using loginAs
   private _jwtStash: JwtGroup<JwtInfo>[] = []
   private _refresh?: Subscription
-  private _waitingForRefresh: ((jwt: JwtGroup<JwtInfo>) => void)[] = []
+  private _waitingForRefresh: JwtRefreshCall[] = []
 
   constructor(
     private jwtApi: JwtApi<Credentials, AuthResponse, UserId>,
@@ -182,41 +183,55 @@ export class JwtService<Credentials,
    */
   withFreshJwt(callback: (jwt?: JwtGroup<JwtInfo>) => void, callWithFreshOnly?: boolean, doNotCallNoFreshJwt?: boolean): void {
     const jwt = this._jwt
+    this._waitingForRefresh.push({
+      callback,
+      callWithFreshOnly,
+      doNotCallNoFreshJwt
+    })
     const noFreshJwt = () => {
       this._deleteJwt()
-      if (!doNotCallNoFreshJwt) {
-        this.noFreshJwtListener.noFreshJwt()
-      }
-      if (!callWithFreshOnly) {
-        callback()
-      }
+      this._waitingForRefresh
+        .forEach(({callback, callWithFreshOnly, doNotCallNoFreshJwt}) => {
+          if (!doNotCallNoFreshJwt) {
+            this.noFreshJwtListener.noFreshJwt()
+          }
+          if (!callWithFreshOnly) {
+            callback()
+          }
+        })
+      this._waitingForRefresh = []
+    }
+    const freshJwt = (jwt: JwtGroup<JwtInfo>) => {
+      this
+        ._waitingForRefresh
+        .forEach(({callback}) => {
+          callback(jwt)
+        })
+      this._waitingForRefresh = []
     }
     if (!jwt?.refreshToken || isJwtExpired(jwt.refreshToken)) {
       noFreshJwt()
       return
     }
     if (!jwt.accessToken || isJwtExpired(jwt.accessToken)) {
-      this._waitingForRefresh.push(callback)
       if (!this._refresh) {
         this._refresh = this
           .jwtApi
           .refresh(jwt.refreshToken)
           .subscribe({
-            next: freshJwt => {
-              this._setJwt(freshJwt)
-              this
-                ._waitingForRefresh
-                .forEach(fn => fn(freshJwt))
-              this._waitingForRefresh = []
+            next: refreshed => {
               this._refresh = undefined
+              this._setJwt(refreshed)
+              freshJwt(refreshed)
             },
             error: () => {
+              this._refresh = undefined
               noFreshJwt()
             }
           })
       }
     } else {
-      callback(jwt)
+      freshJwt(jwt)
     }
   }
 
