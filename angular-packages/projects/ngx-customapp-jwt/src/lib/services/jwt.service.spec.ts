@@ -1,6 +1,5 @@
-import SpyObj = jasmine.SpyObj;
 import {JwtApi} from '../models/jwt-api';
-import {TestAuthResponse, TestCredentials, TestUserInfo} from '../tests/models.spec';
+import {JwtApiSpy, NoFreshJwtSpy, TestAuthResponse, TestCredentials, TestUserInfo} from '../tests/models.spec';
 import {NoFreshJwtListener} from '../models/no-fresh-jwt-listener';
 import createSpyObj = jasmine.createSpyObj;
 import {
@@ -20,10 +19,6 @@ import {defaultJwtStorageKey} from '../constants/jwt-storage-key';
 import {of, throwError} from 'rxjs';
 import {LoginAsApiMethodDoesNotHaveJwtInAuthResponse, LoginAsCalledWhenUnauthorized} from '../errors';
 import {JwtConfig} from '../models/jwt-config';
-
-// Required<> needed fot jasmine.Spy types inference to work on optional methods
-type JwtApiSpy = SpyObj<Required<JwtApi<TestCredentials, TestAuthResponse>>>
-type NoFreshJwtSpy = SpyObj<NoFreshJwtListener>
 
 describe('JwtService', () => {
   let jwtService: JwtService<TestCredentials, TestAuthResponse, TestUserInfo>
@@ -579,11 +574,9 @@ describe('JwtService', () => {
     let callbackCallCounter = 0
     jwtApi.refresh.and.returnValue(asyncError('some error'))
     jwtService.withFreshJwt(() => {
-      console.log('first callback')
       callbackCallCounter++
     })
     jwtService.withFreshJwt(() => {
-      console.log('second callback')
       callbackCallCounter++
     })
     tick()
@@ -592,7 +585,6 @@ describe('JwtService', () => {
     jwtService.login(testCreateCredentials()).subscribe()
     tick()
     jwtService.withFreshJwt(() => {
-      console.log('third callback')
       callbackCallCounter++
     })
     tick(100)

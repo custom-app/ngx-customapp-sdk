@@ -2,7 +2,7 @@ import {HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest} from 
 import {Inject, Injectable} from '@angular/core';
 import {JwtConfig} from '../models/jwt-config';
 import {JwtInfo} from '../models/jwt-info';
-import {mergeMap, Observable} from 'rxjs';
+import {mergeMap, Observable, throwError} from 'rxjs';
 import {disableJwtInterception} from '../constants/disable-jwt-interception';
 import {JwtInterceptorDropsReportProgress} from '../errors';
 import {JwtService} from '../services/jwt.service';
@@ -11,7 +11,7 @@ import {JWT_CONFIG} from '../constants/di-token';
 /**
  * An HttpInterceptor, that adds a header containing fresh JWT access token to every http request.
  * The header is configured by the {@link JwtConfig.authHeader}.
- * If no fresh JWT is available (refresh token expired), will make the request with expired JWT.
+ * If no fresh JWT is available (refresh token expired), will still make the request without JWT.
  */
 
 @Injectable()
@@ -31,7 +31,7 @@ export class JwtInterceptor<Credentials, AuthResponse, UserInfo, UserId = number
       return next.handle(req);
     }
     if (req.reportProgress) {
-      throw new JwtInterceptorDropsReportProgress()
+      return throwError(() => new JwtInterceptorDropsReportProgress())
     }
     return this.jwtService
       .freshJwt(false)
