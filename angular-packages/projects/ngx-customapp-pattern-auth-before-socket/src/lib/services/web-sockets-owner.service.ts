@@ -45,7 +45,7 @@ export class WebSocketsOwnerService<RequestType,
   }
 
   private _jwtAndUserInfo = (): Observable<[JwtGroup<JwtInfo> | undefined, UserInfo | undefined]> => this.jwtService
-    .freshJwt()
+    .freshJwt(false)
     .pipe(
       withLatestFrom(this.store.select(this.s.selectJwtUser))
     )
