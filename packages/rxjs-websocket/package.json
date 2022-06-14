@@ -10,16 +10,19 @@
   "repository": "https://github.com/loyal-inform/ngx-customapp-sdk.git",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --project tsconfig.lib.json",
     "prepare": "yarn build",
-    "watch": "tsc --watch",
+    "watch": "tsc --project tsconfig.lib.json --watch",
     "test": "karma start karma.conf.js"
   },
   "devDependencies": {
+    "@types/jasmine": "^4.0.3",
     "jasmine-core": "^4.0.1",
     "karma": "^6.3.17",
     "karma-chrome-launcher": "^3.1.0",
     "karma-jasmine": "^4.0.1",
+    "karma-jasmine-html-reporter": "^2.0.0",
+    "karma-typescript-preprocessor": "^0.4.0",
     "rxjs": "~7.5.0",
     "typescript": "^4.6.2"
   },

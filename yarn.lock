@@ -74,6 +74,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/jasmine@npm:^4.0.3":
+  version: 4.0.3
+  resolution: "@types/jasmine@npm:4.0.3"
+  checksum: 9d2af9ddb5750667bc9a3b439542fc9457c6eac2ab2c74801f598b03b9bc5cee1338fa8e75e6804dff1856e64539e8b0e3962ed8664a702f362d3db62eb9cd3a
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:>=10.0.0":
   version: 17.0.21
   resolution: "@types/node@npm:17.0.21"
@@ -399,10 +406,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "customapp-rxjs-websocket@workspace:packages/rxjs-websocket"
   dependencies:
+    "@types/jasmine": ^4.0.3
     jasmine-core: ^4.0.1
     karma: ^6.3.17
     karma-chrome-launcher: ^3.1.0
     karma-jasmine: ^4.0.1
+    karma-jasmine-html-reporter: ^2.0.0
+    karma-typescript-preprocessor: ^0.4.0
     rxjs: ~7.5.0
     typescript: ^4.6.2
   peerDependencies:
@@ -952,6 +962,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"karma-jasmine-html-reporter@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "karma-jasmine-html-reporter@npm:2.0.0"
+  peerDependencies:
+    jasmine-core: ^4.0.0
+    karma: ^6.0.0
+    karma-jasmine: ^5.0.0
+  checksum: ddc79c4bd7b94100975fc69b16947dacbf8f55f64b9eec7924e580f60fd041fa7600ec9577a0791f2bdffc0c5eb619e50bce4f9637c942f49cc8b88404016fbd
+  languageName: node
+  linkType: hard
+
 "karma-jasmine@npm:^4.0.1":
   version: 4.0.1
   resolution: "karma-jasmine@npm:4.0.1"
@@ -960,6 +981,15 @@ __metadata:
   peerDependencies:
     karma: "*"
   checksum: 28337c82941ed6c68e0c47ef432c2c91511214e84a336e78d9068daebd61a3c1cee6209207ddc5fe3ad78124597f58054b93aa0f973ff6dcc8a8fcd1951c9851
+  languageName: node
+  linkType: hard
+
+"karma-typescript-preprocessor@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "karma-typescript-preprocessor@npm:0.4.0"
+  dependencies:
+    typescript: ^3.0.3
+  checksum: 7b6daed7017bda4f4456b9ad06e9f9e7c7418f3cf2828bc63b0676864dc2f100e50678ad6ea68b694641835c29fa678c5a122733f8985edcc8de14e1db4a2f5d
   languageName: node
   linkType: hard
 
@@ -1724,6 +1754,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:^3.0.3":
+  version: 3.9.10
+  resolution: "typescript@npm:3.9.10"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 46c842e2cd4797b88b66ef06c9c41dd21da48b95787072ccf39d5f2aa3124361bc4c966aa1c7f709fae0509614d76751455b5231b12dbb72eb97a31369e1ff92
+  languageName: node
+  linkType: hard
+
 "typescript@npm:^4.6.2":
   version: 4.6.2
   resolution: "typescript@npm:4.6.2"
@@ -1731,6 +1771,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 8a44ed7e6f6c4cb1ebe8cf236ecda2fb119d84dcf0fbd77e707b2dfea1bbcfc4e366493a143513ce7f57203c75da9d4e20af6fe46de89749366351046be7577c
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@^3.0.3#~builtin<compat/typescript>":
+  version: 3.9.10
+  resolution: "typescript@patch:typescript@npm%3A3.9.10#~builtin<compat/typescript>::version=3.9.10&hash=bda367"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: dc7141ab555b23a8650a6787f98845fc11692063d02b75ff49433091b3af2fe3d773650dea18389d7c21f47d620fb3b110ea363dab4ab039417a6ccbbaf96fc2
   languageName: node
   linkType: hard
 

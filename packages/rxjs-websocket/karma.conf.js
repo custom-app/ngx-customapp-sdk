@@ -1,7 +1,7 @@
 // Karma configuration
 // Generated on Thu Mar 03 2022 22:38:34 GMT+0300 (Moscow Standard Time)
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -15,26 +15,28 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'src/**/*.ts',
-      'src/**/*.spec.ts'
+      'src/**/*.spec.ts',
     ],
 
 
     // list of files / patterns to exclude
-    exclude: [
-    ],
+    exclude: [],
 
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://www.npmjs.com/search?q=keywords:karma-preprocessor
     preprocessors: {
+      '**/*.ts': ['typescript']
     },
+
+    // https://www.npmjs.com/package/karma-typescript-preprocessor
+    typescriptPreprocessor: {},
 
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://www.npmjs.com/search?q=keywords:karma-reporter
-    reporters: ['progress'],
+    reporters: ['progress', 'kjhtml'],
 
 
     // web server port
