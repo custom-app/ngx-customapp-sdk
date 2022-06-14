@@ -9,8 +9,5 @@
   "out": "docs",
   "excludeInternal": true,
   "excludePrivate": true,
-  "excludeExternals": true,
-  "exclude": [
-    "**/*+(index|.spec|.e2e).ts"
-  ]
+  "excludeExternals": true
 }
