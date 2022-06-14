@@ -10,12 +10,22 @@ module.exports = function (config) {
 
     // frameworks to use
     // available frameworks: https://www.npmjs.com/search?q=keywords:karma-adapter
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', 'webpack'],
+
+    plugins: [
+      'karma-webpack',
+      'karma-jasmine',
+      'karma-chrome-launcher',
+      'karma-jasmine-html-reporter'
+    ],
 
 
     // list of files / patterns to load in the browser
     files: [
-      'src/**/*.spec.ts',
+      {
+        pattern: 'src/**/*.spec.ts',
+        watched: false,
+      },
     ],
 
 
@@ -26,40 +36,29 @@ module.exports = function (config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://www.npmjs.com/search?q=keywords:karma-preprocessor
     preprocessors: {
-      '**/*.ts': ['typescript']
+      'src/**/*.spec.ts': ['webpack']
     },
 
-    // https://www.npmjs.com/package/karma-typescript-preprocessor
-    typescriptPreprocessor: {
-      // copy of the tsconfig
-      options: {
-        "baseUrl": "./",
-        "forceConsistentCasingInFileNames": true,
-        "strict": true,
-        "noImplicitOverride": true,
-        "noPropertyAccessFromIndexSignature": true,
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
-        "sourceMap": true,
-        "declaration": true,
-        "downlevelIteration": true,
-        "experimentalDecorators": true,
-        "moduleResolution": "node",
-        "importHelpers": true,
-        "target": "es2017",
-        "module": "es2020",
-        "lib": [
-          "es2020",
-          "dom"
-        ]
+    // https://gist.github.com/cevek/d64f864ad6677a7f7e46915670a14664
+    webpack: {
+      resolve: {
+        extensions: ['.js', '.ts', '.tsx']
+      },
+      module: {
+        rules: [
+          {
+            test: /\.tsx?$/,
+            use: 'ts-loader',
+            exclude: /node_modules/,
+          },
+        ],
       },
     },
-
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://www.npmjs.com/search?q=keywords:karma-reporter
-    reporters: ['progress', 'kjhtml'],
+    reporters: ['progress'],
 
 
     // web server port
@@ -76,7 +75,7 @@ module.exports = function (config) {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+    autoWatch: false,
 
 
     // start these browsers
