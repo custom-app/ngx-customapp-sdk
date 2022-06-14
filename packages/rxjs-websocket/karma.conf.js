@@ -30,7 +30,30 @@ module.exports = function (config) {
     },
 
     // https://www.npmjs.com/package/karma-typescript-preprocessor
-    typescriptPreprocessor: {},
+    typescriptPreprocessor: {
+      // copy of the tsconfig
+      options: {
+        "baseUrl": "./",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "sourceMap": true,
+        "declaration": true,
+        "downlevelIteration": true,
+        "experimentalDecorators": true,
+        "moduleResolution": "node",
+        "importHelpers": true,
+        "target": "es2017",
+        "module": "es2020",
+        "lib": [
+          "es2020",
+          "dom"
+        ]
+      },
+    },
 
 
     // test results reporter to use

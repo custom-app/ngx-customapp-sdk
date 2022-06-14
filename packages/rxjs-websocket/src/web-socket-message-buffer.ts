@@ -18,7 +18,7 @@ export enum MessageRequirements {
 export class WebSocketMessageBuffer<RequestType, ResponseType> {
 
   constructor(
-    private readonly _config: WebSocketControllerConfig<RequestType, ResponseType>['buffer']
+    private readonly _config?: WebSocketControllerConfig<RequestType, ResponseType>['buffer']
   ) {
   }
 
