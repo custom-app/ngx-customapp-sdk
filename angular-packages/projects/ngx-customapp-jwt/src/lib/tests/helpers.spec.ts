@@ -2,7 +2,12 @@ import {TestAuthResponse, TestCredentials, TestUserInfo} from './models.spec';
 import {JwtGroup} from '../models/jwt-group';
 import {JwtInfo} from '../models/jwt-info';
 import {jwtExpirationGapMs} from '../constants/jwt-expiration';
-import {defer} from 'rxjs';
+import {defer, Observable} from 'rxjs';
+import {ActionCreator} from '@ngrx/store';
+import {Actions, ofType} from '@ngrx/effects';
+import Spy = jasmine.Spy;
+import createSpy = jasmine.createSpy;
+import {tick} from '@angular/core/testing';
 
 // all functions and constants prefixed with 'test'
 
@@ -70,10 +75,35 @@ export function testCreateCredentials(): TestCredentials {
   }
 }
 
-export function asyncData<T>(data:T) {
+export function asyncData<T>(data: T) {
   return defer(() => Promise.resolve(data))
 }
 
 export function asyncError<T>(error: T) {
   return defer(() => Promise.reject(error))
+}
+
+export function spyForAction(action: ActionCreator, actions$: Actions): Spy {
+  const spy = createSpy(action.type)
+  actions$.pipe(
+    ofType(action)
+  ).subscribe(instance => {
+    spy(instance)
+  })
+  return spy
+}
+
+export function tickObservable<T>(observable: Observable<T>, tickMs?: number): T {
+  let value: T;
+  let callCount = 0
+  observable.subscribe({
+    next: v => {
+      value = v;
+      callCount++;
+    }
+  })
+  tick(tickMs)
+  expect(callCount).toEqual(1)
+  // @ts-ignore
+  return value
 }
