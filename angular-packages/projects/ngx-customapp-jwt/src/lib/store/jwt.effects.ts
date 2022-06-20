@@ -2,7 +2,7 @@ import {Inject, Injectable} from '@angular/core';
 import {Actions, concatLatestFrom, createEffect, ofType} from '@ngrx/effects';
 import {Store} from '@ngrx/store'
 import {JwtActions} from './jwt.actions';
-import {catchError, map, mergeMap, of, throwError} from 'rxjs';
+import {catchError, exhaustMap, map, mergeMap, of, throwError} from 'rxjs';
 import {JwtService} from '../services/jwt.service'
 import {JwtConfig} from '../models/jwt-config';
 import {JwtSelectors} from './jwt.selectors';
@@ -26,7 +26,7 @@ export class JwtEffects<Credentials, AuthResponse, UserInfo, UserId = number> {
 
   loginAgain$ = createEffect(() => this.actions$.pipe(
     ofType(this.a.loginAgain),
-    mergeMap(({credentials}) =>
+    exhaustMap(({credentials}) =>
       this.jwtService
         .login(credentials)
         .pipe(
@@ -38,7 +38,7 @@ export class JwtEffects<Credentials, AuthResponse, UserInfo, UserId = number> {
 
   login$ = createEffect(() => this.actions$.pipe(
     ofType(this.a.login),
-    mergeMap(({credentials}) =>
+    exhaustMap(({credentials}) =>
       this.jwtService
         .login(credentials)
         .pipe(
@@ -50,7 +50,7 @@ export class JwtEffects<Credentials, AuthResponse, UserInfo, UserId = number> {
 
   loginAs$ = createEffect(() => this.actions$.pipe(
     ofType(this.a.loginAs),
-    mergeMap(({userId}) =>
+    exhaustMap(({userId}) =>
       this.jwtService
         .loginAs(userId)
         .pipe(
@@ -62,7 +62,7 @@ export class JwtEffects<Credentials, AuthResponse, UserInfo, UserId = number> {
 
   logout$ = createEffect(() => this.actions$.pipe(
     ofType(this.a.logout),
-    mergeMap(({fromAllDevices}) =>
+    exhaustMap(({fromAllDevices}) =>
       this.jwtService
         .logout(fromAllDevices)
         .pipe(
