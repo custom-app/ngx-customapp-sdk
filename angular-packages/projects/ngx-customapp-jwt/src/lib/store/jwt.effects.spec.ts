@@ -259,7 +259,7 @@ describe('JwtEffects', () => {
     expect(jwtService.login).toHaveBeenCalledOnceWith(credentials)
     expect(spyForLoginAgainSucceed).toHaveBeenCalledOnceWith(a.loginAgainSucceed({response: authResp}))
   }))
-  xit('should loginAs multiple times and logout back to user', fakeAsync(() => {
+  it('should loginAs multiple times and logout back to user', fakeAsync(() => {
     login()
 
     const user = selectOnce(s.selectJwtUser)
@@ -290,30 +290,39 @@ describe('JwtEffects', () => {
 
     spyForLoginAsSucceed.calls.reset()
     jwtService.loginAs.calls.reset()
+    checkLoginAs(user1)
 
-    const checkLogout = (equalUser: TestUserInfo | undefined) => {
+    const checkLogout = (equalUser: TestUserInfo | undefined, msg: string) => {
       store.dispatch(a.logout({}))
       tick()
 
-      expect(jwtService.logout).toHaveBeenCalledTimes(1)
-      const user3 = selectOnce(s.selectJwtUser)
-      expect(user3).toEqual(equalUser) // user should be retrieved from the stash
+      expect(jwtService.logout)
+        .withContext(msg)
+        .toHaveBeenCalledTimes(1)
+      const userAfterLogout = selectOnce(s.selectJwtUser)
+      expect(userAfterLogout)
+        .withContext(msg)
+        .toEqual(equalUser) // user should be retrieved from the stash
       const logoutInProcess = selectOnce(s.selectJwtLogoutInProcess)
-      expect(logoutInProcess).toBeFalse()
-      expect(spyForLogoutSucceed).toHaveBeenCalledOnceWith(a.logoutSucceed())
+      expect(logoutInProcess)
+        .withContext(msg)
+        .toBeFalse()
+      expect(spyForLogoutSucceed)
+        .withContext(msg)
+        .toHaveBeenCalledOnceWith(a.logoutSucceed())
     }
 
     // logout from the deepest user
 
     const spyForLogoutSucceed = spyForAction(a.logoutSucceed, actions$)
     jwtService.logout.and.returnValue(of(void 0))
-    checkLogout(user1)
+    checkLogout(user1, 'logout from the deepest user')
 
-    // logout back to master user
+    // logout back to the master user
 
     spyForLogoutSucceed.calls.reset()
     jwtService.logout.calls.reset()
-    checkLogout(user)
+    checkLogout(user, 'logout back to the master user')
 
     // logout from master user
     spyForLogoutSucceed.calls.reset()
