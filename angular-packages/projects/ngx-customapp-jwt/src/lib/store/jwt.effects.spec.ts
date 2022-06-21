@@ -52,6 +52,16 @@ describe('JwtEffects', () => {
     tick()
   }
 
+  const loginAs = (): TestUserInfo | undefined => {
+    const authResp1 = testCreateAuthResponse(true)
+    jwtService.loginAs.and.returnValue(of(authResp1))
+    store.dispatch(a.loginAs({userId: 10}))
+    tick()
+    const user = selectOnce(s.selectJwtUser)
+    expect(user).toEqual(testAuthResponseToUserInfo(authResp1))
+    return user
+  }
+
   const logout = () => {
     jwtService.logout.and.returnValue(of(void 0))
     store.dispatch(a.logout({fromAllDevices: true}))
@@ -334,6 +344,36 @@ describe('JwtEffects', () => {
     const loginAsInProcess = selectOnce(s.selectJwtLoginAsInProcess)
     expect(loginAsInProcess).toBeFalse()
   }))
-  xit('should error loginAs when logging in from slave user')
-  xit('should error logout after loginAs')
+  it('should error loginAs when logging in from slave user', fakeAsync(() => {
+    login()
+    const user = loginAs()
+
+    const userId = 20
+    const spyForLoginAsErrored = spyForAction(a.loginAsErrored, actions$)
+    const error = 'unknown error'
+    jwtService.loginAs.calls.reset()
+    jwtService.loginAs.and.returnValue(throwError(() => error))
+    store.dispatch(a.loginAs({userId}))
+    expect(spyForLoginAsErrored).toHaveBeenCalledOnceWith(a.loginAsErrored({error}))
+    const user2 = selectOnce(s.selectJwtUser)
+    expect(user2).toEqual(user)
+    const loginAsInProcess = selectOnce(s.selectJwtLoginAsInProcess)
+    expect(loginAsInProcess).toBeFalse()
+    const loginInProcess = selectOnce(s.selectJwtLoginInProcess)
+    expect(loginInProcess).toBeFalse()
+  }))
+  it('should error logout after loginAs', fakeAsync(() => {
+    login()
+    const user = loginAs()
+
+    const spyForLogoutErrored = spyForAction(a.logoutErrored, actions$)
+    const error = 'unknown error'
+    jwtService.logout.and.returnValue(throwError(() => error))
+    store.dispatch(a.logout({}))
+    expect(spyForLogoutErrored).toHaveBeenCalledOnceWith(a.logoutErrored({error}))
+    const user2 = selectOnce(s.selectJwtUser)
+    expect(user2).toEqual(user)
+    const logoutInProcess = selectOnce(s.selectJwtLogoutInProcess)
+    expect(logoutInProcess).toBeFalse()
+  }))
 })
