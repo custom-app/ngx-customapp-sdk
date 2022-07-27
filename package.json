@@ -8,9 +8,13 @@
   ],
   "scripts": {
     "doc": "typedoc",
-    "watch": "yarn workspaces foreach -piv run watch",
-    "build": "yarn workspaces foreach -piv run build",
-    "set-version": "node version.mjs"
+    "foreach": "yarn workspaces foreach -iv --exclude ngx-customapp-sdk",
+    "watch-pkg": "yarn foreach -p run watch",
+    "build-pkg": "yarn foreach -p run build",
+    "publish-pkg": "yarn foreach npm publish --tolerate-republish",
+    "set-version": "node version.mjs",
+    "build": "yarn build-pkg && cd angular-packages && yarn build",
+    "publish": "yarn publish-pkg && cd angular-packages && yarn publish"
   },
   "license": "MIT",
   "private": true,
