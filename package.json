@@ -9,7 +9,8 @@
   "scripts": {
     "doc": "typedoc",
     "watch": "yarn workspaces foreach -piv run watch",
-    "build": "yarn workspaces foreach -piv run build"
+    "build": "yarn workspaces foreach -piv run build",
+    "set-version": "node version.mjs"
   },
   "license": "MIT",
   "private": true,

@@ -1,3 +1,10 @@
+/**
+ * Sets the version in all packages, according to the repo package structure.
+ *
+ * ```bash
+ * node version 1.1.1
+ * ```
+ */
 import * as fs from 'node:fs/promises'
 
 const foldersWithProjects = [
