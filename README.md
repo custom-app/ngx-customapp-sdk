@@ -130,10 +130,86 @@ Implemented flow:
 
 ## Initial setup
 
-Install deps for non-angular packages
+Install deps for non-angular packages.
 
-```bash
+```shell
 yarn
 ```
 
+Install deps for angular packages.
 
+```shell
+cd angular-packages
+yarn
+```
+
+Build all packages.
+
+```shell
+# go to the project root
+cd ..
+yarn build
+```
+
+## Tests
+
+Running tests in watch mode is only available per single package.
+For example, customapp-rxjs-websocket
+
+```shell
+cd packages/rxjs-websocket
+yarn test
+```
+
+To run the tests for all packages once, use this command.
+
+```shell
+yarn test-ci
+```
+
+## Publishing
+
+To set version of all packages to 1.2.3, run
+
+```shell
+yarn set-version 1.2.3
+```
+
+To publish all packages, run
+
+```shell
+yarn publish
+```
+
+## Adding a new Angular package
+
+Create a new library in the Angular workspace. Package name should be prefixed with `ngx-customapp-`
+
+```shell
+cd angular-packages
+ng g library ngx-customapp-jwt
+```
+
+Add watch:pkg, build:pkg and test:pkg scripts to package.json
+
+```json
+{
+  "scripts": {
+    "watch:jwt": "yarn build:jwt --watch --configuration=development",
+    "build:jwt": "ng build ngx-customapp-jwt",
+    "test:jwt": "ng test ngx-customapp-jwt"
+  }
+}
+```
+
+Modify common build script, by adding `&& yarn build:pkg && yarn`
+
+```json
+{
+  "scripts": {
+    "build": "/* ... old command */ && yarn build:jwt && yarn",
+  }
+}
+```
+
+Done! All other common scripts should just work.
