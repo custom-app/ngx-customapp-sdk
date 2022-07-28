@@ -125,3 +125,15 @@ Implemented flow:
 - Optionally more sockets are opened and more auth and subscription messages are sent.
 - The user can log out, logout from every device, maybe log in as another user.
 - After logout all the sockets are closed.
+
+# Development
+
+## Initial setup
+
+Install deps for non-angular packages
+
+```bash
+yarn
+```
+
+
