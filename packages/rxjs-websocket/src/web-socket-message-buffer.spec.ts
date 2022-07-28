@@ -14,7 +14,7 @@ describe('WebSocketMessageBuffer', () => {
     const requests: TestRequestType[] = []
     for (let i = 0; i < defaultWebSocketMessageBufferSize; i++) {
       const req = testCreateRequest()
-      requests.push(req)
+      requests.unshift(req)
       buffer.addAny(req)
     }
     expect(buffer.removeAny()).toEqual(requests)
@@ -24,9 +24,9 @@ describe('WebSocketMessageBuffer', () => {
     const requests: TestRequestType[] = []
     for (let i = 0; i < defaultWebSocketMessageBufferSize + 1; i++) {
       const req = testCreateRequest()
-      requests.push(req)
+      requests.unshift(req)
       buffer.addAny(req)
     }
-    expect(buffer.removeAny()).toEqual(requests.slice(1))
+    expect(buffer.removeAny()).toEqual(requests.slice(0, requests.length - 1))
   })
 })
