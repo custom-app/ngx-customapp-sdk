@@ -57,6 +57,7 @@ export class RequestService<RequestType, ResponseType> {
    *
    * Example:
    * ```typescript
+   * @Injectable()
    * export class MenuService {
    *
    *   constructor(
@@ -65,8 +66,8 @@ export class RequestService<RequestType, ResponseType> {
    *
    *   getCategoryList(): Observable<CategoryListResponse.AsObject> {
    *     return this.request.request(
-   *     baseUrl + '/category/list', // instance of
-   *     {categories: {}} // instance of the RequestAsObject
+   *     baseUrl + '/category/list',
+   *     {categories: {}} // instance of the Request.AsObject
    *     ).pipe(map(resp => resp.categories!))
    *   }
    * }
