@@ -51,5 +51,8 @@
     "karma-jasmine-html-reporter": "~1.7.0",
     "ng-packagr": "^13.0.0",
     "typescript": "~4.5.2"
+  },
+  "resolutions": {
+    "rxjs": "file:../node_modules/rxjs"
   }
 }

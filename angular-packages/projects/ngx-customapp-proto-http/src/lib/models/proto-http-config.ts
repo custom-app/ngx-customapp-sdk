@@ -21,7 +21,19 @@
  * Use RequestService to make requests.
  *
  * ```typescript
+ * export class MenuService {
  *
+ *   constructor(
+ *     private request: RequestService<Request.AsObject, Response.AsObject>,
+ *   ) {}
+ *
+ *   getCategoryList(): Observable<CategoryListResponse.AsObject> {
+ *     return this.request.request(
+ *     baseUrl + '/category/list', // instance of
+ *     {categories: {}} // instance of the RequestAsObject
+ *     ).pipe(map(resp => resp.categories!))
+ *   }
+ * }
  * ```
  *
  * Add VersionInterceptor to the app.module providers, if you wish.

@@ -52,6 +52,31 @@ export class RequestService<RequestType, ResponseType> {
     )
   }
 
+  /**
+   * Makes an http request.
+   *
+   * Example:
+   * ```typescript
+   * export class MenuService {
+   *
+   *   constructor(
+   *     private request: RequestService<Request.AsObject, Response.AsObject>,
+   *   ) {}
+   *
+   *   getCategoryList(): Observable<CategoryListResponse.AsObject> {
+   *     return this.request.request(
+   *     baseUrl + '/category/list', // instance of
+   *     {categories: {}} // instance of the RequestAsObject
+   *     ).pipe(map(resp => resp.categories!))
+   *   }
+   * }
+   * ```
+   *
+   * @param endpoint A destination for the request.
+   * @param req The request body. Passed to the {@link ProtoHttpConfig.serializer} before sending the request.
+   * @param headers Some headers. For auth header it is recommended to use AuthInterceptor from ngx-customapp-jwt.
+   * @param disableAuth Disables AuthInterceptor from ngx-customapp-jwt.
+   */
   request(endpoint: string, req?: RequestType, headers?: HttpHeaders, disableAuth?: boolean): Observable<ResponseType> {
     return this._requestArrayBuffer(endpoint, req, headers, disableAuth)
       .pipe(
@@ -61,8 +86,11 @@ export class RequestService<RequestType, ResponseType> {
       )
   }
 
-  requestFile(endpoint: string, headers?: HttpHeaders, req?: RequestType): Observable<File> {
-    return this._requestBlob(endpoint, req).pipe(
+  /**
+   * Some as {@link request}, but expects response to be a file.
+   */
+  requestFile(endpoint: string, req?: RequestType, headers?: HttpHeaders, disableAuth?: boolean): Observable<File> {
+    return this._requestBlob(endpoint, req, headers, disableAuth).pipe(
       switchMap(response => {
         const disposition = response.headers.get('Content-Disposition')
         const type = response.headers.get('Content-Type')

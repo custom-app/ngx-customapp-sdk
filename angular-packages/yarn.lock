@@ -6533,6 +6533,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"ngx-customapp-pattern-auth-before-socket@workspace:dist/ngx-customapp-pattern-auth-before-socket":
+  version: 0.0.0-use.local
+  resolution: "ngx-customapp-pattern-auth-before-socket@workspace:dist/ngx-customapp-pattern-auth-before-socket"
+  dependencies:
+    tslib: ^2.3.0
+  peerDependencies:
+    "@angular/common": ^13.2.0
+    "@angular/core": ^13.2.0
+    customapp-rxjs-websocket: "*"
+    ngx-customapp-errors: "*"
+    ngx-customapp-jwt: "*"
+  languageName: unknown
+  linkType: soft
+
 "ngx-customapp-proto-http@workspace:dist/ngx-customapp-proto-http":
   version: 0.0.0-use.local
   resolution: "ngx-customapp-proto-http@workspace:dist/ngx-customapp-proto-http"
@@ -8051,21 +8065,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rxjs@npm:6.6.7":
-  version: 6.6.7
-  resolution: "rxjs@npm:6.6.7"
-  dependencies:
-    tslib: ^1.9.0
-  checksum: bc334edef1bb8bbf56590b0b25734ba0deaf8825b703256a93714308ea36dff8a11d25533671adf8e104e5e8f256aa6fdfe39b2e248cdbd7a5f90c260acbbd1b
-  languageName: node
-  linkType: hard
-
-"rxjs@npm:^7.0.0, rxjs@npm:^7.2.0, rxjs@npm:~7.5.0":
-  version: 7.5.5
-  resolution: "rxjs@npm:7.5.5"
+"rxjs@file:../node_modules/rxjs::locator=angular-packages%40workspace%3A.":
+  version: 7.5.6
+  resolution: "rxjs@file:../node_modules/rxjs#../node_modules/rxjs::hash=0c13b3&locator=angular-packages%40workspace%3A."
   dependencies:
     tslib: ^2.1.0
-  checksum: e034f60805210cce756dd2f49664a8108780b117cf5d0e2281506e9e6387f7b4f1532d974a8c8b09314fa7a16dd2f6cff3462072a5789672b5dcb45c4173f3c6
+  checksum: 99154bee14b86698b8fda03607a685e4915983cb793a5e396ef2e20467f22362e80f169261c6d068eafaaa399259c695dfec98ab4034ab0a53b2b837e012c9c2
   languageName: node
   linkType: hard
 
@@ -8839,13 +8844,6 @@ __metadata:
   version: 2.3.1
   resolution: "tslib@npm:2.3.1"
   checksum: de17a98d4614481f7fcb5cd53ffc1aaf8654313be0291e1bfaee4b4bb31a20494b7d218ff2e15017883e8ea9626599b3b0e0229c18383ba9dce89da2adf15cb9
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^1.9.0":
-  version: 1.14.1
-  resolution: "tslib@npm:1.14.1"
-  checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
   languageName: node
   linkType: hard
 
