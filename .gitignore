@@ -4,7 +4,7 @@ npm-debug.log
 yarn-error.log
 
 # for hook
-.precommit-lock
+.prepush-lock
 
 # IDEs and editors
 .idea/
