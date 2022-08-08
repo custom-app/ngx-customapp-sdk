@@ -8,6 +8,8 @@ import {disableJwtInterception} from 'ngx-customapp-jwt';
 import {protobufHeader} from '../constants/proto-header';
 import {createResponseHandlerPipe, handleArrayBufferBody, handleBlobBody} from '../utils/response-handlers';
 import {switchMap} from 'rxjs/operators';
+import {RequestOptions} from '../models/request-options';
+import {disableVersionInterception} from '../constants/disable-version-interception';
 
 @Injectable({
   providedIn: 'root'
@@ -26,28 +28,33 @@ export class RequestService<RequestType, ResponseType> {
     this.handleProtoArrayBufferResponse = createResponseHandlerPipe(handleArrayBufferBody, config.deserializer, config.isErrorResponse)
   }
 
-  private _requestBlob(endpoint: string, req?: RequestType, headers?: HttpHeaders, disableAuth?: boolean): Observable<HttpResponse<Blob>> {
+  private _requestBlob(endpoint: string, req?: RequestType, options?: RequestOptions): Observable<HttpResponse<Blob>> {
     return this.http.post(
       endpoint,
       req ? this.config.serializer(req) : null,
       {
-        headers: (headers || new HttpHeaders()).set(protobufHeader.name, protobufHeader.value),
+        headers: (options?.headers || new HttpHeaders())
+          .set(protobufHeader.name, protobufHeader.value),
         observe: 'response',
         responseType: 'blob',
-        context: new HttpContext().set(disableJwtInterception, !!disableAuth)
+        context: new HttpContext()
+          .set(disableJwtInterception, !!options?.disableAuth)
+          .set(disableVersionInterception, !!options?.disableVersion)
       }
     )
   }
 
-  private _requestArrayBuffer(endpoint: string, req?: RequestType, headers?: HttpHeaders, disableAuth?: boolean): Observable<HttpResponse<ArrayBuffer>> {
+  private _requestArrayBuffer(endpoint: string, req?: RequestType, options?: RequestOptions): Observable<HttpResponse<ArrayBuffer>> {
     return this.http.post(
       endpoint,
       req ? this.config.serializer(req) : null,
       {
-        headers: (headers || new HttpHeaders()).set(protobufHeader.name, protobufHeader.value),
+        headers: (options?.headers || new HttpHeaders()).set(protobufHeader.name, protobufHeader.value),
         observe: 'response',
         responseType: 'arraybuffer',
-        context: new HttpContext().set(disableJwtInterception, !!disableAuth)
+        context: new HttpContext()
+          .set(disableJwtInterception, !!options?.disableAuth)
+          .set(disableVersionInterception, !!options?.disableVersion)
       }
     )
   }
@@ -75,11 +82,10 @@ export class RequestService<RequestType, ResponseType> {
    *
    * @param endpoint A destination for the request.
    * @param req The request body. Passed to the {@link ProtoHttpConfig.serializer} before sending the request.
-   * @param headers Some headers. For auth header it is recommended to use AuthInterceptor from ngx-customapp-jwt.
-   * @param disableAuth Disables AuthInterceptor from ngx-customapp-jwt.
+   * @param options {@link RequestOptions}
    */
-  request(endpoint: string, req?: RequestType, headers?: HttpHeaders, disableAuth?: boolean): Observable<ResponseType> {
-    return this._requestArrayBuffer(endpoint, req, headers, disableAuth)
+  request(endpoint: string, req?: RequestType, options?: RequestOptions): Observable<ResponseType> {
+    return this._requestArrayBuffer(endpoint, req, options)
       .pipe(
         this.handleProtoArrayBufferResponse,
         catchError(this.errorsService.reportError),
@@ -90,8 +96,8 @@ export class RequestService<RequestType, ResponseType> {
   /**
    * Some as {@link request}, but expects response to be a file.
    */
-  requestFile(endpoint: string, req?: RequestType, headers?: HttpHeaders, disableAuth?: boolean): Observable<File> {
-    return this._requestBlob(endpoint, req, headers, disableAuth).pipe(
+  requestFile(endpoint: string, req?: RequestType, options?: RequestOptions): Observable<File> {
+    return this._requestBlob(endpoint, req, options).pipe(
       switchMap(response => {
         const disposition = response.headers.get('Content-Disposition')
         const type = response.headers.get('Content-Type')
