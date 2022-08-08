@@ -1,6 +1,7 @@
 {
   "name": "ngx-customapp-sdk",
   "packageManager": "yarn@3.2.0",
+  "version": "1.1.1",
   "description": "SDK allowing you to quickly setup authorization and websocket life cycle in an Angular app. Some utils are also included",
   "repository": "https://github.com/loyal-inform/ngx-customapp-sdk.git",
   "workspaces": [
