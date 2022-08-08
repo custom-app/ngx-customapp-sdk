@@ -90,7 +90,7 @@ deserialization.
 This package:
 
 - Is an Angular package.
-- Depends on ngx-customapp-errors
+- Depends on ngx-customapp-errors and ngx-customapp-jwt (integration with authorization).
 - Based on RxJs.
 - Provides `RequestService` for sending http request.
 - Optional version interceptor, to add a version header to every http request.
