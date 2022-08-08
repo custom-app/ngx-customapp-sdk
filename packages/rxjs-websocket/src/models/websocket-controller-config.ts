@@ -17,6 +17,8 @@ import {Observable} from 'rxjs';
  *
  * ## Usage
  *
+ * TODO: how to use.
+ *
  * @typeParam RequestType The type of messages, that will be consumed
  * by {@link WebSocketController.send} and {@link WebSocketController.request} methods.
  * @typeParam ResponseType The type, of messages, that will be produced by {@link WebSocketController.messages$} observable.

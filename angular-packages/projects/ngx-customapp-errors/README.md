@@ -1,4 +1,4 @@
-## ngx-customapp-errors
+### ngx-customapp-errors
 
 A package for handling errors according to our own conventions.
 

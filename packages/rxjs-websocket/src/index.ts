@@ -1,3 +1,14 @@
+/**
+ * Install
+ * ```sh
+ * yarn add customapp-rxjs-websocket
+ * ```
+ *
+ * The documentation is not complete, but main points are stated here {@link WebSocketControllerConfig}
+ * @module customapp-rxjs-websocket
+ */
+
+
 export {
   WebSocketController,
   defaultRequestTimeout,

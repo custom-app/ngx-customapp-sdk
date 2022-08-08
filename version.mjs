@@ -1,7 +1,7 @@
 /**
  * Sets the version in all packages, according to the repo package structure.
  *
- * ```bash
+ * ```sh
  * node version 1.1.1
  * ```
  */
