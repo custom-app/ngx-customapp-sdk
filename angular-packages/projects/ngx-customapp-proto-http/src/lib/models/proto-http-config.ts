@@ -37,7 +37,7 @@
  * }
  * ```
  *
- * Add VersionInterceptor to the app.module providers, if you wish.
+ * Add {@link VersionInterceptor} to the app.module providers, if you wish.
  *
  * ```typescript
  * @NgModule({
@@ -73,7 +73,7 @@ export interface ProtoHttpConfig<RequestType, ResponseType> {
    */
   isErrorResponse?: (response: ResponseType) => boolean,
   /**
-   * If provided, will be used by
+   * If provided, will be used by {@link VersionInterceptor}
    */
   versionHeader?: {
     name: string,

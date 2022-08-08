@@ -1,4 +1,13 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-yarn doc
+lockfile=.precommit-lock
+echo "precommit"
+if [ ! -e $lockfile ]
+then
+  echo "no lock file"
+  touch $lockfile
+  yarn doc
+  git commit --amend --no-edit
+  rm -f $lockfile
+fi
