@@ -213,3 +213,32 @@ Modify common build script, by adding `&& yarn build:pkg && yarn`
 ```
 
 Done! All other common scripts should just work.
+
+## Debug
+
+To reproduce and fix an error, you need to link local version of the ngx-customapp-sdk with a reproduction app.
+To do so, the app needs to use yarn 2, because of new `portal:` [protocol](https://dev.to/arcanis/introducing-yarn-2-4eh1#new-protocol-raw-portal-endraw-).
+[Yarn migration docs](https://yarnpkg.com/getting-started/migration).
+
+Suppose your local ngx-customapp-sdk version is located in `~/WebstormProjects/ngx-customapp-sdk`.
+
+Register packages from ngx-customapp-sdk for use in the app.
+
+```sh
+yarn link --all ~/WebstormProjects/ngx-customapp-sdk
+yarn link --all ~/WebstormProjects/ngx-customapp-sdk/angular-packages/
+```
+
+Add preserveSymlink option to the `tsconfig.json`. This allows Typescript to properly resolve dependencies and 
+peer dependencies of the linked packages.
+
+```json
+{
+  "compilerOptions": {
+    "preserveSymlinks": true
+  }
+}
+
+```
+
+Run the app and debug with pleasure (impossible).
