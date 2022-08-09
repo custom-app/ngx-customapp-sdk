@@ -1,4 +1,20 @@
 /**
+ *
+ * Implemented flow:
+ *
+ * The user logs in.
+ * An http request with user credentials is sent to the backend.
+ * An http response with JWT and maybe user info is received.
+ * JWT tokens being saved and included in headers of every request (except explicitly stated).
+ * The socket opened.
+ * An optional auth request is sent in the socket.
+ * An auth response received from the socket.
+ * Optional Subscription requests are sent in the socket.
+ * Subscription responses received from the socket.
+ * Optionally more sockets are opened and more auth and subscription messages are sent.
+ * The user can log out, logout from every device, maybe log in as another user.
+ * After logout all the sockets are closed.
+ *
  * ### Usage
  *
  * Install
