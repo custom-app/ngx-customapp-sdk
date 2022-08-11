@@ -3,7 +3,7 @@
 Connects together rxjs-websocket and jwt packages to implement pattern "Auth before an authorized or unauthorized
 socket".
 
-[Documentation starts here](https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_pattern_auth_before_socket_src_public_api.WebSocketChain.html)
+[Documentation starts here](https://custom-app.github.io/ngx-customapp-sdk/modules/ngx_customapp_pattern_auth_before_socket.html)
 
 A part of the [ngx-customapp-sdk](https://custom-app.github.io/ngx-customapp-sdk/).
 

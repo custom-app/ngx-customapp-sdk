@@ -1,6 +1,6 @@
 {
   "name": "customapp-rxjs-websocket",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "A package for a websocket life cycle management. Not only for angular",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

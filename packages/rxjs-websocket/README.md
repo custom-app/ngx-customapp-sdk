@@ -2,7 +2,7 @@
 
 A package for a websocket life cycle management.
 
-[Documentation starts here](https://custom-app.github.io/ngx-customapp-sdk/interfaces/packages_rxjs_websocket_src.WebSocketControllerConfig.html)
+[Documentation starts here](https://custom-app.github.io/ngx-customapp-sdk/modules/customapp_rxjs_websocket.html)
 
 A part of the [ngx-customapp-sdk](https://custom-app.github.io/ngx-customapp-sdk/).
 

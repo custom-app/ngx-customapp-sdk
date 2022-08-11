@@ -2,7 +2,7 @@
 
 A package for an authorization and a JWT management.
 
-[Documentation starts here](https://custom-app.github.io/ngx-customapp-sdk/interfaces/angular_packages_projects_ngx_customapp_jwt_src_public_api.JwtConfig.html)
+[Documentation starts here](https://custom-app.github.io/ngx-customapp-sdk/modules/ngx_customapp_jwt.html)
 
 A part of the [ngx-customapp-sdk](https://custom-app.github.io/ngx-customapp-sdk/).
 

@@ -126,6 +126,50 @@ Implemented flow:
 - The user can log out, logout from every device, maybe log in as another user.
 - After logout all the sockets are closed.
 
+# Example
+
+Suppose you have an Angular + NgRx app using protocol buffers for communication with backend.
+The app has login/password authorization and uses websockets to handle updates and send some requests.
+
+Suppose your proto3 description of the api messages looks like this:
+```
+message Request {
+  uint64 id = 1;  // id запроса
+  reserved 2, 3, 4, 9;
+  oneof data {
+    option (validate.required) = true;
+    CheckVersionRequest check_version = 5 [(validate.rules).message.required = true];  // проверка версии
+    AuthCodeRequest auth_code = 6 [(validate.rules).message.required = true];  // запрос смс-кода авторизации
+    AuthRequest auth = 7 [(validate.rules).message.required = true];  // авторизация
+    SocketAuthRequest socket_auth = 8 [(validate.rules).message.required = true];  // авторизация WS
+    ClientListRequest clients = 10 [(validate.rules).message.required = true];  // список клиентов
+    ClientUpdateRequest client_update = 11 [(validate.rules).message.required = true];  // редактирование клиента
+    ClientAddressListRequest client_addresses = 12 [(validate.rules).message.required = true];  // список адресов
+    ClientAddressAddRequest client_address_add = 13 [(validate.rules).message.required = true];  // добавление адреса
+    ClientAddressUpdateRequest client_address_update = 14 [(validate.rules).message.required = true];  // редактирование адреса
+    ClientAddressDeleteRequest  client_address_delete = 15 [(validate.rules).message.required = true];  // удаление адреса
+    CategoryListRequest categories = 16 [(validate.rules).message.required = true];  // список категорий
+    CategoryAddRequest category_add = 17 [(validate.rules).message.required = true];   // добавление категории
+    CategoryUpdateRequest category_update = 18 [(validate.rules).message.required = true];   // редактирование категории
+    CategoryDeleteRequest category_delete = 19 [(validate.rules).message.required = true];   // удаление категории
+    MenuListRequest menu = 20 [(validate.rules).message.required = true];      // список анализов
+    MenuAddRequest menu_add = 21 [(validate.rules).message.required = true];   // добавление анализа
+    MenuUpdateRequest menu_update = 22 [(validate.rules).message.required = true];   // редактирование анализа
+    MenuDeleteRequest menu_delete = 23 [(validate.rules).message.required = true];   // удаление анализа
+    CartInfoRequest cart = 24 [(validate.rules).message.required = true];   // корзина
+    CartUpdateRequest cart_update = 25 [(validate.rules).message.required = true];  // редактирование корзины
+    OrderListRequest orders = 26 [(validate.rules).message.required = true];  // список заказов
+    OrderAddRequest order_add = 27 [(validate.rules).message.required = true];  // добавление заказа
+    OrderUpdateRequest order_update = 28 [(validate.rules).message.required = true];  // редактирование заказа
+    PageConfigRequest page_config = 29 [(validate.rules).message.required = true];  // конфиг постраничного вывода
+    ConfigUpdateRequest config_update = 30 [(validate.rules).message.required = true]; // редактирование конфига
+    BugReportRequest bug_report = 31 [(validate.rules).message.required = true]; // баг репорт
+    SubscribeRequest sub = 32 [(validate.rules).message.required = true];  // подписка
+    UnsubscribeRequest unsub = 33 [(validate.rules).message.required = true];  // отписка
+  }
+}
+```
+
 # Development
 
 ## Initial setup
