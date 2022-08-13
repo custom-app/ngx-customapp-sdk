@@ -141,7 +141,7 @@ export interface WebSocketControllerConfig<RequestType, ResponseType, Underlying
    * Sets the `binaryType` property of the underlying WebSocket.
    * if UnderlyingDataType type param is set to be `string`, and you communicate with server through text frames,
    * this parameter does not matter.
-   * If UnderlyingDataType type param is set to be `ArrayBuffer` , binaryType must be `'blob'`.
+   * If UnderlyingDataType type param is set to be `Blob` , binaryType must be `'blob'`.
    * If set to be `ArrayBuffer`, binaryType must be `'arraybuffer'`
    */
   binaryType?: 'blob' | 'arraybuffer';
