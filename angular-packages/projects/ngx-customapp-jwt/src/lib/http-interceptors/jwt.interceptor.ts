@@ -7,6 +7,7 @@ import {disableJwtInterception} from '../constants/disable-jwt-interception';
 import {JwtInterceptorDropsReportProgress} from '../errors';
 import {JwtService} from '../services/jwt.service';
 import {JWT_CONFIG} from '../constants/di-token';
+import {urlExcluded} from '../utils/url-excluded';
 
 /**
  * An HttpInterceptor, that adds a header containing fresh JWT access token to every http request.
@@ -24,7 +25,10 @@ export class JwtInterceptor<Credentials, AuthResponse, UserInfo, UserId = number
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (req.context.get(disableJwtInterception)) {
-      return next.handle(req);
+      return next.handle(req)
+    }
+    if (urlExcluded(req.url, this.config.excludeUrls)) {
+      return next.handle(req)
     }
     // do not override existing header
     if (req.headers.has(this.config.authHeader.name)) {

@@ -27,6 +27,12 @@ export interface JwtConfig<Credentials,
     createValue: (jwt: JwtInfo) => string,
   },
   /**
+   * Urls, which will not be intercepted.
+   * If string, the url should start with that string to be excluded.
+   * If RegExp, the url will be tested with .match and excluded if matches.
+   */
+  excludeUrls?: (string | RegExp)[]
+  /**
    * Provides methods to interact with backend. Must implement {@link JwtApi}.
    */
   jwtApi: JwtApiConstructor<Credentials, AuthResponse, UserId>,

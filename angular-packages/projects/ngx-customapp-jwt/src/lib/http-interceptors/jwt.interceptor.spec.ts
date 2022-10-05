@@ -20,6 +20,7 @@ import {disableJwtInterception} from '../constants/disable-jwt-interception';
 import {JwtInterceptorDropsReportProgress} from '../errors';
 
 const testUrl = '/test'
+const excludeUrls = ['/exclude', /\.exclude$/]
 const testBody = {
   body: '1337',
 }
@@ -40,6 +41,7 @@ describe('JwtInterceptor', () => {
       authResponseToJwt: testAuthResponseToJwt,
       authResponseToUserInfo: testAuthResponseToUserInfo,
       authHeader: testAuthHeader,
+      excludeUrls,
     }
     TestBed.configureTestingModule({
       providers: [
@@ -159,5 +161,31 @@ describe('JwtInterceptor', () => {
     ).subscribe()
     const req = controller.expectOne(testUrl)
     expect(req.request.headers.has(testAuthHeader.name)).toBeFalsy()
+  }))
+  it('should exclude url that starts with some string', fakeAsync(() => {
+    const url = '/exclude/example/abc'
+    jwtService.freshJwt.and.returnValue(of(jwt))
+    http.post(
+      url, // starts with excludeUrls[0]
+      testBody,
+    ).subscribe()
+    tick()
+    const req = controller.expectOne(url)
+    expect(req.request.body).toEqual(testBody)
+    expect(req.request.headers.get(testAuthHeader.name))
+      .toBeFalsy()
+  }))
+  it('should exclude url that matches RegExp', fakeAsync(() => {
+    const url = '/any/url/ends/with.exclude'
+    jwtService.freshJwt.and.returnValue(of(jwt))
+    http.post(
+      url,
+      testBody
+    ).subscribe()
+    tick()
+    const req = controller.expectOne(url)
+    expect(req.request.body).toEqual(testBody)
+    expect(req.request.headers.get(testAuthHeader.name))
+      .toBeFalsy()
   }))
 })
