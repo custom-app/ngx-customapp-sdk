@@ -66,7 +66,7 @@ export class JwtGuard<Credentials,
                           tap(accessGranted => {
                             if (!accessGranted) {
                               this.noFreshJwtListener.noFreshJwt(
-                                `JwtGuard: tried to loginAgain, but ended unsuccessful with action: ${this.actionAppReady.type}`
+                                `JwtGuard: tried to loginAgain, but ended unsuccessful with action: ${this.actionAppNotReady.type}`
                               );
                             }
                           })
