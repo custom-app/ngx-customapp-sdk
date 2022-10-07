@@ -5,7 +5,7 @@
  * Message describes, where the noFreshJwtListener was called
  */
 export abstract class NoFreshJwtListener {
-  abstract noFreshJwt: (message?: string) => void
+  abstract noFreshJwt: (message: string) => void
 }
 
 export interface NoFreshJwtListenerConstructor {
