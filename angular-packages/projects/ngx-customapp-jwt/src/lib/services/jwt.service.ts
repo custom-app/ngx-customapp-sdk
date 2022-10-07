@@ -188,12 +188,12 @@ export class JwtService<Credentials,
       callWithFreshOnly,
       doNotCallNoFreshJwt
     })
-    const noFreshJwt = () => {
+    const noFreshJwt = (reason: string) => {
       this._deleteJwt()
       this._waitingForRefresh
         .forEach(({callback, callWithFreshOnly, doNotCallNoFreshJwt}) => {
           if (!doNotCallNoFreshJwt) {
-            this.noFreshJwtListener.noFreshJwt()
+            this.noFreshJwtListener.noFreshJwt(`JwtService: tried to refresh tokens, but ${reason}`)
           }
           if (!callWithFreshOnly) {
             callback()
@@ -210,7 +210,7 @@ export class JwtService<Credentials,
       this._waitingForRefresh = []
     }
     if (!jwt?.refreshToken || isJwtExpired(jwt.refreshToken)) {
-      noFreshJwt()
+      noFreshJwt('no refresh token or refresh token expired')
       return
     }
     if (!jwt.accessToken || isJwtExpired(jwt.accessToken)) {
@@ -226,7 +226,7 @@ export class JwtService<Credentials,
             },
             error: () => {
               this._refresh = undefined
-              noFreshJwt()
+              noFreshJwt('refresh token request errored')
             }
           })
       }
