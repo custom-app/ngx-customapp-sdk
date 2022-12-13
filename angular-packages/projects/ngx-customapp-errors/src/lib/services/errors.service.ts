@@ -3,7 +3,7 @@ import {ErrorsReporter} from '../models/errors-reporter';
 import {ERRORS_CONFIG} from '../constants/di-token';
 import {ErrorsConfig} from '../models/errors-config';
 import {throwError} from 'rxjs';
-import {addErrorContext, errorToUserText, normalizeError} from '../utils/errors';
+import {addErrorContext, errorToUserText, normalizeError} from '../utils/internal';
 import {LocaleId, NormalizedError} from '../models/errors-text';
 
 @Injectable({

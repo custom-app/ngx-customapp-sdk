@@ -92,3 +92,5 @@ export * from './lib/models/unhandled-error-handler'
 
 export * from './lib/constants/di-token'
 export * from './lib/constants/errors-text'
+
+export * from './lib/utils/public'

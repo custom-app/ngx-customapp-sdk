@@ -31,19 +31,24 @@ export interface ErrorsConfig {
   /**
    * Converts the error response from the backend into normalized error text, used as a key
    * to get human-readable error from {@link ErrorsConfig.errorsText}.
+   * Should handle null arguments, cos nothing is guaranteed. If null argument is passed,
+   * you could just return 'undefined' string and add it to {@link ErrorsConfig.errorsText}.
    * @param errorResponse the error response from the backend, detected by isErrorResponse function.
    */
   errorResponseToNormalizedError: (errorResponse: any) => NormalizedError
   /**
    * Can be used to extract non-translated information about error.
+   * Should handle null arguments, cos nothing is guaranteed.
    * @param errorResponse the error response from the backend, detected by {@link ErrorsConfig.isErrorResponse} function.
    */
   errorResponseToAppendix?: (errorResponse: any) => string | undefined
   /**
-   * Provides a function to send the error report to the backend. Must implement {@link ErrorsReporter} abstract class
+   * A service which provides a function to send the error report to the backend.
+   * Must implement {@link ErrorsReporter} abstract class
    */
   reporter: ErrorsReporterConstructor,
   /**
+   * A service used to handle unhandled errors.
    * The only method of this service is called, when an error is thrown
    * anywhere in an Angular app, and not caught by the app.
    * You may want to use it to show an error overlay,

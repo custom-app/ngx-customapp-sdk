@@ -1,6 +1,7 @@
 import {ContextError} from '../models/context-error';
 import {ErrorsText, LocaleId} from '../models/errors-text';
 import {ErrorsConfig} from '../models/errors-config';
+import {stringifyError} from './public';
 
 /**
  * @internal
@@ -11,22 +12,6 @@ export function normalizeError(error: any): string {
   return (error + '').toLocaleLowerCase()
 }
 
-/**
- * @internal
- * Safely transforms any error into the text. Prepares message to be the field of the JSON message.
- */
-export function stringifyError(error: any): string {
-  let str;
-  try {
-    str = JSON.stringify(error).replace(/"/g, '\'');
-    if (str === '{}') {
-      str = error + '';
-    }
-  } catch (e) {
-    str = (error + '').replace(/"/g, '\'');
-  }
-  return str;
-}
 
 /**
  * @internal

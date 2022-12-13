@@ -1,10 +1,10 @@
 /**
  * ### Usage
  *
- * Install.
+ * Install package and it's dependencies.
  *
  * ```sh
- * yarn add ngx-customapp-jwt
+ * yarn add @ngrx/store @ngrx/effects ngx-customapp-jwt
  * ```
  *
  * Create the config {@link JwtConfig}. You can read recommendations in the description of each field.
