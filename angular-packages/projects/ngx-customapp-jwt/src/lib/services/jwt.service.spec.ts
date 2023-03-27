@@ -51,7 +51,14 @@ describe('JwtService', () => {
       authResponseToUserInfo: testAuthResponseToUserInfo,
       authHeader: testAuthHeader,
       jwtApi: jwtApiSpy,
-      noFreshJwt: noFreshJwtSpy,
+      noFreshJwt: {
+        service: noFreshJwtSpy,
+        callWhen: {
+          interceptorNotFoundJwt: true,
+          guardNotFoundJwt: true,
+          loginAsJwtNotFound: true,
+        }
+      },
       jwtStorageKey
     }
     TestBed.configureTestingModule({
