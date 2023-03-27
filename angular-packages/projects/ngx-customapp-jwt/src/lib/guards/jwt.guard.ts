@@ -48,7 +48,7 @@ export class JwtGuard<Credentials,
               return of(true)
             } else {
               return this.jwtService
-                .freshJwt(false)
+                .freshJwt(!this.config.noFreshJwt?.callWhen.guardNotFoundJwt)
                 .pipe(
                   mergeMap(jwt => {
                     const accessJwt = jwt?.accessToken
@@ -65,9 +65,11 @@ export class JwtGuard<Credentials,
                           )),
                           tap(accessGranted => {
                             if (!accessGranted) {
-                              this.noFreshJwtListener.noFreshJwt(
-                                `JwtGuard: tried to loginAgain, but ended unsuccessful with action: ${this.actionAppNotReady.type}`
-                              );
+                              if (this.config.noFreshJwt?.callWhen.guardNotFoundJwt) {
+                                this.noFreshJwtListener.noFreshJwt(
+                                  `JwtGuard: tried to loginAgain, but ended unsuccessful with action: ${this.actionAppNotReady.type}`
+                                );
+                              }
                             }
                           })
                         )

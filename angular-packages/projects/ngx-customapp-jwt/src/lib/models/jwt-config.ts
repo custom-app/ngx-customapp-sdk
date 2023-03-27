@@ -40,7 +40,19 @@ export interface JwtConfig<Credentials,
    * Used to start actions, when refresh jwt failed. Usually you want to
    * redirect user to the login page.
    */
-  noFreshJwt: NoFreshJwtListenerConstructor
+  noFreshJwt: {
+    service: NoFreshJwtListenerConstructor,
+    /**
+     * If all fields are false, NoFreshJwtListener is never called.
+     * If you want to navigate to the auth page every time a JWT needed, but there was none,
+     * set all fields to true.
+     */
+    callWhen: {
+      interceptorNotFoundJwt: boolean,
+      guardNotFoundJwt: boolean,
+      loginAsJwtNotFound: boolean,
+    }
+  }
   /**
    * the key to be used in the localStorage.
    *

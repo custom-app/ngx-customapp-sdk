@@ -39,7 +39,7 @@ export class JwtModule {
         },
         {
           provide: NoFreshJwtListener,
-          useExisting: config.noFreshJwt,
+          useExisting: config.noFreshJwt.service,
         },
         {
           provide: JWT_ACTIONS,

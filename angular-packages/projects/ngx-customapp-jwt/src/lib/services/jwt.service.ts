@@ -143,7 +143,7 @@ export class JwtService<Credentials,
    */
   loginAs(userId: UserId): Observable<AuthResponse> {
     return this
-      .freshJwt(false)
+      .freshJwt(!this.config.noFreshJwt.callWhen.loginAsJwtNotFound)
       .pipe(
         mergeMap(jwt => {
           if (!jwt?.accessToken) {
