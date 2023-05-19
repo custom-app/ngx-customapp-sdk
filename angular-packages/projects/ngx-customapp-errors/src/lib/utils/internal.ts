@@ -33,24 +33,15 @@ export function getErrorText(
   error: string,
   locale: LocaleId,
   errorsText: ErrorsText,
-  errorResponseToAppendix?: (error: any) => string | undefined
+  appendix?: string
 ): string {
   if (error) {
     const errText = errorsText[locale][error.trim().toLowerCase()];
     if (errText) {
-      if (errorResponseToAppendix) {
-        try {
-          const appendix = errorResponseToAppendix(error)
-          return errText + (appendix && appendix !== 'undefined' ? appendix : '')
-        } catch (e) {
-          return errText
-        }
-      } else {
-        return errText
-      }
+      return errText + (appendix && appendix !== 'undefined' ? appendix : '')
     } else {
       // if there is no human-readable error text
-      return error + '';
+      return error + (appendix && appendix !== 'undefined' ? appendix : '')
     }
   } else {
     return errorsText[locale]['no connection'];
@@ -67,7 +58,13 @@ export function errorToUserText(
   locale: LocaleId,
 ): string {
   if (config.isErrorResponse(error)) {
-    return getErrorText(config.errorResponseToNormalizedError(error), locale, config.errorsText, config.errorResponseToAppendix);
+    let appendix: string | undefined
+    try {
+      appendix = config.errorResponseToAppendix?.(error)
+    } catch (e) {
+      appendix = undefined
+    }
+    return getErrorText(config.errorResponseToNormalizedError(error), locale, config.errorsText, appendix);
   } else if (error.message === 'Timeout has occurred') {
     // timeout of the observable (usually the request into socket)
     return getErrorText(error.message, locale, config.errorsText);
