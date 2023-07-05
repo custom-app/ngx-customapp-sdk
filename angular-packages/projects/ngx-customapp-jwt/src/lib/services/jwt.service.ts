@@ -41,7 +41,11 @@ export class JwtService<Credentials,
     return this.config.jwtStorageKey || defaultJwtStorageKey
   }
 
-  private _setJwt(jwt: JwtGroup<JwtInfo>): void {
+  /**
+   * Use this method with caution! You are supposed to set JWT only via login or loginAs!
+   * @param jwt
+   */
+  setJwt(jwt: JwtGroup<JwtInfo>): void {
     this._jwt = jwt
     if (this.isMasterUser) {
       // JWT is saved only for master user, cos otherwise we need to preserve UserInfo stash,
@@ -50,7 +54,11 @@ export class JwtService<Credentials,
     }
   }
 
-  private _deleteJwt(): void {
+  /**
+   * Use this method with caution! You are supposed to delete JWT only via logout!
+   * WILL NOT deactivate session or clear UserInfo from AppStore, only deletes locally stored JWT!
+   */
+  deleteJwt(): void {
     this._jwt = undefined
     if (this.isMasterUser) {
       localStorage.removeItem(this._storageKey)
@@ -89,7 +97,7 @@ export class JwtService<Credentials,
   }
 
   private _logoutSucceed(): void {
-    this._deleteJwt()
+    this.deleteJwt()
     // will set the JWT of the previous user (if there have been) into this.jwt
     this._unstashJwt()
   }
@@ -125,13 +133,13 @@ export class JwtService<Credentials,
           const jwt = this.config.authResponseToJwt(authResponse)
           // authorization by token may not return fresh tokens
           if (jwt && jwtNotNull(jwt)) {
-            this._setJwt(jwt)
+            this.setJwt(jwt)
           }
         }),
         catchError(error => {
           // if login errored, that means either there were no jwt at the moment, the login called,
           // or the jwt were invalid all the time
-          this._deleteJwt();
+          this.deleteJwt();
           throw error;
         })
       )
@@ -189,7 +197,7 @@ export class JwtService<Credentials,
       doNotCallNoFreshJwt
     })
     const noFreshJwt = (reason: string) => {
-      this._deleteJwt()
+      this.deleteJwt()
       this._waitingForRefresh
         .forEach(({callback, callWithFreshOnly, doNotCallNoFreshJwt}) => {
           if (!doNotCallNoFreshJwt) {
@@ -221,7 +229,7 @@ export class JwtService<Credentials,
           .subscribe({
             next: refreshed => {
               this._refresh = undefined
-              this._setJwt(refreshed)
+              this.setJwt(refreshed)
               freshJwt(refreshed)
             },
             error: () => {
